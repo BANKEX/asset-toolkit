@@ -1,0 +1,32 @@
+.header {
+  height: 135px;
+  &-inner {
+    position: relative;
+    &-logo {
+      position: absolute;
+      left: 0;
+      top: 50px;
+    }
+    &-title {
+      position: absolute;
+      right: 0;
+      top: 50px;
+      line-height: 39px;
+      font-size: 16px;
+      letter-spacing: 1.3px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    &-address {
+      position: absolute;
+      right: 0;
+      top: 80px;
+      line-height: 39px;
+      font-size: 10px;
+      letter-spacing: 1.3px;
+      font-weight: 600;
+    }
+  }
+}
+
+

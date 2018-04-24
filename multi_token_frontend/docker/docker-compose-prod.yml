@@ -1,0 +1,18 @@
+version: '3'
+
+services:
+  multitikenfrontend:
+    image: $CI_REGISTRY_IMAGE
+    container_name: multitikenfrontend
+    restart: always
+    expose:
+      - "80"
+    environment:
+      VIRTUAL_HOST: $VIRTUAL_HOST
+      LETSENCRYPT_HOST: $LETSENCRYPT_HOST
+      LETSENCRYPT_EMAIL: $LETSENCRYPT_EMAIL
+
+networks:
+  default:
+    external:
+      name: frontend_default

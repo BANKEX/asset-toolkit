@@ -1,0 +1,15 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title><%= htmlWebpackPlugin.options.title %></title>
+    <link rel="icon" type="image/x-icon" href="assets/favicon.png">
+    <base href="/"/>
+    <!-- <base href="<%= htmlWebpackPlugin.options.metadata.baseUrl %>"> -->
+    <%= htmlWebpackPlugin.files.webpackManifest %>
+  </head>
+  <body>
+    <app-root>
+    </app-root>
+  </body>
+</html>

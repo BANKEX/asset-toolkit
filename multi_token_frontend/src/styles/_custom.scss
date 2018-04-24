@@ -1,0 +1,36 @@
+.btn {
+  border-radius: 20px;
+
+  &.pl {
+    box-shadow: -2px 2px 5px lightgrey;
+    margin-left: 15px;
+    padding-left: 30px;
+    padding-right: 30px;
+
+  }
+
+  &.spinner {
+    background: white;
+    img {
+      position: absolute;
+      right: 24px;
+      top: -2px;
+    }
+  }
+}
+
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+}
+
+button {
+  position: relative;
+}
+select {
+  outline: none;
+  option {
+    color: grey;
+    padding: 2px 3px;
+  }
+}

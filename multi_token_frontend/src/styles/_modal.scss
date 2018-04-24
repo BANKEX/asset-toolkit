@@ -1,0 +1,25 @@
+.modal-dialog {
+  .modal-header {
+    background-color: #fafafa;
+    .modal-title {
+      width: 100%;
+      text-align: center;
+    }
+  }
+  .modal-body {
+    padding: 1rem 2rem;
+    .scroller {
+      max-height: 650px;
+    }
+  }
+  .modal-footer .btn {
+    margin: 5px auto;
+    font-size: 16px;
+  }
+}
+
+@include media-breakpoint-down(md) {
+  .modal-dialog {
+    max-width: 550px;
+  }
+}
