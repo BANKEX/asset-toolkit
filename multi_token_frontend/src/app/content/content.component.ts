@@ -12,10 +12,7 @@ export class ContentComponent implements OnInit {
     private $connection: ConnectionService,
     private $overlay: LoadingOverlayService,
   ) {
-    $connection.subscribe((state: Connection) => {
-      // tslint:disable-next-line:no-unused-expression
-      state === Connection.Estableshed && $overlay.hideOverlay();
-    })
+
   }
 
   ngOnInit(): void { }
