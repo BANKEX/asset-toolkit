@@ -1,0 +1,26 @@
+.footer, .header {
+  padding-left: 32px;
+  padding-right: 32px;
+  &-inner {
+    height: 112px;
+    position: relative;
+    &-copyright, &-link {
+      position: absolute;
+      top: 40px;
+      line-height: 40px;
+      letter-spacing: 1.2px;
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    &-copyright {
+      left: 0;
+    }
+    &-link {
+      right: 0;
+      a {
+        color: #0da9ff;
+      }
+    }
+  }
+}
