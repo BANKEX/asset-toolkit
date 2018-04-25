@@ -8,7 +8,6 @@ import { HelperService } from '.';
 import { ErrorMessageService } from '../shared/services';
 import { ToastyService } from 'ng2-toasty';
 import { BlockingNotificationOverlayService } from '../shared/services';
-
 declare const require: any;
 
 @Injectable()
@@ -25,6 +24,7 @@ export class ConnectionService extends BehaviorSubject<Connection> {
   private account: string;
   private utils = (Web3 as any).utils;
   private useHardcodedContractData = false;
+  private balances: any;
 
   public constructor(
     private $error: ErrorMessageService,
@@ -33,21 +33,17 @@ export class ConnectionService extends BehaviorSubject<Connection> {
   ) {
     super(Connection.None); // set initial connection state
     this.web3 = this.checkAndInstantiateWeb3();
-    this.connect();
   }
 
-  public connect() {
+  public async connect(contractHash) {
     this.next(Connection.InProcess);
     try {
-      this.init().then(() => {
-        this.contract = new this.web3.eth.Contract(this.contractData.abi);
-        this.contract.options.address = this.contractData.address;
-        this.contract.options.from = this.account;
-        this.next(Connection.Estableshed);
-        this.startLoops();
-      }, () => {
-        this.next(Connection.None);
-      });
+      await this.init();
+      this.contract = new this.web3.eth.Contract(this.contractData.abi, contractHash);
+      await this.getBalances();
+      this.subscribeBlockChain();
+      this.next(Connection.Estableshed);
+      this.startLoops();
     } catch (e) {
       this.$blockingNotificationOverlay.setOverlayMessage('Sorry, can not connect to the blockchain. ' +
         'Please check your settings and try again.');
@@ -61,6 +57,8 @@ export class ConnectionService extends BehaviorSubject<Connection> {
 
   private init = () => {
     return new Promise((resolve, reject) => {
+      console.log('init');
+
       if (!this.web3) {
         this.$blockingNotificationOverlay.setOverlayMessage('No Metamask');
         this.$blockingNotificationOverlay.showOverlay();
@@ -90,6 +88,60 @@ export class ConnectionService extends BehaviorSubject<Connection> {
           resolve();
         });
       });
+    });
+  };
+
+  private getBalances = async () => {
+    const cells = [];
+    const balances = {};
+    const transferedCells = await this.contract.getPastEvents('Transfer', { fromBlock: 0, filter: [{ from: this.account }, { to: this.account }]});
+    transferedCells.forEach((ev) => {
+      const { tokenId }  = ev.returnValues;
+      if (cells.indexOf(tokenId)==-1) cells.push(tokenId);
+    });
+    await Promise.all(cells.map(async (tokenId) => {
+      this.balances[tokenId] = await this.getBalance(tokenId);
+      return null;
+    }));
+  };
+
+  private getBalance = async (tokenId) => {
+    const amount = await this.contract.methods.balanceOf(tokenId, this.account).call();
+    const totalSupply = await this.contract.methods.totalSupply(tokenId).call();
+    const part = amount / totalSupply;
+    const pending = {};
+    return { amount, part, pending };
+  };
+
+  private getDetails = async (tokenId) => {
+    const transfersOnTokenId = await this.contract.getPastEvents('Transfer', { fromBlock: 0, filter: [{ from: this.account, tokenId }, { to: this.account, tokenId }]});
+    return await Promise.all(transfersOnTokenId.map(async (ev) => {
+      const blockAdded = await this.web3.eth.getBlock(ev.blockHash);
+      const date = blockAdded.timestamp*1000;
+      const plus = (ev.returnValues.to == this.account);
+      const address = (plus) ? ev.returnValues.from : ev.returnValues.to;
+      const value = (plus) ? ev.returnValues.value : -ev.returnValues.value;
+      return { address, date, value };
+    }));
+  };
+
+  private sendTokens = async (tokenId, address, amount) => {
+    const balance = await this.contract.methods.balanceOf(tokenId, this.account).call();
+    if (balance < amount) throw new Error('not enough tokens');
+    const transactionHash = await this.contract.methods.transfer(tokenId, address, amount).send({from: this.account});
+    this.balances[tokenId].pending[transactionHash] = -amount;
+    // render view this tokenId balance
+
+  };
+
+  private subscribeBlockChain = () => {
+    this.contract.events.Transfer({
+      fromBlock: 'latest',
+      filter: [{ from: this.account }, { to: this.account }]
+    }).on('data', async (event) => {
+      const { tokenId } = event.returnValues;
+      this.balances[tokenId] = await this.getBalance(tokenId);
+      // render view this tokenId balance
     });
   };
 

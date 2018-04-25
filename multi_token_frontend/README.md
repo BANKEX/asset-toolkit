@@ -7,7 +7,7 @@ https://multitoken.staging.bankex.team
 
 Clone this repo and CD in it's folder.
 
-$ npm install
+`$ npm install`
 
 Now you can start dev server with aot:
 
