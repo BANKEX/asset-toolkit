@@ -4,4 +4,5 @@ export * from './connection.enum';
 export * from './contract-data';
 export * from './confirmation-response';
 export * from './confirmation-status';
-export * from './loading-overlay.config'
+export * from './loading-overlay.config';
+export * from './multitoken';

@@ -1,0 +1,15 @@
+.history
+  .history-inner
+    h2 Transactions
+    .history-list.deposit
+      perfect-scrollbar
+        .transaction(*ngFor="let item of transactions | orderBy:sortBy.id:sortBy.reverse")
+          .transaction-number {{item.value}}
+          .transaction-address {{item.address}}
+          .transaction-date(*ngIf="item.date") {{item.date | date}}
+          .transaction-date(*ngIf="!item.date")
+            img(src="/assets/spinner.gif", alt="transaction in process")
+    //-.history-sort
+      label Sort by
+      select([(ngModel)]="sortBy")
+        option(*ngFor="let option of sortOptions, let i = index", [ngValue]="option") {{option.name}}

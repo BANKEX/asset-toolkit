@@ -1,0 +1,99 @@
+.history {
+  max-height: 350px;
+  min-height: 350px;
+  padding: 32px 100px;
+  background: #0da9ff;
+  color: #fff;
+  border-bottom-right-radius: 4px;
+  border-bottom-left-radius: 4px;
+
+  h2, label {
+    color: #fff;
+    margin-right: 10px;
+  }
+
+  select option {
+    color: grey;
+    padding: 2px 3px;
+  }
+
+  .transaction {
+    background: rgba(255, 255, 255, 0.1);
+
+    &-date {
+      float: right;
+      text-align: center;
+   }
+ }
+
+  .pane {
+    height: 250px;
+  }
+
+  .finish-withdrawal {
+    height: 30px;
+    top: 0px;
+    margin-left: 150px;
+    line-height: 12px;
+    font-size: 16px;
+    padding: 8px 40px;
+    text-align: center;
+    right: 0;
+    left: 0%;
+    margin-right: 2em;
+    cursor: default;
+  }
+
+  &-tabs {
+    position: absolute;
+    top: 0;
+    left: 200px;
+    line-height: 32px;
+    font-size: 14px;
+    text-transform: uppercase;
+    font-weight: bold;
+    letter-spacing: 1.5px;
+    margin-left: -8px;
+
+    li {
+      padding: 0 8px;
+      border-left: 1px solid rgba(255, 255, 255, 0.2);
+
+      &:first-child {
+        border: none;
+      }
+
+      &.is-active a {
+        color: #fff;
+      }
+
+      a {
+        font-size: 14px !important;
+        line-height: 32px;
+      }
+    }
+  }
+
+  &-inner {
+    position: relative;
+  }
+
+  &-list {
+    height: 240px;
+    margin-right: -32px;
+  }
+
+  &-sort {
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+
+  &-info {
+    text-align: center;
+    font-size: 17px;
+    line-height: 32px;
+    padding: 24px 0 20px 0;
+    font-family: 'Lora';
+  }
+}

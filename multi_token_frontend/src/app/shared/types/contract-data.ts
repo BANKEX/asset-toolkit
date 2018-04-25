@@ -2,15 +2,19 @@ export class ContractData {
 
   public address;
   public abi;
-  public apiAddress?;
 
   /**
-   * Returns hardcoded settings if needed
+   * Returns hardcoded settings
    */
   static getData() {
     return {
-    apiAddress: '',
-    address: '0x075aeb00624b5fe91a003bd00667285860ad490e',
-    abi: require('../_data/MultiToken.json').abi
+    address: '0xb16214a724f85030196d241da1f307890cc2c4d6',
+    abi: require('../data/MultiToken.json').abi
   }}
+
+  public constructor(_address?: string) {
+    const data = ContractData.getData();
+    this.address = _address || data.address;
+    this.abi = data.abi;
+  }
 }

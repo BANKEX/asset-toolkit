@@ -1,0 +1,113 @@
+.tokens {
+  padding: 32px 100px;
+  max-height: 350px;
+
+  label {
+    margin-right: 10px;
+  }
+
+  select option {
+    color: grey;
+    padding: 2px 3px;
+  }
+
+  &-inner {
+    position: relative;
+  }
+
+  &-sort {
+    position: absolute;
+    right: 0;
+    top: 12px;
+  }
+
+  &-list {
+    height: 240px;
+    margin-right: -32px;
+    margin-top: -5px;
+  }
+
+  .token-controls {
+    position: absolute;
+    right: 0;
+    top: 0;
+
+    span {
+      display: inline-block;
+      text-align: center;
+      width: 48px;
+      height: 48px;
+      padding-top: 10px;
+      cursor: pointer;
+      transition: all 0.5s;
+
+      &:hover {
+        background: #0da9ff;
+      }
+
+      &:hover svg * {
+        fill: #fff;
+      }
+    }
+  }
+
+  &-info {
+    text-align: center;
+    font-size: 17px;
+    line-height: 32px;
+    padding: 24px 0 20px 0;
+    font-family: 'Lora';
+  }
+}
+
+.token, .transaction {
+  position: relative;
+  font-size: 0;
+  background: rgba(10, 60, 87, 0.03);
+  border-radius: 4px;
+  height: 48px;
+  line-height: 48px;
+  margin-bottom: 16px;
+  padding: 2px 24px 0 16px;
+  margin-right: 15px;
+
+  &-address,
+  &-date,
+  &-number,
+  &-sum {
+    display: inline-block;
+    font-size: 14px;
+  }
+
+  &-sum {
+    width: 250px;
+    text-align: right;
+    margin-right: 2em;
+    text-transform: uppercase;
+  }
+
+  &-address {
+    width: 450px;
+    text-transform: uppercase;
+  }
+
+  &-number {
+    width: 100px;
+    text-transform: uppercase;
+  }
+
+  &-date {
+    width: 100px;
+  }
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.ps__rail-x, .ps__rail-x:hover, .ps__rail-y, .ps__rail-y:hover {
+  background-color: initial !important;
+  .ps__thumb-x, .ps__thumb-x:hover, .ps__thumb-y, .ps__thumb-y:hover {
+    background-color: #0da9ff !important;
+  }
+}

@@ -8,12 +8,6 @@ import { Connection } from '../shared/types';
   templateUrl: './content.component.pug',
 })
 export class ContentComponent implements OnInit {
-  public constructor(
-    private $connection: ConnectionService,
-    private $overlay: LoadingOverlayService,
-  ) {
-
-  }
 
   ngOnInit(): void { }
 }
