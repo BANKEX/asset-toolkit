@@ -102,8 +102,6 @@ export class MultitokenService {
         details.push(pend);
       });
     }
-    // details.push({address: 'test', value: -3, date: 0}) // -----------TEST ------------
-    // details.push({address: 'test', value: -5, date: 0}) // -----------TEST ------------
     this.transactions.next(details);
     this.lastToken = tokenId;
   };
