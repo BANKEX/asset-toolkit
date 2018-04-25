@@ -33,6 +33,7 @@ export class ConnectionService extends BehaviorSubject<Connection> {
   ) {
     super(Connection.None); // set initial connection state
     this.web3 = this.checkAndInstantiateWeb3();
+    this.connect('0xc228110fe7eedc5f6524fb75eb12f167e9b9fd5b');
   }
 
   public async connect(contractHash) {
@@ -40,13 +41,18 @@ export class ConnectionService extends BehaviorSubject<Connection> {
     try {
       await this.init();
       this.contract = new this.web3.eth.Contract(this.contractData.abi, contractHash);
-      await this.getBalances();
+      this.balances = await this.getBalances();
+      setTimeout(() => {console.log(this.balances)}, 1000);
+      setTimeout(async () => {
+        const det = await this.getDetails(2);
+        console.log(det);
+      }, 3000);
       this.subscribeBlockChain();
       this.next(Connection.Estableshed);
       this.startLoops();
     } catch (e) {
-      this.$blockingNotificationOverlay.setOverlayMessage('Sorry, can not connect to the blockchain. ' +
-        'Please check your settings and try again.');
+      // this.$blockingNotificationOverlay.setOverlayMessage('Sorry, can not connect to the blockchain. ' +  'Please check your settings and try again.');
+      this.$blockingNotificationOverlay.setOverlayMessage(e);
       this.$blockingNotificationOverlay.showOverlay();
       this.next(Connection.None);
       console.error(e);
@@ -57,8 +63,6 @@ export class ConnectionService extends BehaviorSubject<Connection> {
 
   private init = () => {
     return new Promise((resolve, reject) => {
-      console.log('init');
-
       if (!this.web3) {
         this.$blockingNotificationOverlay.setOverlayMessage('No Metamask');
         this.$blockingNotificationOverlay.showOverlay();
@@ -76,7 +80,7 @@ export class ConnectionService extends BehaviorSubject<Connection> {
         this.account = acc[0]; // save account data
         this.web3.eth.net.getNetworkType((e, net) => {
           if (e) { reject(e); return; }
-          if (net !== 'rinkeby') { // && net !== 'private'
+          if (net !== 'rinkeby' && net !== 'private') { // && net !== 'private'
             this.$blockingNotificationOverlay.setOverlayMessage('Choose Rinkeby Network');
             this.$blockingNotificationOverlay.showOverlay();
             return reject('Choose Rinkeby Network');
@@ -100,9 +104,10 @@ export class ConnectionService extends BehaviorSubject<Connection> {
       if (cells.indexOf(tokenId)==-1) cells.push(tokenId);
     });
     await Promise.all(cells.map(async (tokenId) => {
-      this.balances[tokenId] = await this.getBalance(tokenId);
+      balances[tokenId] = await this.getBalance(tokenId);
       return null;
     }));
+    return balances;
   };
 
   private getBalance = async (tokenId) => {
