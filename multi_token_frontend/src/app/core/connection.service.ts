@@ -8,7 +8,6 @@ import { HelperService } from '.';
 import { ErrorMessageService } from '../shared/services';
 import { ToastyService } from 'ng2-toasty';
 import { BlockingNotificationOverlayService } from '../shared/services';
-
 declare const require: any;
 
 @Injectable()
@@ -25,6 +24,7 @@ export class ConnectionService extends BehaviorSubject<Connection> {
   private account: string;
   private utils = (Web3 as any).utils;
   private useHardcodedContractData = false;
+  private balances: any;
 
   public constructor(
     private $error: ErrorMessageService,
@@ -33,21 +33,16 @@ export class ConnectionService extends BehaviorSubject<Connection> {
   ) {
     super(Connection.None); // set initial connection state
     this.web3 = this.checkAndInstantiateWeb3();
-    this.connect();
   }
 
-  public connect() {
+  public async connect(contractHash) {
     this.next(Connection.InProcess);
     try {
-      this.init().then(() => {
-        this.contract = new this.web3.eth.Contract(this.contractData.abi);
-        this.contract.options.address = this.contractData.address;
-        this.contract.options.from = this.account;
-        this.next(Connection.Estableshed);
-        this.startLoops();
-      }, () => {
-        this.next(Connection.None);
-      });
+      await this.init();
+      this.contract = new this.web3.eth.Contract(this.contractData.abi, contractHash);
+      this.balances = await this.getBalances();
+      this.next(Connection.Estableshed);
+      this.startLoops();
     } catch (e) {
       this.$blockingNotificationOverlay.setOverlayMessage('Sorry, can not connect to the blockchain. ' +
         'Please check your settings and try again.');
@@ -91,6 +86,34 @@ export class ConnectionService extends BehaviorSubject<Connection> {
         });
       });
     });
+  };
+
+  private getBalances = async () => {
+    const transferedCells = await this.contract.getPastEvents('Transfer', { fromBlock: 0, filter: [{ from: this.account }, { to: this.account }]});
+    const cells = [];
+    transferedCells.forEach((ev) => {
+      const { tokenId }  = ev.returnValues;
+      if (cells.indexOf(tokenId)==-1) cells.push(tokenId);
+    });
+    return await Promise.all(cells.map(async (tokenId) => {
+      const amount = await this.contract.methods.balanceOf(tokenId, this.account).call();
+      const totalSupply = await this.contract.methods.totalSupply(tokenId).call();
+      const part = amount / totalSupply;
+      const pending = {};
+      return { tokenId, amount, part, pending };
+    }));
+  };
+
+  private getDetails = async (tokenId) => {
+    const transfersOnTokenId = await this.contract.getPastEvents('Transfer', { fromBlock: 0, filter: [{ from: this.account, tokenId }, { to: this.account, tokenId }]});
+    return await Promise.all(transfersOnTokenId.map(async (ev) => {
+      const blockAdded = await this.web3.eth.getBlock(ev.blockHash);
+      const date = blockAdded.timestamp*1000;
+      const plus = (ev.returnValues.to == this.account);
+      const address = (plus) ? ev.returnValues.from : ev.returnValues.to;
+      const value = (plus) ? ev.returnValues.value : -1 * ev.returnValues.value;
+      return { address, date, value };
+    }));
   };
 
   private startLoops() {
