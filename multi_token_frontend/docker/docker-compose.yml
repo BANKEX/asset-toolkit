@@ -1,9 +1,9 @@
 version: '3'
 
 services:
-  multitikenfrontend-stage:
+  multitokenfrontend-stage:
     image: $CI_REGISTRY_IMAGE
-    container_name: multitikenfrontend-stage
+    container_name: multitokenfrontend-stage
     restart: always
     expose:
       - "80"
