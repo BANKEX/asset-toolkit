@@ -14,7 +14,7 @@ const ProgressPlugin = require('webpack/lib/ProgressPlugin');
 
 const ENV = process.env.NODE_ENV = process.env.ENV = 'production';
 const HOST = process.env.HOST || 'localhost';
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 9090;
 
 const metadata = webpackMerge(commonConfig({ENV}).metadata, {
   HOST,

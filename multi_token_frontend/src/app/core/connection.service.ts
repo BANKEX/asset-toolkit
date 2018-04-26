@@ -2,13 +2,12 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, Subject } from 'rxjs/Rx';
 import { Connection, ContractData } from '../shared/types';
 import { Account, Contract, Tx } from 'web3/types';
-import Web3 from 'web3';
-import to from 'await-to-js';
+import { to } from 'await-to-js';
 import { HelperService } from '.';
 import { ErrorMessageService } from '../shared/services';
 import { ToastyService } from 'ng2-toasty';
 import { BlockingNotificationOverlayService } from '../shared/services';
-declare const require: any;
+import * as Web3 from 'web3';
 
 @Injectable()
 export class ConnectionService extends BehaviorSubject<Connection> {
@@ -22,9 +21,9 @@ export class ConnectionService extends BehaviorSubject<Connection> {
   public contractData: ContractData;
   public account: string;
 
-  private utils = (Web3 as any).utils;
   private useHardcodedContractData = false;
   private balances: any;
+  private Web3: any = Web3;
 
   public constructor(
     private $error: ErrorMessageService,
@@ -100,13 +99,13 @@ export class ConnectionService extends BehaviorSubject<Connection> {
         'Using web3 detected from external source. If you find that your accounts don\'t appear or you have 0 MetaCoin, ensure you\'ve configured that source properly. If using MetaMask, see the following link. Feel free to delete this warning. :) http://truffleframework.com/tutorials/truffle-and-metamask'
       );
       // Use Mist/MetaMask's provider
-      return new Web3((window as any).web3.currentProvider);
+      return new this.Web3((window as any).web3.currentProvider);
     } else {
       console.warn(
         'No web3 detected. Falling back to http://localhost:8545. You should remove this fallback when you deploy live, as it\'s inherently insecure. Consider switching to Metamask for development. More info here: http://truffleframework.com/tutorials/truffle-and-metamask'
       );
       // fallback - use your fallback strategy (local node / hosted node + in-dapp id mgmt / fail)
-      return new Web3(new Web3.providers.HttpProvider('https://rpcprovider.staging.bankex.team:8635'));
+      return new this.Web3(new this.Web3.providers.HttpProvider('https://rpcprovider.staging.bankex.team:8635'));
     }
   }
 
