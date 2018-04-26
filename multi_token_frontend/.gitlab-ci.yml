@@ -5,5 +5,4 @@ setup:
   image: ubuntu
   stage: setup
   script:
-    - cat $DOCKER_CA
     - echo $DOCKER_CA
