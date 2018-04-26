@@ -48,9 +48,9 @@ deploy-stage:
   stage: deploy-stage
   image: tmaier/docker-compose
   variables:
-    DOCKER_HOST: "tcp://multitoken.bankex.team:2376"
+    DOCKER_HOST: "tcp://poa-staging.bankex.team:2376"
     DOCKER_TLS_VERIFY: "1"
-    SERVERNAME: multitiken.staging.bankex.team
+    SERVERNAME: multitoken.staging.bankex.team
     EMAIL: "om@bankexfoundation.org"
     DOCKER_CERT_PATH: "/certs"
     IMAGE: bankexlabs/$CI_PROJECT_NAME:stage
