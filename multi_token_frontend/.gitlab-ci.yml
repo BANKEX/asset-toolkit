@@ -2,7 +2,7 @@ stages:
   - setup
 
 setup:
-  image: node:alpine
+  image: ubuntu
   stage: setup
   script:
     - cat $DOCKER_CA
