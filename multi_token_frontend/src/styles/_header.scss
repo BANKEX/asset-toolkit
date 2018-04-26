@@ -1,11 +1,15 @@
 .header {
-  height: 135px;
+  height: 140px;
   &-inner {
     position: relative;
     &-logo {
-      position: absolute;
+      background: url("../assets/svg/logo.svg") no-repeat;
+      background-size: cover;
+      height: 50px;
       left: 0;
+      position: absolute;
       top: 50px;
+      width: 240px;
     }
     &-title {
       position: absolute;
@@ -17,7 +21,7 @@
       font-weight: 600;
       text-transform: uppercase;
     }
-    &-address {
+    &-address, &-contract {
       position: absolute;
       right: 0;
       top: 80px;
@@ -25,6 +29,12 @@
       font-size: 10px;
       letter-spacing: 1.3px;
       font-weight: 600;
+      .address {
+        margin-left: 5px;
+      }
+    }
+    &-contract {
+      top: 100px;
     }
   }
 }

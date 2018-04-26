@@ -131,7 +131,8 @@ textarea, textarea:focus {
 }
 
 .container {
-  width: 1180px !important;
+  // width: 1180px !important;
+  min-width: 900px !important;
   margin: auto;
   max-width: 1180px !important;
   padding: 0 !important;

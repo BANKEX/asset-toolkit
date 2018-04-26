@@ -13,8 +13,9 @@ export class BlockingNotificationOverlayComponent implements OnInit, OnDestroy {
   public message: string;
   private componentDestroyed: Subject<void> = new Subject<void>();
 
-  constructor(private blockingNotificationOverlayService: BlockingNotificationOverlayService) {
-  }
+  constructor(
+    private blockingNotificationOverlayService: BlockingNotificationOverlayService
+  ) {}
 
   public ngOnInit(): void {
     this.blockingNotificationOverlayService.onSetMessage()

@@ -5,7 +5,7 @@ https://multitoken.staging.bankex.team
 
 ## Installation on the local machine:
 
-Clone this repo and CD in it's folder.
+Clone this repo and CD in created folder.
 
 `$ npm install`
 

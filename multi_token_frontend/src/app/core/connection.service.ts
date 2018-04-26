@@ -19,9 +19,9 @@ export class ConnectionService extends BehaviorSubject<Connection> {
   public err: Subject<Error> = new Subject();
   public web3: any;
   public contract: Contract;
-  public contractData: ContractData = ContractData.getData();
+  public contractData: ContractData;
+  public account: string;
 
-  private account: string;
   private utils = (Web3 as any).utils;
   private useHardcodedContractData = false;
   private balances: any;
@@ -33,28 +33,18 @@ export class ConnectionService extends BehaviorSubject<Connection> {
   ) {
     super(Connection.None); // set initial connection state
     this.web3 = this.checkAndInstantiateWeb3();
-    setTimeout(() => {
-      this.connect('0xc228110fe7eedc5f6524fb75eb12f167e9b9fd5b');
-    }, 1000);
+    this.connect();
   }
 
-  public async connect(contractHash) {
+  public async connect(contractHash?: string) {
     this.next(Connection.InProcess);
+    this.contractData = new ContractData(contractHash);
     try {
       await this.init();
-      this.contract = new this.web3.eth.Contract(this.contractData.abi, contractHash);
-      this.balances = await this.getBalances();
-      console.log(this.balances);
-
-      Object.getOwnPropertyNames(this.balances).forEach(async (tokenId) => {
-        console.log(await this.getDetails(tokenId));
-      });
-
-      this.subscribeBlockChain();
+      this.contract = new this.web3.eth.Contract(this.contractData.abi, this.contractData.address);
       this.next(Connection.Estableshed);
-      // this.startLoops();
+      this.startLoops();
     } catch (e) {
-      // this.$blockingNotificationOverlay.setOverlayMessage('Sorry, can not connect to the blockchain. ' +  'Please check your settings and try again.');
       this.$blockingNotificationOverlay.setOverlayMessage(e);
       this.$blockingNotificationOverlay.showOverlay();
       this.next(Connection.None);
@@ -80,7 +70,7 @@ export class ConnectionService extends BehaviorSubject<Connection> {
           this.$blockingNotificationOverlay.showOverlay();
           return reject('Metamask Locked');
         }
-        this.account = acc[2]; // save account data
+        this.account = acc[0]; // save account data
         this.web3.eth.net.getNetworkType((e, net) => {
           if (e) { reject(e); return; }
           if (net !== 'rinkeby' && net !== 'private') { // && net !== 'private'
@@ -98,76 +88,8 @@ export class ConnectionService extends BehaviorSubject<Connection> {
     });
   };
 
-  private getBalances = async () => {
-    const cells = [];
-    const balances = {};
-    const transferedCellsFrom = await this.contract.getPastEvents('Transfer', { fromBlock: 0, filter: { from: this.account }});
-    const transferedCellsTo = await this.contract.getPastEvents('Transfer', { fromBlock: 0, filter: { to: this.account }});
-    const transferedCells = transferedCellsFrom.concat(transferedCellsTo);
-    transferedCells.forEach((ev) => {
-      const { tokenId }  = ev.returnValues;
-      if (cells.indexOf(tokenId)==-1) cells.push(tokenId);
-    });
-    await Promise.all(cells.map(async (tokenId) => {
-      balances[tokenId] = await this.getBalance(tokenId);
-      return null;
-    }));
-    return balances;
-  };
-
-  private getBalance = async (tokenId) => {
-    const amount = await this.contract.methods.balanceOf(tokenId, this.account).call();
-    const totalSupply = await this.contract.methods.totalSupply(tokenId).call();
-    const part = amount / totalSupply;
-    const pending = {};
-    return { amount, part, pending };
-  };
-
-  private getDetails = async (tokenId) => {
-    const transfersOnTokenIdFrom = await this.contract.getPastEvents('Transfer', { fromBlock: 0, filter: { from: this.account, tokenId }});
-    const transfersOnTokenIdTo = await this.contract.getPastEvents('Transfer', { fromBlock: 0, filter: { to: this.account, tokenId }});
-    const transfersOnTokenId = transfersOnTokenIdFrom.concat(transfersOnTokenIdTo);
-    return await Promise.all(transfersOnTokenId.map(async (ev) => {
-      const blockAdded = await this.web3.eth.getBlock(ev.blockHash);
-      const date = blockAdded.timestamp*1000;
-      const plus = (ev.returnValues.to == this.account);
-      const address = (plus) ? ev.returnValues.from : ev.returnValues.to;
-      const value = Number((plus) ? ev.returnValues.value : -ev.returnValues.value);
-      return { address, date, value };
-    }));
-  };
-
-  private sendTokens = async (tokenId, address, amount) => {
-    const balance = await this.contract.methods.balanceOf(tokenId, this.account).call();
-    if (balance < amount) throw new Error('not enough tokens');
-    const transactionHash = await this.contract.methods.transfer(tokenId, address, amount).send({from: this.account});
-    this.balances[tokenId].pending[transactionHash] = -amount;
-    // render view this tokenId balance
-  };
-
-  private subscribeBlockChain = () => {
-    this.contract.events.Transfer({
-      fromBlock: 'latest',
-      filter: { from: this.account }
-    }).on('data', async (event) => {
-      const { tokenId } = event.returnValues;
-      this.balances[tokenId] = await this.getBalance(tokenId);
-      console.log(this.balances[tokenId]);
-      // render view this tokenId balance
-    });
-    this.contract.events.Transfer({
-      fromBlock: 'latest',
-      filter: { to: this.account }
-    }).on('data', async (event) => {
-      const { tokenId } = event.returnValues;
-      this.balances[tokenId] = await this.getBalance(tokenId);
-      console.log(this.balances[tokenId]);
-      // render view this tokenId balance
-    });
-  };
-
   private startLoops() {
-    const accountInterval = setInterval(this.watchAccountChange.bind(this), 1000); // turned off
+    const accountInterval = setInterval(this.watchAccountChange.bind(this), 1000);
   }
 
   private checkAndInstantiateWeb3() {
@@ -178,8 +100,7 @@ export class ConnectionService extends BehaviorSubject<Connection> {
         'Using web3 detected from external source. If you find that your accounts don\'t appear or you have 0 MetaCoin, ensure you\'ve configured that source properly. If using MetaMask, see the following link. Feel free to delete this warning. :) http://truffleframework.com/tutorials/truffle-and-metamask'
       );
       // Use Mist/MetaMask's provider
-      // return new Web3((window as any).web3.currentProvider);
-      return new Web3(new Web3.providers.WebsocketProvider("ws://localhost:8545"))
+      return new Web3((window as any).web3.currentProvider);
     } else {
       console.warn(
         'No web3 detected. Falling back to http://localhost:8545. You should remove this fallback when you deploy live, as it\'s inherently insecure. Consider switching to Metamask for development. More info here: http://truffleframework.com/tutorials/truffle-and-metamask'

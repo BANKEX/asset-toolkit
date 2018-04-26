@@ -1,13 +1,15 @@
 import {
   ConnectionService,
   EventService,
+  FormService,
   HelperService,
-  FormService
+  MultitokenService,
 } from './core';
 
 export const APP_PROVIDERS = [
   ConnectionService,
   EventService,
   FormService,
-  HelperService
+  HelperService,
+  MultitokenService,
 ];
