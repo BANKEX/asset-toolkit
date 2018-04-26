@@ -8,5 +8,4 @@ if ('PROD' === process.env.ENV) {
   enableProdMode();
 }
 
-const platform = platformBrowserDynamic();
-platform.bootstrapModule(AppModule);
+platformBrowserDynamic().bootstrapModule(AppModule);

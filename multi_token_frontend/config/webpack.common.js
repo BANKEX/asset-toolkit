@@ -10,7 +10,7 @@ const rxPaths = require('rxjs/_esm5/path-mapping');
 
 const HMR = helpers.hasProcessFlag('hot');
 const metadata = {
-  title: 'Multitoken Demo',
+  title: 'Multitoken',
   baseUrl: '',
   isDevServer: helpers.isWebpackDevServer(),
   HMR: HMR

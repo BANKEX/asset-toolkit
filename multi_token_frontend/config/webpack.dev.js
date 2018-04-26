@@ -11,7 +11,7 @@ const AngularCompilerPlugin = require('@ngtools/webpack').AngularCompilerPlugin;
 const ENV = process.env.ENV = process.env.NODE_ENV = 'development';
 const AOT = process.env.BUILD_AOT || helpers.hasNpmFlag('aot');
 const HOST = process.env.HOST || 'localhost';
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8000;
 
 const metadata = webpackMerge(commonConfig({ENV}).metadata, {
   HOST,
