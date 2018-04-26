@@ -1,74 +1,9 @@
 stages:
   - setup
-  - build-node
-  - release-nginx
-  - deploy-stage
 
 setup:
   image: node:alpine
   stage: setup
   script:
-    - apk add --update git
-    - apk --no-cache add g++ gcc libgcc libstdc++ linux-headers make python
-    - npm install --quiet node-gyp -g
-    - npm install
-    - npm rebuild bcrypt --build-from-source
-    - npm rebuild node-sass
-  cache:
-    key: "$CI_PROJECT_ID"
-    paths:
-      - node_modules/
-
-build-node:
-  image: node:alpine
-  stage: build-node
-  script:
-    - npm run build
-  artifacts:
-    paths:
-      - dist
-    expire_in: 7d
-  cache:
-    key: "$CI_PROJECT_ID"
-    paths:
-      - node_modules/
-    policy: pull
-
-release-nginx:
-  image: docker:latest
-  stage: release-nginx
-  before_script:
-    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-  script:
-    - docker build -f docker/Dockerfile -t $CI_REGISTRY_IMAGE .
-    - docker push $CI_REGISTRY_IMAGE
-  cache: {}
-
-deploy-stage:
-  stage: deploy-stage
-  image: tmaier/docker-compose
-  variables:
-    DOCKER_HOST: "tcp://poa-staging.bankex.team:2376"
-    DOCKER_TLS_VERIFY: "1"
-    SERVERNAME: multitoken.staging.bankex.team
-    EMAIL: "om@bankexfoundation.org"
-    DOCKER_CERT_PATH: "/certs"
-    IMAGE: bankexlabs/$CI_PROJECT_NAME:stage
-  before_script:
-    - mkdir -p $DOCKER_CERT_PATH
-    - echo "$DOCKER_CA" > $DOCKER_CERT_PATH/ca.pem
-    - echo "$DOCKER_CERT" > $DOCKER_CERT_PATH/cert.pem
-    - echo "$DOCKER_KEY" > $DOCKER_CERT_PATH/key.pem
-    - echo "VIRTUAL_HOST=$SERVERNAME" >> .env ; echo "LETSENCRYPT_HOST=$SERVERNAME" >> .env; echo "LETSENCRYPT_EMAIL=$EMAIL" >> .env
-  script:
-    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-    - docker-compose -f docker/docker-compose.yml down
-    - docker rmi $CI_REGISTRY_IMAGE || echo "image not exist"
-    - docker pull $CI_REGISTRY_IMAGE
-    - docker-compose -f docker/docker-compose.yml up -d
-  environment:
-    name: staging
-    url: https://multitoken.staging.bankex.team
-  when: manual
-  cache: {}
-  dependencies: []
+    - cat $DOCKER_CA
+    - echo $DOCKER_CA
