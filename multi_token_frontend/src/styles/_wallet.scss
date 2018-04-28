@@ -73,6 +73,7 @@
 
   &-address,
   &-date,
+  &-direction,
   &-number,
   &-sum {
     display: inline-block;
@@ -87,17 +88,25 @@
   }
 
   &-address {
-    width: 450px;
+    width: 430px;
     text-transform: uppercase;
   }
 
   &-number {
-    width: 100px;
+    width: 70px;
     text-transform: uppercase;
   }
 
   &-date {
     width: 100px;
+  }
+
+  &-transfer {
+    svg {
+      transform: scale(1.35);
+      top: -4px;
+      position: relative;
+    }
   }
 
   &:last-child {

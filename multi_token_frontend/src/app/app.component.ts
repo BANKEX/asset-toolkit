@@ -1,7 +1,8 @@
+import { ActivatedRoute, Router, ParamMap } from '@angular/router';
 import { Component, AfterViewInit } from '@angular/core';
 import { Connection } from './shared/types';
-import { ConnectionService, EventService } from './core';
-import { LoadingOverlayService } from './shared/services';
+import { ConnectionService, EventService, FormService, MultitokenService } from './core';
+import { LoadingOverlayService, ErrorMessageService } from './shared/services';
 import { Observable } from 'rxjs/Observable';
 import { ToastyService } from 'ng2-toasty';
 import { NeatComponent } from './shared/common';
@@ -13,12 +14,18 @@ import { NeatComponent } from './shared/common';
 export class AppComponent extends NeatComponent implements AfterViewInit {
 
   public clientAddress: string;
+  public ownerAddress: string;
   public contractAddress: string;
 
   public constructor(
     private $connection: ConnectionService,
-    private $overlay: LoadingOverlayService,
     private $events: EventService,
+    private $error: ErrorMessageService,
+    private $form: FormService,
+    private $mt: MultitokenService,
+    private $overlay: LoadingOverlayService,
+    private $route: ActivatedRoute,
+    private $router: Router,
     private $toasty: ToastyService,
   ) {
     super();
@@ -29,15 +36,29 @@ export class AppComponent extends NeatComponent implements AfterViewInit {
         this.contractAddress = $connection.contractData.address;
         this.$toasty.success('Connected to blockchain.');
         this.listenForEvents();
+        this.$mt.getOwner().then(address => this.ownerAddress = address)
+          .catch(e => $error.addError('Check if you entered it right', 'Wrong contract address', ));
       }
     })
   }
 
   public ngAfterViewInit() {
     this.$overlay.showOverlay();
+      if (window.location.href.indexOf('contract=0x') === -1) {
+        this.connect();
+      } else {
+        this.$route.queryParams.skip(1).take(1).subscribe(params => {
+          this.connect(params.contract);
+        })
+      }
     Observable.timer(1000).subscribe(() => {
       this.$overlay.hideOverlay();
     });
+  }
+
+  private connect(contract?: string) {
+    this.$connection.connect(contract || undefined); // this  will change value of this.$connection.contractData.address
+    this.$router.navigate(['../'], { queryParams: {contract: this.$connection.contractData.address}});
   }
 
   private listenForEvents() {

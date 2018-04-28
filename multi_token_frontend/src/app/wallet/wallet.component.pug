@@ -10,15 +10,14 @@
       perfect-scrollbar
         .token(*ngFor="let key of objectKeys(tokens) | orderBy:sortBy.id:sortBy.reverse")
           .token-number
-            a((click)="showTransactions(key)", href="#", title="Show") type {{key}}
+            a((click)="showTransactions(key)", href="javascript:void(0)", title="Show") type {{key}}
           .token-sum {{tokens[key].amount}} tokens ({{tokens[key].part}}%)
           .token-sum(*ngIf="tokens[key].pending.length>0") Blocked: {{calculatePendings(tokens[key])}} tokens
             img(src="/assets/spinner.gif", alt="transaction in process")
           .token-controls
             span.token-transfer((click)="openTransferModal(key, tokens[key])", title="Transfer")
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" style="transform: scale(1.35);">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
                 <g fill="#0DA9FF" fill-rule="evenodd">
-                  <path d="M0 16h4V0H0zM11 2.6L9.6 4l3 3H6v2h6.6l-3 3 1.4 1.4 4.7-4.7c.4-.4.4-1 0-1.4L11 2.6z">
-                  </path>
+                  <path d="M7 16H1a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1M15.978 0H9l2.789 2.797-3.496 3.496 1.414 1.414L13.2 4.214 15.978 7z"></path>
                 </g>
               </svg>
