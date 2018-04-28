@@ -3,6 +3,7 @@ stages:
   - build-node
   - release-nginx
   - deploy-stage
+  - deploy-prod
 
 setup:
   image: node:alpine
@@ -67,6 +68,37 @@ deploy-stage:
   environment:
     name: staging
     url: https://multitoken.staging.bankex.team
+  cache: {}
+  dependencies: []
+  only:
+    - master
+
+deploy-prod:
+  stage: deploy-prod
+  image: tmaier/docker-compose
+  variables:
+    DOCKER_HOST: "tcp://poa-prod.bankex.team:2376"
+    DOCKER_TLS_VERIFY: "1"
+    SERVERNAME: multitoken.bankex.team
+    EMAIL: "om@bankexfoundation.org"
+    DOCKER_CERT_PATH: "/certs"
+  before_script:
+    - mkdir -p $DOCKER_CERT_PATH
+    - echo "$DOCKER_CA" > $DOCKER_CERT_PATH/ca.pem
+    - echo "$DOCKER_CERT" > $DOCKER_CERT_PATH/cert.pem
+    - echo "$DOCKER_KEY" > $DOCKER_CERT_PATH/key.pem
+    - echo "VIRTUAL_HOST=$SERVERNAME" >> .env ; echo "LETSENCRYPT_HOST=$SERVERNAME" >> .env; echo "LETSENCRYPT_EMAIL=$EMAIL" >> .env
+  script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+    - docker-compose -f docker/docker-compose-prod.yml down
+    - docker rmi $CI_REGISTRY_IMAGE || echo "image not exist"
+    - docker pull $CI_REGISTRY_IMAGE
+    - docker-compose -f docker/docker-compose-prod.yml up -d
+  environment:
+    name: prod
+    url: https://multitoken.bankex.team
   when: manual
   cache: {}
   dependencies: []
+  only:
+    - production
