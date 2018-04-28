@@ -10,7 +10,7 @@
       perfect-scrollbar
         .token(*ngFor="let key of objectKeys(tokens) | orderBy:sortBy.id:sortBy.reverse")
           .token-number
-            a((click)="showTransactions(key)", href="#", title="Show") type {{key}}
+            a((click)="showTransactions(key)", href="javascript:void(0)", title="Show") type {{key}}
           .token-sum {{tokens[key].amount}} tokens ({{tokens[key].part}}%)
           .token-sum(*ngIf="tokens[key].pending.length>0") Blocked: {{calculatePendings(tokens[key])}} tokens
             img(src="/assets/spinner.gif", alt="transaction in process")

@@ -1,3 +1,4 @@
+import { ActivatedRoute, Router } from '@angular/router';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, Subject } from 'rxjs/Rx';
 import { Connection, ContractData } from '../shared/types';
@@ -18,7 +19,7 @@ export class ConnectionService extends BehaviorSubject<Connection> {
   public err: Subject<Error> = new Subject();
   public web3: any;
   public contract: Contract;
-  public contractData: ContractData;
+  public contractData: ContractData = new ContractData;
   public account: string;
 
   private useHardcodedContractData = false;
@@ -26,22 +27,23 @@ export class ConnectionService extends BehaviorSubject<Connection> {
   private Web3: any = Web3;
 
   public constructor(
+    private $blockingNotificationOverlay: BlockingNotificationOverlayService,
     private $error: ErrorMessageService,
     private $toasty: ToastyService,
-    private $blockingNotificationOverlay: BlockingNotificationOverlayService,
   ) {
     super(Connection.None); // set initial connection state
     this.web3 = this.checkAndInstantiateWeb3();
-    this.connect();
+    // this.connect(); // now call connection start from app.component
   }
 
   public async connect(contractHash?: string) {
     this.next(Connection.InProcess);
-    this.contractData = new ContractData(contractHash);
+    if (contractHash) { this.contractData = new ContractData(contractHash) };
     try {
       await this.init();
       this.contract = new this.web3.eth.Contract(this.contractData.abi, this.contractData.address);
       this.next(Connection.Estableshed);
+      // this.$router.navigate(['../'], { queryParams: {contract: this.contractData.address}});
       this.startLoops();
     } catch (e) {
       this.$blockingNotificationOverlay.setOverlayMessage(e);

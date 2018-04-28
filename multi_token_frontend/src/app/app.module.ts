@@ -19,6 +19,7 @@ import { RouterModule } from '@angular/router';
   imports: [
     HttpClientModule,
     BrowserModule,
+    RouterModule.forRoot([]),
     SharedModule,
     APP_IMPORTS,
     // IdlePreloadModule.forRoot(), // forRoot ensures the providers are only created once
