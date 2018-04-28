@@ -23,9 +23,22 @@
     &-date {
       float: right;
       text-align: center;
-   }
- }
-
+    }
+    &-direction {
+      width: 70px;
+      &.in {
+        padding-left: 17px;
+        svg {
+          transform: scale(1.35);
+        }
+      }
+      &.out {
+        svg {
+          transform: scale(1.35) rotate(180deg);
+        }
+      }
+    }
+  }
   .pane {
     height: 250px;
   }

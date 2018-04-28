@@ -9,9 +9,10 @@ import { to } from 'await-to-js';
 })
 export class HistoryComponent implements OnInit {
 
-  public transactions: any[];
   public sortOptions: any[];
   public sortBy;
+  public tokenId;
+  public transactions: any[];
 
   public constructor(
     private $events: EventService,
@@ -20,6 +21,7 @@ export class HistoryComponent implements OnInit {
   ) {
     $mt.transactions.subscribe((_transactions: any[]) => {
       this.transactions = _transactions;
+      this.tokenId = $mt.lastToken;
     });
   }
 

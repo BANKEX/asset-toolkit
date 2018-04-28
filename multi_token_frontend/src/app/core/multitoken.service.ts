@@ -14,15 +14,15 @@ import * as moment from 'moment';
 @Injectable()
 export class MultitokenService {
 
+  public lastToken: string;
   public transactions: Subject<any[]> = new Subject();
   public tokens: Subject<any> = new Subject();
 
-  private fetchDataDelay = 5000;
+  private fetchDataDelay = 50000;
   private userAddress: string;
   private contractAddress: string;
   private balances: any;
   private contract: Contract;
-  private lastToken: string;
 
   constructor(
     private $connection: ConnectionService,
@@ -102,8 +102,8 @@ export class MultitokenService {
         details.push(pend);
       });
     }
+    this.lastToken = tokenId; // should assign before brodcasting transactions!
     this.transactions.next(details);
-    this.lastToken = tokenId;
   };
 
   private getPendings = async () => {
