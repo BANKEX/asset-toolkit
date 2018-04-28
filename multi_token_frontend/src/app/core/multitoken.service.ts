@@ -106,6 +106,10 @@ export class MultitokenService {
     this.transactions.next(details);
   };
 
+  public getOwner() {
+    return this.contract.methods.owner().call();
+  }
+
   private getPendings = async () => {
     const { transactions } = await this.$connection.web3.eth.getBlock('pending', true);
     const userTransactions = transactions.filter((elem) => (elem.from === this.userAddress));

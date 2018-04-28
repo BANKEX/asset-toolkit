@@ -10,11 +10,14 @@
 		display: inline-block;
 
 		.alert-content {
-			display: inline-block;
+      display: inline-block;
+      span {
+        padding: 0 10px;
+      }
 		}
 
 		.alert-heading {
-			cursor: pointer;
+      cursor: pointer;
 			&:hover {
 				text-decoration: underline;
 			}
