@@ -183,18 +183,43 @@ export class MultitokenService {
     this.dividends.next(divBalances);
   };
 
-  public getDividendsDetails = async (tokenId) => {
-    const releaseDividendsRights = await this.contract.getPastEvents('ReleaseDividendsRights', { fromBlock: 0, filter: { _for: this.userAddress, tokenId }});
-    // const acceptDivivdends = await this.contract.getPastEvents('AcceptDivivdends', { fromBlock: 0, filter: { tokenId }});
-    // const transactionsDividends = releaseDividendsRights.concat(acceptDivivdends);
+  private getTokenPartOnAcceptDividendsEvent = async (event) => {
+    const tokenId = event.returnValues.tokenId;
+    const blockAdded = await this.$connection.web3.eth.getBlock(event.blockHash);
+    const transfersOnTokenIdFrom = await this.contract.getPastEvents('Transfer', { fromBlock: 0, toBlock: blockAdded, filter: { from: this.userAddress, tokenId }});
+    const transfersOnTokenIdTo = await this.contract.getPastEvents('Transfer', { fromBlock: 0, toBlock: blockAdded, filter: { to: this.userAddress, tokenId }});
+    const transfersOnTokenId = transfersOnTokenIdFrom.concat(transfersOnTokenIdTo);
+    let sum = 0;
+    await Promise.all(transfersOnTokenId.map(async (ev) => {
+      const plus = (ev.returnValues.to === this.userAddress) ? 1 : -1;
+      const value = Number(ev.returnValues.value) * plus;
+      sum += value;
+      return null;
+    }));
+    const totalSupply = await this.contract.methods.totalSupply(tokenId).call();
+    return sum/totalSupply;
+  };
 
-    const details = await Promise.all(releaseDividendsRights.map(async (ev) => {
+  public getDividendsDetails = async (tokenId) => {
+    const details = [];
+    const releaseDividendsRights = await this.contract.getPastEvents('ReleaseDividendsRights', { fromBlock: 0, filter: { _for: this.userAddress, tokenId }});
+    await Promise.all(releaseDividendsRights.map(async (ev) => {
       const blockAdded = await this.$connection.web3.eth.getBlock(ev.blockHash);
       const date = blockAdded.timestamp * 1000;
-      const value = Number(ev.returnValues.value);
-      return { date, value };
+      const value = -Number(ev.returnValues.value);
+      details.push({ date, value, accept: 0, part: 0 });
+      return null;
     }));
-
+    const acceptDividends = await this.contract.getPastEvents('AcceptDividends', { fromBlock: 0, filter: { tokenId }});
+    await Promise.all(acceptDividends.map(async (ev) => {
+      const blockAdded = await this.$connection.web3.eth.getBlock(ev.blockHash);
+      const date = blockAdded.timestamp * 1000;
+      const part = await this.getTokenPartOnAcceptDividendsEvent(ev);
+      const accept = Number(ev.returnValues.value);
+      const value = accept * part;
+      details.push({ date, accept, part, value });
+      return null;
+    }));
     this.lastDivToken = tokenId; // should assign before brodcasting transactions!
     this.divTransactions.next(details);
   };
