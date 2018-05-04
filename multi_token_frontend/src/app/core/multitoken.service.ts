@@ -15,8 +15,11 @@ import * as moment from 'moment';
 export class MultitokenService {
 
   public lastToken: string;
+  public lastDivToken: string;
   public transactions: Subject<any[]> = new Subject();
   public tokens: Subject<any> = new Subject();
+  public divTransactions: Subject<any[]> = new Subject();
+  public dividends: Subject<any> = new Subject();
 
   private fetchDataDelay = 50000;
   private userAddress: string;
@@ -40,17 +43,42 @@ export class MultitokenService {
     })
   }
 
-  public getBalance = async (tokenId) => {
-    const amount = await this.contract.methods.balanceOf(tokenId, this.userAddress).call();
-    const totalSupply = await this.contract.methods.totalSupply(tokenId).call();
-    const part = Math.round(amount / totalSupply * 100);
-    const pending = {};
-    return { amount, part, pending };
-  };
+  private startLoops() {
+    this.getBalances();
+    setInterval(this.getBalances.bind(this), this.fetchDataDelay);
+    setInterval(() => {
+      if (this.lastToken) {
+        this.getDetails(this.lastToken)
+      }
+    }, this.fetchDataDelay)
 
-  public async getBalances () {
+    /*
+        this.contract.events.Transfer({
+          fromBlock: 'latest',
+          filter: { from: this.userAddress }
+        }).on('data', async (event) => {
+          // const { tokenId } = event.returnValues;
+          // this.balances[tokenId] = await this.getBalance(tokenId);
+          this.getBalances();
+        });
+
+        this.contract.events.Transfer({
+          fromBlock: 'latest',
+          filter: { to: this.userAddress }
+        }).on('data', async (event) => {
+          // const { tokenId } = event.returnValues;
+          // this.balances[tokenId] = await this.getBalance(tokenId);
+          this.getBalances();
+        });
+    */
+  }
+
+  public getOwner() {
+    return this.contract.methods.owner().call();
+  }
+
+  private getCells = async () => {
     const cells = [];
-    const balances = {};
     const transferedCellsFrom = await this.contract.getPastEvents('Transfer', { fromBlock: 0, filter: { from: this.userAddress }});
     const transferedCellsTo = await this.contract.getPastEvents('Transfer', { fromBlock: 0, filter: { to: this.userAddress }});
     const transferedCells = transferedCellsFrom.concat(transferedCellsTo);
@@ -58,11 +86,45 @@ export class MultitokenService {
       const { tokenId }  = event.returnValues;
       if (cells.indexOf(tokenId) === -1) { cells.push(tokenId); }
     });
+    return cells;
+  };
+
+  // Tokens Tab
+  private getBalance = async (tokenId) => {
+    const amount = await this.contract.methods.balanceOf(tokenId, this.userAddress).call();
+    const totalSupply = await this.contract.methods.totalSupply(tokenId).call();
+    const part = Math.round(amount / totalSupply * 100);
+    const pending = {};
+    return { amount, part, pending };
+  };
+
+  private getPendings = async () => {
+    const { transactions } = await this.$connection.web3.eth.getBlock('pending', true);
+    const userTransactions = transactions.filter((elem) => (elem.from === this.userAddress));
+    const pendings = {};
+    await Promise.all(userTransactions.map(async (elem) => {
+      const transaction = await this.$connection.web3.eth.getTransaction(elem.hash);
+      const tokenId = this.$connection.web3.utils.hexToNumber(transaction.input.slice(-192, -128));
+      const pending = {
+        address: transaction.input.slice(-128, -64).replace(/^0*/, '0x'),
+        value: this.$connection.web3.utils.hexToNumber(transaction.input.slice(-64))
+      };
+      if (!Array.isArray(pendings[tokenId])) {
+        pendings[tokenId] = [];
+      }
+      pendings[tokenId].push(pending);
+      return null;
+    }));
+    return pendings;
+  };
+
+  public getBalances = async () => {
+    const cells = await this.getCells();
+    const balances = {};
     const pendings = await this.getPendings();
     await Promise.all(cells.map(async (tokenId) => {
       balances[tokenId] = await this.getBalance(tokenId);
       balances[tokenId].pending = pendings[tokenId] || [];
-
       return null;
     }));
     this.tokens.next(balances);
@@ -106,58 +168,44 @@ export class MultitokenService {
     this.transactions.next(details);
   };
 
-  public getOwner() {
-    return this.contract.methods.owner().call();
-  }
-
-  private getPendings = async () => {
-    const { transactions } = await this.$connection.web3.eth.getBlock('pending', true);
-    const userTransactions = transactions.filter((elem) => (elem.from === this.userAddress));
-    const pendings = {};
-    await Promise.all(userTransactions.map(async (elem) => {
-      const transaction = await this.$connection.web3.eth.getTransaction(elem.hash);
-      const tokenId = this.$connection.web3.utils.hexToNumber(transaction.input.slice(-192, -128));
-      const pending = {
-        address: transaction.input.slice(-128, -64).replace(/^0*/, '0x'),
-        value: this.$connection.web3.utils.hexToNumber(transaction.input.slice(-64))
-      };
-      if (!Array.isArray(pendings[tokenId])) {
-        pendings[tokenId] = [];
-      }
-      pendings[tokenId].push(pending);
-      return null;
-    }));
-    return pendings;
+  // Dividends Tab
+  private getDividendsBalance = async (tokenId) => {
+    return await this.contract.methods.dividendRightsOf(tokenId, this.userAddress).call();
   };
 
+  public getAllDividendsBalances = async () => {
+    const cells = await this.getCells();
+    const divBalances = {};
+    await Promise.all(cells.map(async (tokenId) => {
+      divBalances[tokenId] = await this.getDividendsBalance(tokenId);
+      return null;
+    }));
+    this.dividends.next(divBalances);
+  };
 
-  private startLoops() {
-    this.getBalances();
-    setInterval(this.getBalances.bind(this), this.fetchDataDelay);
-    setInterval(() => {
-      if (this.lastToken) {
-        this.getDetails(this.lastToken)
-      }
-    }, this.fetchDataDelay)
+  public getDividendsDetails = async (tokenId) => {
+    const releaseDividendsRights = await this.contract.getPastEvents('ReleaseDividendsRights', { fromBlock: 0, filter: { _for: this.userAddress, tokenId }});
+    // const acceptDivivdends = await this.contract.getPastEvents('AcceptDivivdends', { fromBlock: 0, filter: { tokenId }});
+    // const transactionsDividends = releaseDividendsRights.concat(acceptDivivdends);
 
-/*
-    this.contract.events.Transfer({
-      fromBlock: 'latest',
-      filter: { from: this.userAddress }
-    }).on('data', async (event) => {
-      // const { tokenId } = event.returnValues;
-      // this.balances[tokenId] = await this.getBalance(tokenId);
-      this.getBalances();
-    });
+    const details = await Promise.all(releaseDividendsRights.map(async (ev) => {
+      const blockAdded = await this.$connection.web3.eth.getBlock(ev.blockHash);
+      const date = blockAdded.timestamp * 1000;
+      const value = Number(ev.returnValues.value);
+      return { date, value };
+    }));
 
-    this.contract.events.Transfer({
-      fromBlock: 'latest',
-      filter: { to: this.userAddress }
-    }).on('data', async (event) => {
-      // const { tokenId } = event.returnValues;
-      // this.balances[tokenId] = await this.getBalance(tokenId);
-      this.getBalances();
-    });
-*/
-  }
+    this.lastDivToken = tokenId; // should assign before brodcasting transactions!
+    this.divTransactions.next(details);
+  };
+
+  public sendDividendsToWallet = async (tokenId, value) => {
+    await this.contract.methods.releaseDividendsRights(tokenId, value).send({from: this.userAddress});
+  };
+
+  // Incoming accepts
+  public sendEtherForContract = async (tokenId, value) => {
+    await this.contract.methods.acceptDividends(tokenId).send({from: this.userAddress, value});
+  };
+
 }
