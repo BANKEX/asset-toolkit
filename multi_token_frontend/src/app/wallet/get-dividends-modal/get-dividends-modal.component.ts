@@ -8,8 +8,8 @@ import { to } from 'await-to-js';
 import { NeatComponent } from '../../shared/common/index';
 
 @Component({
-  selector: 'mt-send-dividends-modal',
-  templateUrl: 'send-dividends-modal.component.pug',
+  selector: 'mt-get-dividends-modal',
+  templateUrl: 'get-dividends-modal.component.pug',
   styles: [`
     select.tokens {
       display: inline;
@@ -21,7 +21,7 @@ import { NeatComponent } from '../../shared/common/index';
   `]
 })
 
-export class SendDividendsModalComponent implements AfterViewInit, OnInit {
+export class GetDividendsModalComponent implements AfterViewInit, OnInit{
 
   @Output() public transferred: EventEmitter<string> = new EventEmitter<string>();
   @ViewChildren('value') public value;

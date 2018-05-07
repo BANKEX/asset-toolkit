@@ -134,12 +134,12 @@ export class MultitokenService {
   };
 
   // Send dividends to token holders
-  public sendDividends(tokenId, value): PromiEvent<Transaction> {
+  public withdrawDividends(tokenId, value): PromiEvent<Transaction> {
     return this.contract.methods.releaseDividendsRights(tokenId, value).send({from: this.userAddress});
   };
 
   // Withdraw dividends
-  public withdrawDividends(tokenId, value): PromiEvent<Transaction> {
+  public sendDividends(tokenId, value): PromiEvent<Transaction> {
     return this.contract.methods.acceptDividends(tokenId).send({from: this.userAddress, value});
   };
 
