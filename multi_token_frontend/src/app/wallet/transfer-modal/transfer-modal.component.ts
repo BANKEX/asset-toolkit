@@ -8,7 +8,7 @@ import { to } from 'await-to-js';
 import { Multitoken } from '../../shared/types/multitoken';
 
 @Component({
-  selector: 'pl-transfer-modal',
+  selector: 'mt-transfer-modal',
   templateUrl: 'transfer-modal.component.pug'
 })
 

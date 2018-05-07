@@ -16,6 +16,7 @@ import {
 } from './services';
 import { BlockingNotificationOverlayComponent } from './common/blocking-notification-overlay/blocking-notification-overlay.component';
 import { BlockingNotificationOverlayService } from './services';
+import { EtherLogoComponent } from './common';
 
 export function windowFactory() {
   return window;
@@ -33,6 +34,7 @@ export function windowFactory() {
   exports: [
     // COMPONENTS
     ErrorMessageComponent,
+    EtherLogoComponent,
     InfiniteScrollerDirective,
     LoadingOverlayComponent,
     NotFound404Component,
@@ -50,6 +52,7 @@ export function windowFactory() {
   ],
   declarations: [
     ErrorMessageComponent,
+    EtherLogoComponent,
     InfiniteScrollerDirective,
     LoadingOverlayComponent,
     BlockingNotificationOverlayComponent,

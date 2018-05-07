@@ -6,6 +6,8 @@ import { LoadingOverlayService, ErrorMessageService } from './shared/services';
 import { Observable } from 'rxjs/Observable';
 import { ToastyService } from 'ng2-toasty';
 import { NeatComponent } from './shared/common';
+import { SendDividendsModalComponent } from './wallet/send-dividends-modal/send-dividends-modal.component';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-root',
@@ -22,6 +24,7 @@ export class AppComponent extends NeatComponent implements AfterViewInit {
     private $events: EventService,
     private $error: ErrorMessageService,
     private $form: FormService,
+    private $modal: NgbModal,
     private $mt: MultitokenService,
     private $overlay: LoadingOverlayService,
     private $route: ActivatedRoute,
@@ -54,6 +57,16 @@ export class AppComponent extends NeatComponent implements AfterViewInit {
     Observable.timer(1000).subscribe(() => {
       this.$overlay.hideOverlay();
     });
+  }
+
+  public showDividendsModal() {
+    let modalInstance;
+    modalInstance =	this.$modal.open(
+      SendDividendsModalComponent,
+      {
+        size: 'lg',
+        windowClass: 'modal-margin-lg'
+      }).componentInstance;
   }
 
   private connect(contract?: string) {
