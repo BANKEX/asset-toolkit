@@ -7,7 +7,8 @@ bnkx-blocking-notification-overlay
     .container
       .header-inner
         .header-inner-logo
-        .header-inner-title Multitoken Demo
+        .header-inner-title((click)="showDividendsModal()") Multitoken Demo
+          //mt-ether-logo((click)="showDividendsModal()")
         .header-inner-address Client address:
           i.address {{clientAddress}}
         .header-inner-contract Contract address:
