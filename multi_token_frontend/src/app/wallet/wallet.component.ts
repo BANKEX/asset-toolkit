@@ -64,6 +64,7 @@ export class WalletComponent implements OnInit {
 
   public openWithdrawModal(key: any, token): void {
     let modalInstance;
+    if (this.dividends[key] === '0') { return; }
     modalInstance =	this.$modal.open(
       GetDividendsModalComponent,
       {
@@ -72,11 +73,6 @@ export class WalletComponent implements OnInit {
       }).componentInstance;
     modalInstance.tokenKey = key;
     modalInstance.amount = this.dividends[key];
-  }
-
-  public calculatePendings(token: Multitoken) {
-    Object.setPrototypeOf(token, new Multitoken());
-    return token.totalPending();
   }
 
   public openDividendsModal(key: any, token): void {
@@ -88,6 +84,11 @@ export class WalletComponent implements OnInit {
         windowClass: 'modal-margin-lg'
       }).componentInstance;
     modalInstance.tokenKey = key;
+  }
+
+  public calculatePendings(token: Multitoken) {
+    Object.setPrototypeOf(token, new Multitoken());
+    return token.totalPending();
   }
 
   public onTabChanged() {

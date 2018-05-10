@@ -3,7 +3,7 @@
     h2 {{title}}
     .history-list.deposit
       perfect-scrollbar
-        .transaction(*ngFor="let item of transactions | orderBy:item:false")
+        .transaction(*ngFor="let item of transactions")
           .transaction-direction([ngClass]="{in: item.value > 0, out: item.value < 0}", title="{{item.value>0?'Incoming':'Outgoing'}}")
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
               <g fill="#fff" fill-rule="evenodd">
