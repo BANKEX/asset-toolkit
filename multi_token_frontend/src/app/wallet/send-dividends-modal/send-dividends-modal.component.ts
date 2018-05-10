@@ -23,8 +23,9 @@ import { NeatComponent } from '../../shared/common/index';
 
 export class SendDividendsModalComponent implements AfterViewInit, OnInit {
 
+  @Input() public tokenKey: number;
   @Output() public transferred: EventEmitter<string> = new EventEmitter<string>();
-  @ViewChildren('value') public value;
+  @ViewChildren('focus') public focus;
 
   public form: FormGroup;
   public tokens: any;
@@ -57,7 +58,7 @@ export class SendDividendsModalComponent implements AfterViewInit, OnInit {
   }
 
   ngAfterViewInit() {
-    this.value.first.nativeElement.focus();
+    this.focus.first.nativeElement.focus();
   }
 
   public async sendDividends() {
@@ -71,7 +72,7 @@ export class SendDividendsModalComponent implements AfterViewInit, OnInit {
       // Object.setPrototypeOf(this.transaction, new PlasmaDepositImp());
       // if (amountBN.eq(this.transaction.bn)) {
         // const balance = await this.$mt.getTokenBalance(this.transaction.key);
-      const event = this.$mt.sendDividends(this.toBN(tokenType), this.toBN(amount));
+      const event = this.$mt.sendDividends(this.toBN(tokenType), amountBN);
       event.on('transactionHash', (hash) => {
         this.$activeModal.close();
         this.$overlay.hideOverlay();
@@ -109,7 +110,7 @@ export class SendDividendsModalComponent implements AfterViewInit, OnInit {
         Validators.min(0.001),
         Validators.pattern(/^\d+(\.\d+)?$/)]
       ],
-      tokenKey: ['', [
+      tokenKey: [this.tokenKey ? this.tokenKey : '', [
         Validators.required,
       ]
     ]});

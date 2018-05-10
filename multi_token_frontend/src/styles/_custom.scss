@@ -32,10 +32,29 @@ body {
 button {
   position: relative;
 }
+
 select {
   outline: none;
   option {
     color: grey;
     padding: 2px 3px;
   }
+}
+
+.send-dividends {
+  display: inline-block;
+  text-align: center;
+  width: 48px;
+  height: 48px;
+  padding-top: 10px;
+  cursor: pointer;
+  transition: all 0.5s;
+
+  // &:hover {
+  //   background: #0da9ff;
+  // }
+
+  // &:hover svg * {
+  //   fill: #fff;
+  // }
 }

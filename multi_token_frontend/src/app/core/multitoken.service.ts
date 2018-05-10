@@ -97,7 +97,7 @@ export class MultitokenService {
     this.transactions.next(details);
   };
 
-  public getAllDividendsBalances = async () => {
+  public getDividendsBalances = async () => {
     const cells = await this.getCells();
     const divBalances = {};
     await Promise.all(cells.map(async (tokenId) => {
@@ -140,15 +140,28 @@ export class MultitokenService {
 
   // Withdraw dividends
   public sendDividends(tokenId, value): PromiEvent<Transaction> {
-    return this.contract.methods.acceptDividends(tokenId).send({from: this.userAddress, value});
+    return this.contract.methods.acceptDividends(tokenId)
+      .send({from: this.userAddress, value});
   };
+
+  public resetTransactionsHistory() {
+    this.lastDivToken = undefined;
+    this.lastToken = undefined;
+    this.transactions.next([]);
+    this.divTransactions.next([]);
+  }
 
   private startLoops() {
     this.getBalances();
+    this.getDividendsBalances();
     setInterval(this.getBalances.bind(this), this.fetchDataDelay);
+    setInterval(this.getDividendsBalances.bind(this), this.fetchDataDelay);
     setInterval(() => {
       if (this.lastToken) {
         this.getDetails(this.lastToken)
+      };
+      if (this.lastDivToken) {
+        this.getDividendsDetails(this.lastDivToken)
       }
     }, this.fetchDataDelay)
         /*
@@ -174,16 +187,16 @@ export class MultitokenService {
 
   // Dividends Tab
   private getDividendsBalance = async (tokenId) => {
-    return await this.contract.methods.dividendRightsOf(tokenId, this.userAddress).call();
+    return await this.contract.methods.dividendsRightsOf(tokenId, this.userAddress).call();
   };
 
   private getTokenPartOnAcceptDividendsEvent = async (event) => {
     const tokenId = event.returnValues.tokenId;
     const blockAdded = await this.$connection.web3.eth.getBlock(event.blockHash);
     const transfersOnTokenIdFrom = await this.contract.getPastEvents(
-      'Transfer', { fromBlock: 0, toBlock: blockAdded, filter: { from: this.userAddress, tokenId }});
+      'Transfer', { fromBlock: 0, toBlock: blockAdded.number, filter: { from: this.userAddress, tokenId }});
     const transfersOnTokenIdTo = await this.contract.getPastEvents(
-      'Transfer', { fromBlock: 0, toBlock: blockAdded, filter: { to: this.userAddress, tokenId }});
+      'Transfer', { fromBlock: 0, toBlock: blockAdded.number, filter: { to: this.userAddress, tokenId }});
     const transfersOnTokenId = transfersOnTokenIdFrom.concat(transfersOnTokenIdTo);
     let sum = 0;
     await Promise.all(transfersOnTokenId.map(async (ev) => {

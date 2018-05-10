@@ -22,6 +22,11 @@ export class FormService {
 
   public toWei(val) {
     const utils = this.web3.utils;
-    return utils.toBN(utils.toWei(val, 'ether'))
+    return utils.toBN(utils.toWei(val, 'ether'));
+  }
+
+  public fromWei(val) {
+    const utils = this.web3.utils;
+    return utils.fromWei(String(val), 'ether');
   }
 }

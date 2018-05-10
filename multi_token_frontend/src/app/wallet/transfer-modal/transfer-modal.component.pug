@@ -7,6 +7,24 @@ doctype html
   form([formGroup]='transferForm')
     .popup-input.popup-input-add.placeholder
       input.value(
+        #focus,
+        type='text',
+        formControlName='amount',
+        [ngClass]=`{
+          'error': amount.touched &&amount.invalid,
+          'not-null': amount.touched && !amount.hasError('required')
+        }`)
+      .label Tokens amount
+      div(*ngIf="amount.touched && amount.hasError('required')")
+        label.error Amount is required
+      div(*ngIf="amount.touched && amount.hasError('min')")
+        label.error Amount should be >= 1
+      div(*ngIf="amount.touched && amount.hasError('max')")
+        label.error Amount shouldn't exceed {{transaction.max}}
+      div(*ngIf="amount.touched && amount.hasError('pattern')")
+        label.error Amount should be a valid number
+    .popup-input.popup-input-add.placeholder
+      input.value(
         type='text',
         formControlName='walletAddress',
         [ngClass]=`{
@@ -18,24 +36,6 @@ doctype html
         label.error Wallet Address is required
       div(*ngIf="address.touched && address.hasError('validAddress')")
         label.error Invalid wallet address
-    .popup-input.popup-input-add.placeholder
-      input.value(
-        #value,
-        type='text',
-        formControlName='amount',
-        [ngClass]=`{
-          'error': amount.touched &&amount.invalid,
-          'not-null': amount.touched && !amount.hasError('required')
-        }`)
-      .label Dividends amount in ether
-      div(*ngIf="amount.touched && amount.hasError('required')")
-        label.error Amount is required
-      div(*ngIf="amount.touched && amount.hasError('min')")
-        label.error Amount should be >= 1
-      div(*ngIf="amount.touched && amount.hasError('max')")
-        label.error Amount shouldn't exceed {{transaction.max}}
-      div(*ngIf="amount.touched && amount.hasError('pattern')")
-        label.error Amount should be a valid number
   .popup-details
     .desc You going to transfer tokens to another blockchain address
   input.popup-button(type='submit' value='Transfer output', (click)='transfer()', [ngClass]='{disabled: transferForm.invalid}')

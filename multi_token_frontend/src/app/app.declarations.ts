@@ -3,11 +3,16 @@ import { WalletComponent } from './wallet/wallet.component';
 import { HistoryComponent } from './history/history.component';
 import { TransferModalComponent } from './wallet/transfer-modal/transfer-modal.component';
 import { SendDividendsModalComponent } from './wallet/send-dividends-modal/send-dividends-modal.component';
+import { TabsComponent, TabComponent } from './tabs';
+import { GetDividendsModalComponent } from './wallet/get-dividends-modal/get-dividends-modal.component';
 
 export const APP_DECLARATIONS = [
   ContentComponent,
   WalletComponent,
   HistoryComponent,
   TransferModalComponent,
-  SendDividendsModalComponent
+  SendDividendsModalComponent,
+  GetDividendsModalComponent,
+  TabComponent,
+  TabsComponent,
 ];
