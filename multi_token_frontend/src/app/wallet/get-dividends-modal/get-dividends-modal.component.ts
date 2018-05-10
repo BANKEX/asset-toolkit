@@ -23,6 +23,8 @@ import { NeatComponent } from '../../shared/common/index';
 
 export class GetDividendsModalComponent implements AfterViewInit, OnInit{
 
+  @Input() public tokenKey: number;
+  @Input() public amount: string;
   @Output() public transferred: EventEmitter<string> = new EventEmitter<string>();
   @ViewChildren('value') public value;
 
@@ -33,7 +35,7 @@ export class GetDividendsModalComponent implements AfterViewInit, OnInit{
 
   constructor(
     private $activeModal: NgbActiveModal,
-    private $cdr: ChangeDetectorRef,
+    // private $cdr: ChangeDetectorRef,
     private $connection: ConnectionService,
     private $events: EventService,
     private $error: ErrorMessageService,
@@ -43,27 +45,27 @@ export class GetDividendsModalComponent implements AfterViewInit, OnInit{
     private $mt: MultitokenService,
   ) {
   }
-  get token() { return this.form.get('tokenKey'); }
-  get amount() { return this.form.get('amount'); }
+  // get token() { return this.form.get('tokenKey'); }
+  // get amount() { return this.form.get('amount'); }
 
   public ngOnInit() {
     this.initForm();
     this.$mt.tokens.take(1).subscribe(_tokens => {
       this.tokens = _tokens;
       this.form.controls['tokenKey'].setValue(this.objectKeys(_tokens)[0], {onlySelf: true});
-      this.$cdr.detectChanges();
+      // this.$cdr.detectChanges();
       this.toBN = this.$connection.web3.utils.toBN;
     })
   }
 
   ngAfterViewInit() {
-    this.value.first.nativeElement.focus();
+    // this.value.first.nativeElement.focus();
   }
 
-  public async sendDividends() {
+  public async getDividends(_tokenKey?, _amount?) {
     let err, result;
-    const amount = this.form.value.amount;
-    const tokenType = this.form.value.tokenKey;
+    const amount = _amount ? _amount : this.form.value.amount;
+    const tokenType = _tokenKey ? _tokenKey : this.form.value.tokenKey;
     const amountBN = this.$form.toWei(amount);
     this.$events.transferAdded(amount);
     this.$overlay.showOverlay(true);
@@ -71,7 +73,7 @@ export class GetDividendsModalComponent implements AfterViewInit, OnInit{
       // Object.setPrototypeOf(this.transaction, new PlasmaDepositImp());
       // if (amountBN.eq(this.transaction.bn)) {
         // const balance = await this.$mt.getTokenBalance(this.transaction.key);
-      const event = this.$mt.sendDividends(this.toBN(tokenType), this.toBN(amount));
+      const event = this.$mt.withdrawDividends(this.toBN(tokenType), this.toBN(amount));
       event.on('transactionHash', (hash) => {
         this.$activeModal.close();
         this.$overlay.hideOverlay();
@@ -102,14 +104,18 @@ export class GetDividendsModalComponent implements AfterViewInit, OnInit{
     this.$activeModal.close();
   }
 
+  public fromWei(value) {
+    return this.$form.fromWei(value);
+  }
+
   private initForm() {
     this.form = this.$fb.group({
-      amount: ['1', [
+      amount: [this.amount ? this.amount : '1', [
         Validators.required,
         Validators.min(0.001),
         Validators.pattern(/^\d+(\.\d+)?$/)]
       ],
-      tokenKey: ['', [
+      tokenKey: [this.tokenKey ? +this.tokenKey : '', [
         Validators.required,
       ]
     ]});

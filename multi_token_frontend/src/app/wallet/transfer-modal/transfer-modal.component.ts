@@ -16,7 +16,7 @@ export class TransferModalComponent implements OnInit, AfterViewInit {
 
   @Output() public transferred: EventEmitter<string> = new EventEmitter<string>();
   @Input() public transaction: any;
-  @ViewChildren('value') public value;
+  @ViewChildren('focus') public focus;
 
   public transferForm: FormGroup;
 
@@ -41,7 +41,7 @@ export class TransferModalComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    this.value.first.nativeElement.focus();
+    this.focus.first.nativeElement.focus();
   }
 
   public async transfer() {

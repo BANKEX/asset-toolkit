@@ -1,10 +1,9 @@
 .history
   .history-inner
-    h2(*ngIf="tokenId") Transactions for type {{tokenId}} token
-    h2(*ngIf="!tokenId") Transactions - choose one by clicking on selected token name
+    h2 {{title}}
     .history-list.deposit
       perfect-scrollbar
-        .transaction(*ngFor="let item of transactions | orderBy:sortBy.id:sortBy.reverse")
+        .transaction(*ngFor="let item of transactions | orderBy:item:false")
           .transaction-direction([ngClass]="{in: item.value > 0, out: item.value < 0}", title="{{item.value>0?'Incoming':'Outgoing'}}")
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
               <g fill="#fff" fill-rule="evenodd">
@@ -12,7 +11,7 @@
                 </path>
               </g>
             </svg>
-          .transaction-number {{item.value}}
+          .transaction-number {{item.address ? fromTokens(item.value) : (fromWei(item.value))}}
           .transaction-address {{item.address}}
           .transaction-date(*ngIf="item.date") {{item.date | date}}
           .transaction-date(*ngIf="!item.date")

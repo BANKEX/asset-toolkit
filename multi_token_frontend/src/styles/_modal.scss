@@ -4,6 +4,10 @@
     margin: 0 20px 0 0;
     min-width: 250px;
 
+    &:before {
+      background: #aaa;
+    }
+
     &:after {
       content: '';
       position: absolute;
@@ -36,7 +40,7 @@
       background-color: transparent;
       position: relative;
       z-index: 2;
-      color: rgba(32, 35, 38, 0.7);
+      color: rgba(32, 35, 38, 0.8);
       font-size: 16px;
       line-height: 40px;
       height: 40px;
