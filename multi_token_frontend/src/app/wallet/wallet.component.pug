@@ -3,6 +3,23 @@
     //h2 Tokens
     mt-tabs((selected)="onTabChanged()")
       mt-tab(title="Tokens with dividends")
+        .tokens-buttons
+          a.tokens-buttons-add(href="javascript:void(0)", (click)="openAddTokenModal()", title="Create new subtoken")
+            i.icon
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 31.059 31.059" width="30px" height="30px">
+                <g>
+                  <g>
+                    <path d="M15.529,31.059C6.966,31.059,0,24.092,0,15.529C0,6.966,6.966,0,15.529,0 c8.563,0,15.529,6.966,15.529,15.529C31.059,24.092,24.092,31.059,15.529,31.059z M15.529,1.774 c-7.585,0-13.755,6.171-13.755,13.755s6.17,13.754,13.755,13.754c7.584,0,13.754-6.17,13.754-13.754S23.113,1.774,15.529,1.774z" fill="#0da9ff"/>
+                  </g>
+                  <g>
+                    <path d="M21.652,16.416H9.406c-0.49,0-0.888-0.396-0.888-0.887c0-0.49,0.397-0.888,0.888-0.888h12.246 c0.49,0,0.887,0.398,0.887,0.888C22.539,16.02,22.143,16.416,21.652,16.416z" fill="#0da9ff"/>
+                  </g>
+                  <g>
+                    <path d="M15.529,22.539c-0.49,0-0.888-0.397-0.888-0.887V9.406c0-0.49,0.398-0.888,0.888-0.888 c0.49,0,0.887,0.398,0.887,0.888v12.246C16.416,22.143,16.02,22.539,15.529,22.539z" fill="#0da9ff"/>
+                  </g>
+                </g>
+              </svg>
+            span.label Add Token
         //-.tokens-sort
           label Sort by
           select([(ngModel)]="sortBy")
@@ -15,8 +32,8 @@
                 a((click)="showTokensTransactions(key)", href="javascript:void(0)", title="Show token transactions") 0x{{key}}
                 | &nbsp;/&nbsp;
                 a((click)="showDividendsTransactions(key)", href="javascript:void(0)", title="Show dividends transactions") {{fromWei(dividends[key])}} Eth
-              .token-sum {{tokens[key].amount}} tokens ({{tokens[key].part}}%)
-              .token-sum(*ngIf="tokens[key].pending.length>0") Blocked: {{calculatePendings(tokens[key])}}&nbsp;
+              .token-sum {{this.$form.from1E18(tokens[key].amount)}} tokens ({{tokens[key].part}}%)
+              .token-sum(*ngIf="tokens[key].pending.length>0") Blocked: {{this.$form.from1E18(calculatePendings(tokens[key]))}}&nbsp;
                 img(src="/assets/cool-spinner.gif", alt="transaction in process", width="21px")
               .token-controls
                 span.token-send-dividends((click)="openDividendsModal(key, tokens[key])", title="Add dividends")

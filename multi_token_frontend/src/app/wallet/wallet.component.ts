@@ -6,6 +6,7 @@ import { TransferModalComponent } from './transfer-modal/transfer-modal.componen
 import { GetDividendsModalComponent } from './get-dividends-modal/get-dividends-modal.component';
 import { Multitoken } from '../shared/types/multitoken';
 import { SendDividendsModalComponent } from './send-dividends-modal/send-dividends-modal.component';
+import { AddTokenModalComponent } from './add-token-modal/add-token-modal.component';
 @Component({
   selector: 'mt-wallet',
   templateUrl: './wallet.component.pug',
@@ -20,6 +21,7 @@ export class WalletComponent implements OnInit {
   public objectKeys = Object.keys;
 
   constructor(
+    public $form: FormService,
     private $connection: ConnectionService,
     private $events: EventService,
     private $modal: NgbModal,
@@ -84,6 +86,16 @@ export class WalletComponent implements OnInit {
         windowClass: 'modal-margin-lg'
       }).componentInstance;
     modalInstance.tokenKey = key;
+  }
+
+  public openAddTokenModal(key: any, token): void {
+    let modalInstance;
+    modalInstance =	this.$modal.open(
+      AddTokenModalComponent,
+      {
+        size: 'lg',
+        windowClass: 'modal-margin-lg'
+      }).componentInstance;
   }
 
   public calculatePendings(token: Multitoken) {

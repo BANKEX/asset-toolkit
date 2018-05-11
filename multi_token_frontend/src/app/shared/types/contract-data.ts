@@ -8,8 +8,8 @@ export class ContractData {
    */
   static getData() {
     return {
-    address: '0xcdb7c2da74c11280eb3f63fbcf5ac6d484029797',
-    abi: require('../data/MultiVendingToken.json').abi
+    address: '0x0b8db2bd9df24a254d1793687ca32275e8018522',
+    abi: require('../data/MultiToken.json').abi
   }}
 
   public constructor(_address?: string) {
