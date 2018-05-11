@@ -49,12 +49,12 @@ export class GetDividendsModalComponent implements AfterViewInit, OnInit{
   // get amount() { return this.form.get('amount'); }
 
   public ngOnInit() {
+    this.toBN = this.$connection.web3.utils.toBN;
     this.initForm();
     this.$mt.tokens.take(1).subscribe(_tokens => {
       this.tokens = _tokens;
       this.form.controls['tokenKey'].setValue(this.objectKeys(_tokens)[0], {onlySelf: true});
       // this.$cdr.detectChanges();
-      this.toBN = this.$connection.web3.utils.toBN;
     })
   }
 
