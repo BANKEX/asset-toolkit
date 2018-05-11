@@ -12,6 +12,47 @@
     padding: 2px 3px;
   }
 
+  &-buttons {
+    position: absolute;
+    top: -37px;
+    left: 30%;
+    &-add {
+      text-decoration: none;
+      outline: none;
+      position: relative;
+      display: inline-block;
+      height: 44px;
+      border: 1px solid #0da9ff;
+      border-radius: 24px;
+      color: #0da9ff;
+      font-size: 16px;
+      letter-spacing: -0.3;
+      font-weight: 600;
+      line-height: 50px;
+      padding: 0 20px 0 50px;
+      //transition: all 0.5s;
+      &:hover {
+        background: #0da9ff;
+        color: #fff;
+        text-decoration: none;
+      }
+      &:hover svg * {
+        fill: #fff;
+      }
+      i.icon {
+        position: absolute;
+        width: 20px;
+        height: 32px;
+        top: 5px;
+        left: 10px;
+      }
+      .label {
+        position: relative;
+        top: -5px;
+      }
+    }
+  }
+
   &-inner {
     position: relative;
   }
@@ -102,16 +143,21 @@
   &-date,
   &-direction,
   &-number,
-  &-sum {
+  &-label,
+  &-sum,
+  &-tokens,
+  &-dividends {
     display: inline-block;
     font-size: 14px;
   }
 
   &-sum {
-    width: 250px;
+    width: 300px;
     text-align: right;
     margin-right: 2em;
     text-transform: uppercase;
+    //overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   &-address {

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { EventService, MultitokenService, ConnectionService } from '../core';
+import { EventService, MultitokenService, ConnectionService, FormService } from '../core';
 import { LoadingOverlayService } from '../shared/services';
 import { to } from 'await-to-js';
 
@@ -20,6 +20,7 @@ export class HistoryComponent implements OnInit {
   public constructor(
     private $connection: ConnectionService,
     private $events: EventService,
+    private $form: FormService,
     private $overlay: LoadingOverlayService,
     private $mt: MultitokenService,
   ) {
@@ -51,7 +52,7 @@ export class HistoryComponent implements OnInit {
   }
 
   public fromTokens(val) {
-    val = String(val).replace(/-/, '');
-    return val + ' tokens'
+    val = val.toLocaleString().replace(/[-\s]/g, '');
+    return this.$form.from1E18(val) + ' tokens'
   }
 }

@@ -6,6 +6,7 @@ import { ValidatorFn, AbstractControl } from '@angular/forms';
 export class FormService {
 
   public web3 = new Web3;
+  public utils = this.web3.utils;
 
   constructor(
   ) {
@@ -20,13 +21,22 @@ export class FormService {
     };
   }
 
-  public toWei(val) {
+  public toWei(value) {
     const utils = this.web3.utils;
-    return utils.toBN(utils.toWei(val, 'ether'));
+    return utils.toBN(utils.toWei(value, 'ether'));
   }
 
-  public fromWei(val) {
+  public fromWei(value) {
     const utils = this.web3.utils;
-    return utils.fromWei(String(val), 'ether');
+    return utils.fromWei(String(value), 'ether');
+  }
+
+  public to1E18(value) {
+    return this.utils.toWei(value, 'ether');
+  }
+
+  public from1E18(value) {
+    return this.utils.fromWei(value, 'ether');
   }
 }
+

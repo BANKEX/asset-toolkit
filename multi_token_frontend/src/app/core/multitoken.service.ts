@@ -43,6 +43,39 @@ export class MultitokenService {
     })
   }
 
+  //#region Send Methods
+
+  public initSubTokens(tokenId, value): PromiEvent<Transaction> {
+    return this.contract.methods.init(tokenId, value).send({from: this.userAddress});
+  };
+
+  public transferTokens(tokenId, address, amount): PromiEvent<Transaction> {
+    return this.contract.methods.transfer(tokenId, address, amount).send({from: this.userAddress});
+  };
+
+  public acceptDividends(tokenId, value): PromiEvent<Transaction> {
+    return this.contract.methods.acceptDividends(tokenId).send({from: this.userAddress, value});
+  };
+
+  public withdrawDividends(tokenId, value): PromiEvent<Transaction> {
+    return this.contract.methods.releaseDividendsRights(tokenId, value).send({from: this.userAddress});
+  };
+
+  //#endregion
+
+  //#region Utility Methods
+
+  public getAllInitedTokenIds = async () => {
+    const tokenType = [];
+    const transfers = await this.contract.getPastEvents(
+      'Transfer', { fromBlock: 0, filter: { from: '0X0000000000000000000000000000000000000000' }});
+    transfers.forEach((event, index, array) => {
+      const { tokenId }  = event.returnValues;
+      if (tokenType.indexOf(tokenId) === -1) { tokenType.push(tokenId); }
+    });
+    return tokenType;
+  };
+
   public getOwner() {
     return this.contract.methods.owner().call();
   }
@@ -57,11 +90,6 @@ export class MultitokenService {
       return null;
     }));
     this.tokens.next(balances);
-  };
-
-  public sendTokens (tokenId, address, amount): PromiEvent<Transaction> {
-      return this.contract.methods.transfer(tokenId, address, amount).send({from: this.userAddress});
-    // this.balances[tokenId].pending[transactionHash] = -amount;
   };
 
   public getTokenBalance(tokenId): Promise<string> {
@@ -133,23 +161,16 @@ export class MultitokenService {
     this.divTransactions.next(details);
   };
 
-  // Send dividends to token holders
-  public withdrawDividends(tokenId, value): PromiEvent<Transaction> {
-    return this.contract.methods.releaseDividendsRights(tokenId, value).send({from: this.userAddress});
-  };
-
-  // Withdraw dividends
-  public sendDividends(tokenId, value): PromiEvent<Transaction> {
-    return this.contract.methods.acceptDividends(tokenId)
-      .send({from: this.userAddress, value});
-  };
-
   public resetTransactionsHistory() {
     this.lastDivToken = undefined;
     this.lastToken = undefined;
     this.transactions.next([]);
     this.divTransactions.next([]);
   }
+
+  //#endregion
+
+  //#region Private Methods
 
   private startLoops() {
     this.getBalances();
@@ -251,4 +272,6 @@ export class MultitokenService {
     }));
     return pendings;
   };
+
+  //#endregion
 }

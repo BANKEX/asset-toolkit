@@ -55,7 +55,7 @@ export class TransferModalComponent implements OnInit, AfterViewInit {
       // Object.setPrototypeOf(this.transaction, new PlasmaDepositImp());
       // if (amountBN.eq(this.transaction.bn)) {
         const balance = await this.$mt.getTokenBalance(this.transaction.key);
-        const event = this.$mt.sendTokens(this.transaction.key, destination, amount);
+        const event = this.$mt.transferTokens(this.transaction.key, destination, amount);
         if (+balance < +amount) { throw new Error('not enough tokens'); }
         event.on('transactionHash', (hash) => {
           this.$activeModal.close();
