@@ -32,7 +32,7 @@
                 a((click)="showTokensTransactions(key)", href="javascript:void(0)", title="Show token transactions") 0x{{key}}
                 | &nbsp;/&nbsp;
                 a((click)="showDividendsTransactions(key)", href="javascript:void(0)", title="Show dividends transactions") {{fromWei(dividends[key])}} Eth
-              .token-sum {{this.$form.from1E18(tokens[key].amount)}} tokens ({{tokens[key].part}}%)
+              .token-sum {{this.$form.from1E18(tokens[key].amount)}} tokens
               .token-sum(*ngIf="tokens[key].pending.length>0") Blocked: {{this.$form.from1E18(calculatePendings(tokens[key]))}}&nbsp;
                 img(src="/assets/cool-spinner.gif", alt="transaction in process", width="21px")
               .token-controls

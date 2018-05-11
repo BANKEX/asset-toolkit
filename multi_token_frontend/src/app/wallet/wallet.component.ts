@@ -88,7 +88,7 @@ export class WalletComponent implements OnInit {
     modalInstance.tokenKey = key;
   }
 
-  public openAddTokenModal(key: any, token): void {
+  public openAddTokenModal(): void {
     let modalInstance;
     modalInstance =	this.$modal.open(
       AddTokenModalComponent,
