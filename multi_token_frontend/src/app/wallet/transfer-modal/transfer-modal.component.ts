@@ -39,7 +39,7 @@ export class TransferModalComponent implements OnInit, AfterViewInit {
   public ngOnInit() {
     Object.setPrototypeOf(this.transaction.token, new Multitoken());
     this.tokenKey = this.$form.fromWei(this.transaction.key);
-    this.avalableTokens = this.$form.fromWei(+this.transaction.token.amount - this.transaction.token.totalPending(); );
+    this.avalableTokens = this.$form.fromWei(+this.transaction.token.amount - this.transaction.token.totalPending());
     this.initForm();
   }
 
