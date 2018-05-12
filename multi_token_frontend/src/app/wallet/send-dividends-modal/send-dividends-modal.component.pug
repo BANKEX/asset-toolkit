@@ -10,13 +10,13 @@ doctype html
         type='text',
         formControlName='tokenKey',
         [ngClass]=`{
-          'error': amount.touched && amount.invalid,
-          'not-null': amount.touched && !amount.hasError('required')
+          'error': token.touched && token.invalid,
+          'not-null': token.touched && !token.hasError('required')
         }`)
       .label Token Id (in 0x... format)
-      div(*ngIf="amount.touched && amount.hasError('required')")
-        label.error Amount is required
-      div(*ngIf="amount.touched && amount.hasError('pattern')")
+      div(*ngIf="token.touched && token.hasError('required')")
+        label.error token is required
+      div(*ngIf="token.touched && token.hasError('pattern')")
         label.error Amount should be a valid number
     .popup-input.popup-input-add.placeholder
       input.value(

@@ -99,11 +99,12 @@ export class AddTokenModalComponent implements AfterViewInit, OnInit {
     this.form = this.$fb.group({
       amount: ['', [
         Validators.required,
-        Validators.min(0.001),
+        Validators.min(1),
         Validators.pattern(/^\d/)]
       ],
       tokenKey: ['', [
         Validators.required,
+        Validators.pattern(/^\d/)
       ]
     ]});
   }

@@ -10,13 +10,13 @@ doctype html
         #focus,
         formControlName='tokenKey',
         [ngClass]=`{
-          'error': amount.touched && amount.invalid,
-          'not-null': amount.touched && !amount.hasError('required')
+          'error': token.touched && token.invalid,
+          'not-null': token.touched && !token.hasError('required')
         }`)
       .label Token Id (without '0x' - just numbers)
-      div(*ngIf="amount.touched && amount.hasError('required')")
+      div(*ngIf="token.touched && token.hasError('required')")
         label.error Id is required
-      div(*ngIf="amount.touched && amount.hasError('pattern')")
+      div(*ngIf="token.touched && token.hasError('pattern')")
         label.error Id should be a valid number
     .popup-input.popup-input-add.placeholder
       input.value(
@@ -35,5 +35,5 @@ doctype html
         label.error Amount should be a valid number
   .popup-details
     .desc You going to create and emmit new subtoken in this multitiken
-  input.popup-button(type='submit' value='Send', (click)='createToken()', [ngClass]='{disabled: form.invalid}')
+  input.popup-button(type='submit' value='Create', (click)='createToken()', [ngClass]='{disabled: form.invalid}')
   a.popup-cancel(href='javascript:void(0)', (click)='closeModal()') Cancel
