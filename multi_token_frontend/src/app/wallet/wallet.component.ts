@@ -77,7 +77,7 @@ export class WalletComponent implements OnInit {
     modalInstance.amount = this.dividends[key];
   }
 
-  public openDividendsModal(key: any, token): void {
+  public openDividendsModal(key?: string, token?: any): void {
     let modalInstance;
     modalInstance =	this.$modal.open(
       SendDividendsModalComponent,

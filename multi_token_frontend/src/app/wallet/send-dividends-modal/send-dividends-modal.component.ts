@@ -50,11 +50,6 @@ export class SendDividendsModalComponent implements AfterViewInit, OnInit {
   public ngOnInit() {
     this.toBN = this.$connection.web3.utils.toBN;
     this.initForm();
-    // this.$mt.tokens.take(1).subscribe(_tokens => {
-    //   this.tokens = _tokens;
-    //   this.form.controls['tokenKey'].setValue(this.objectKeys(_tokens)[0], {onlySelf: true});
-    //   this.$cdr.detectChanges();
-    // })
   }
 
   ngAfterViewInit() {
@@ -68,10 +63,7 @@ export class SendDividendsModalComponent implements AfterViewInit, OnInit {
     const amountBN = this.$form.toWei(amount);
     this.$events.transferAdded(amount);
     this.$overlay.showOverlay(true);
-    try {debugger
-      // Object.setPrototypeOf(this.transaction, new PlasmaDepositImp());
-      // if (amountBN.eq(this.transaction.bn)) {
-        // const balance = await this.$mt.getTokenBalance(this.transaction.key);
+    try {
       const event = this.$mt.acceptDividends(this.toBN(tokenType), amountBN);
       event.on('transactionHash', (hash) => {
         this.$activeModal.close();
