@@ -53,7 +53,7 @@ export class MultitokenService {
     return this.contract.methods.transfer(tokenId, address, amount).send({from: this.userAddress});
   };
 
-  public acceptDividends(tokenId, value): PromiEvent<Transaction> {
+  public acceptDividends(tokenId, value): PromiEvent<Transaction> {debugger
     return this.contract.methods.acceptDividends(tokenId).send({from: this.userAddress, value});
   };
 

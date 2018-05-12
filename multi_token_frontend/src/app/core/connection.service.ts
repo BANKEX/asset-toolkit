@@ -57,27 +57,21 @@ export class ConnectionService extends BehaviorSubject<Connection> {
 
   private init = () => {
     return new Promise((resolve, reject) => {
-      if (!this.web3) {
-        this.$blockingNotificationOverlay.setOverlayMessage('No Metamask');
-        this.$blockingNotificationOverlay.showOverlay();
-        return reject('No Metamask');
+      if (!this.web3.currentProvider.isMetaMask) {
+        return reject('No Metamask installed, please install Metamask browser extension');
       }
       this.web3.eth.getAccounts((err, acc) => {
         if (err) {
           reject(err);
         }
         if (!acc[0]) {
-          this.$blockingNotificationOverlay.setOverlayMessage('Metamask Locked');
-          this.$blockingNotificationOverlay.showOverlay();
-          return reject('Metamask Locked');
+          return reject('Metamask is locked, please unlock it');
         }
         this.account = acc[0]; // save account data
         this.web3.eth.net.getNetworkType((e, net) => {
           if (e) { reject(e); return; }
           if (net !== 'rinkeby' && net !== 'private') { // && net !== 'private'
-            this.$blockingNotificationOverlay.setOverlayMessage('Choose Rinkeby Network');
-            this.$blockingNotificationOverlay.showOverlay();
-            return reject('Choose Rinkeby Network');
+            return reject('Choose Rinkeby Network in Metamask');
           } else {
             this.isRinkeby = net === 'rinkeby';
           }

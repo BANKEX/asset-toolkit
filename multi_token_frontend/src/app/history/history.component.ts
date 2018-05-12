@@ -47,8 +47,8 @@ export class HistoryComponent implements OnInit {
 
   // TODO Нужно убрать этот костыль
   public fromWei(val) {
-    val = String(val).replace(/-/, '');
-    return (val.indexOf('.') > -1) || (val.length < 5)  ? Math.floor(+val) + ' Wei' : this.$connection.web3.utils.fromWei(val) + ' Eth';
+    val = String(Math.floor(val)).replace(/-/, '');
+    return this.$connection.web3.utils.fromWei(val) + ' Eth';
   }
 
   public fromTokens(val) {
