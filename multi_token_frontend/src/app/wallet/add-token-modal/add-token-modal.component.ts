@@ -18,10 +18,11 @@ export class AddTokenModalComponent implements AfterViewInit, OnInit {
   @ViewChildren('focus') public focus;
 
   public form: FormGroup;
-  public tokenKey: any;
-  public tokens: any;
+  public initialDataReady = false;
   public objectKeys = Object.keys;
   public toBN: any;
+  public tokenKey: any;
+  public tokens: string[] = [];
 
   constructor(
     private $activeModal: NgbActiveModal,
@@ -40,29 +41,30 @@ export class AddTokenModalComponent implements AfterViewInit, OnInit {
 
   public ngOnInit() {
     this.toBN = this.$connection.web3.utils.toBN;
-    this.initForm();
+    this.$mt.getAllInitedTokenIds().then(_ids => {
+      this.tokens = _ids;
+      this.initForm();
+      this.initialDataReady = true;
+    });
   }
 
   ngAfterViewInit() {
-    this.focus.first.nativeElement.focus();
   }
 
   public async createToken() {
     let err, result;
-    const amount = this.form.value.amount;
-    const tokenType = this.form.value.tokenKey;
-    const amountBN = this.$form.toWei(amount);
-    this.$events.transferAdded(amount);
+    const amount = this.$form.to1E18(this.form.value.amount);
+    const tokenType = this.toBN(this.$form.remove0x(this.form.value.tokenKey));
+    this.$events.transferAdded(null);
     this.$overlay.showOverlay(true);
     try {
-      const event = this.$mt.initSubTokens(this.toBN(tokenType), this.toBN(amount));
+      const event = this.$mt.initSubTokens(tokenType, amount);
       event.on('transactionHash', (hash) => {
         this.$activeModal.close();
         this.$overlay.hideOverlay();
         this.$events.transferSubmited(null);
       });
       [err, result] = await to(event);
-      // }
       if (err) {
         if (err.message.indexOf('User denied') > 0) {
           this.$events.transferCanceled(undefined);
@@ -88,15 +90,17 @@ export class AddTokenModalComponent implements AfterViewInit, OnInit {
 
   private initForm() {
     this.form = this.$fb.group({
-      amount: ['', [
-        Validators.required,
-        Validators.min(1),
-        Validators.pattern(/^\d/)]
-      ],
       tokenKey: ['', [
         Validators.required,
-        Validators.pattern(/^\d/)
-      ]
-    ]});
+        Validators.pattern(/^0x[1-9](\d+)?$/m),
+        this.$form.tokenNotExistsValidator(this.tokens)
+      ]],
+      amount: ['', [
+        Validators.required,
+        Validators.pattern(/^\d+(\.\d+)?$/m),
+        this.$form.rangeValidator()
+      ]],
+    });
+    setTimeout(() => { this.focus.first.nativeElement.focus(); }, 1000)
   }
 }

@@ -1,5 +1,5 @@
 doctype html
-.popup-block
+.popup-block(*ngIf="initialDataReady")
   a.popup-close(href='javascript:void(0)', (click)='closeModal()')
     span <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14"><path fill="#444" fill-rule="evenodd" d="M13.7.3c-.4-.4-1-.4-1.4 0L7 5.6 1.7.3C1.3-.1.7-.1.3.3c-.4.4-.4 1 0 1.4L5.6 7 .3 12.3c-.4.4-.4 1 0 1.4.2.2.4.3.7.3.3 0 .5-.1.7-.3L7 8.4l5.3 5.3c.2.2.5.3.7.3.2 0 .5-.1.7-.3.4-.4.4-1 0-1.4L8.4 7l5.3-5.3c.4-.4.4-1 0-1.4" opacity=".5"></path></svg>
   form([formGroup]='form')
@@ -8,16 +8,19 @@ doctype html
     .popup-input.popup-input-add.placeholder(*ngIf="!tokenKey")
       input.value(
         type='text',
+        #focus,
         formControlName='tokenKey',
         [ngClass]=`{
           'error': token.touched && token.invalid,
           'not-null': token.touched && !token.hasError('required')
         }`)
-      .label Token Id (in 0x... format)
+      .label Token Id (for example '0x123')
       div(*ngIf="token.touched && token.hasError('required')")
-        label.error token is required
-      div(*ngIf="token.touched && token.hasError('pattern')")
-        label.error Amount should be a valid number
+        label.error Token Id is required
+      div(*ngIf="token.touched && !token.hasError('min') && token.hasError('pattern')")
+        label.error Wrong format
+      div(*ngIf="token.touched && !token.hasError('min') && !token.hasError('pattern') && token.hasError('not-exists')")
+        label.error Token with this Id does not exists
     .popup-input.popup-input-add.placeholder
       input.value(
         type='text',
@@ -31,7 +34,7 @@ doctype html
       div(*ngIf="amount.touched && amount.hasError('required')")
         label.error Amount is required
       div(*ngIf="amount.touched && amount.hasError('min')")
-        label.error Amount should be >= 1
+        label.error Amount should be >= {{amountMin}}
       div(*ngIf="amount.touched && amount.hasError('pattern')")
         label.error Amount should be a valid number
   .popup-details
