@@ -17,20 +17,20 @@
     top: -60px;
     //left: 30%;
     &-add {
-      text-decoration: none;
-      outline: none;
-      position: relative;
-      display: inline-block;
-      height: 44px;
       border: 1px solid #0da9ff;
       border-radius: 4px;
       color: #0da9ff;
-      font-size: 16px;
-      letter-spacing: -0.3;
+      display: inline-block;
       font-weight: 600;
+      font-size: 16px;
+      height: 44px;
+      letter-spacing: -0.3;
       line-height: 50px;
-      padding: 0 20px 0 50px;
       margin-right: 20px;
+      outline: none;
+      position: relative;
+      padding: 0 20px 0 50px;
+      text-decoration: none;
       transition: all 0.5s;
       &:hover {
         background: #0da9ff;
@@ -41,11 +41,11 @@
         fill: #fff;
       }
       i.icon {
-        position: absolute;
-        width: 20px;
         height: 32px;
-        top: 5px;
         left: 10px;
+        position: absolute;
+        top: 5px;
+        width: 20px;
       }
       .label {
         position: relative;

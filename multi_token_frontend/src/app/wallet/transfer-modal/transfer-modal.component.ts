@@ -19,6 +19,8 @@ export class TransferModalComponent implements OnInit, AfterViewInit {
   @ViewChildren('focus') public focus;
 
   public transferForm: FormGroup;
+  public avalableTokens: number;
+  public tokenKey: string;
 
   constructor(
     private $activeModal: NgbActiveModal,
@@ -36,7 +38,8 @@ export class TransferModalComponent implements OnInit, AfterViewInit {
 
   public ngOnInit() {
     Object.setPrototypeOf(this.transaction.token, new Multitoken());
-    this.transaction.max = +this.transaction.token.amount - this.transaction.token.totalPending();
+    this.tokenKey = this.$form.fromWei(this.transaction.key);
+    this.avalableTokens = this.$form.fromWei(+this.transaction.token.amount - this.transaction.token.totalPending());
     this.initForm();
   }
 
@@ -46,14 +49,11 @@ export class TransferModalComponent implements OnInit, AfterViewInit {
 
   public async transfer() {
     let err, result;
-    const amount = this.transferForm.value.amount;
+    const amount = this.$form.toWei(this.transferForm.value.amount);
     const destination = this.transferForm.value.walletAddress;
-    const amountBN = this.$form.toWei(amount);
     this.$events.transferAdded(amount);
     this.$overlay.showOverlay(true);
     try {
-      // Object.setPrototypeOf(this.transaction, new PlasmaDepositImp());
-      // if (amountBN.eq(this.transaction.bn)) {
         const balance = await this.$mt.getTokenBalance(this.transaction.key);
         const event = this.$mt.transferTokens(this.transaction.key, destination, amount);
         if (+balance < +amount) { throw new Error('not enough tokens'); }
@@ -88,11 +88,11 @@ export class TransferModalComponent implements OnInit, AfterViewInit {
 
   private initForm() {
     this.transferForm = this.$fb.group({
-      amount: [this.transaction.eth, [
+      amount: [this.avalableTokens, [
         Validators.required,
-        Validators.min(1),
-        Validators.max(this.transaction.max),
-        Validators.pattern(/^\d?/)]
+        // Validators.min(1),
+        Validators.max(this.avalableTokens),
+        Validators.pattern(/^\d+(\.\d+)?$/)]
       ],
       walletAddress: ['', [
         Validators.required,

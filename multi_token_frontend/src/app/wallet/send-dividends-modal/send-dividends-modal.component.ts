@@ -27,10 +27,12 @@ export class SendDividendsModalComponent implements AfterViewInit, OnInit {
   @Output() public transferred: EventEmitter<string> = new EventEmitter<string>();
   @ViewChildren('focus') public focus;
 
+  public amountMin = 0.001;
   public form: FormGroup;
-  public tokens: any;
+  public initialDataReady = false;
   public objectKeys = Object.keys;
   public toBN: any;
+  public tokens: string[] = [];
 
   constructor(
     private $activeModal: NgbActiveModal,
@@ -49,17 +51,20 @@ export class SendDividendsModalComponent implements AfterViewInit, OnInit {
 
   public ngOnInit() {
     this.toBN = this.$connection.web3.utils.toBN;
-    this.initForm();
+    this.$mt.getAllInitedTokenIds().then(_ids => {
+      this.initialDataReady = true;
+      this.tokens = _ids;
+      this.initForm();
+    });
   }
 
   ngAfterViewInit() {
-    this.focus.first.nativeElement.focus();
   }
 
   public async sendDividends() {
     let err, result;
     const amount = this.form.value.amount;
-    const tokenType = this.form.value.tokenKey;
+    const tokenType = this.$form.remove0x(this.form.value.tokenKey);
     const amountBN = this.$form.toWei(amount);
     this.$events.transferAdded(amount);
     this.$overlay.showOverlay(true);
@@ -97,14 +102,17 @@ export class SendDividendsModalComponent implements AfterViewInit, OnInit {
 
   private initForm() {
     this.form = this.$fb.group({
+      tokenKey: [this.tokenKey ? this.$form.add0x(this.tokenKey) : '', [
+        Validators.required,
+        Validators.pattern(/^0x[1-9](\d+)?$/m),
+        this.$form.tokenExistsValidator(this.tokens)
+      ]],
       amount: ['1', [
         Validators.required,
-        Validators.min(0.001),
-        Validators.pattern(/^\d+(\.\d+)?$/)]
+        Validators.min(this.amountMin),
+        Validators.pattern(/^\d+(\.\d+)?$/m)]
       ],
-      tokenKey: [this.tokenKey ? this.tokenKey : '', [
-        Validators.required,
-      ]
-    ]});
+    });
+    setTimeout(() => { this.focus.first.nativeElement.focus(); }, 100)
   }
 }

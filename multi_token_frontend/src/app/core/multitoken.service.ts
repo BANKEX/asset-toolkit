@@ -46,18 +46,22 @@ export class MultitokenService {
   //#region Send Methods
 
   public initSubTokens(tokenId, value): PromiEvent<Transaction> {
+    console.log(`TokenId: ${tokenId.toString()}, Value: ${value.toString()}`)
     return this.contract.methods.init(tokenId, value).send({from: this.userAddress});
   };
 
   public transferTokens(tokenId, address, amount): PromiEvent<Transaction> {
+    console.log(`TokenId: ${tokenId.toString()}, Address: ${address},Amount: ${amount.toString()}`)
     return this.contract.methods.transfer(tokenId, address, amount).send({from: this.userAddress});
   };
 
-  public acceptDividends(tokenId, value): PromiEvent<Transaction> {debugger
+  public acceptDividends(tokenId, value): PromiEvent<Transaction> {
+    console.log(`TokenId: ${tokenId.toString()}, Value: ${value.toString()}`)
     return this.contract.methods.acceptDividends(tokenId).send({from: this.userAddress, value});
   };
 
   public withdrawDividends(tokenId, value): PromiEvent<Transaction> {
+    console.log(`TokenId: ${tokenId.toString()}, Value: ${value.toString()}`)
     return this.contract.methods.releaseDividendsRights(tokenId, value).send({from: this.userAddress});
   };
 
@@ -65,7 +69,7 @@ export class MultitokenService {
 
   //#region Utility Methods
 
-  public getAllInitedTokenIds = async () => {
+  public async getAllInitedTokenIds() {
     const tokenType = [];
     const transfers = await this.contract.getPastEvents(
       'Transfer', { fromBlock: 0, filter: { from: '0X0000000000000000000000000000000000000000' }});
@@ -80,7 +84,7 @@ export class MultitokenService {
     return this.contract.methods.owner().call();
   }
 
-  public getBalances = async () => {
+  public async getBalances() {
     const cells = await this.getCells();
     const balances = {};
     const pendings = await this.getPendings();
@@ -96,7 +100,7 @@ export class MultitokenService {
     return this.contract.methods.balanceOf(tokenId, this.userAddress).call();
   }
 
-  public getDetails = async (tokenId) => {
+  public async getDetails(tokenId) {
     const transfersOnTokenIdFrom = await this.contract.getPastEvents(
       'Transfer', { fromBlock: 0, filter: { from: this.userAddress, tokenId }});
     const transfersOnTokenIdTo = await this.contract.getPastEvents(
@@ -125,7 +129,7 @@ export class MultitokenService {
     this.transactions.next(details);
   };
 
-  public getDividendsBalances = async () => {
+  public async getDividendsBalances() {
     const cells = await this.getCells();
     const divBalances = {};
     await Promise.all(cells.map(async (tokenId) => {
@@ -135,7 +139,7 @@ export class MultitokenService {
     this.dividends.next(divBalances);
   };
 
-  public getDividendsDetails = async (tokenId) => {
+  public async getDividendsDetails(tokenId) {
     const details = [];
     const releaseDividendsRights = await this.contract.getPastEvents(
       'ReleaseDividendsRights', { fromBlock: 0, filter: { _for: this.userAddress, tokenId }});
