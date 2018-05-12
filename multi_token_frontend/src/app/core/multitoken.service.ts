@@ -21,7 +21,7 @@ export class MultitokenService {
   public divTransactions: Subject<any[]> = new Subject();
   public dividends: Subject<any> = new Subject();
 
-  private fetchDataDelay = 5000;
+  private fetchDataDelay = 500000;
   private userAddress: string;
   private contractAddress: string;
   private balances: any;

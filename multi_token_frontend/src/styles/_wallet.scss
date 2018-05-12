@@ -153,12 +153,20 @@
   }
 
   &-sum {
-    width: 300px;
-    text-align: right;
+    width: 450px;
+    text-align: left;
     margin-right: 2em;
     text-transform: uppercase;
-    //overflow: hidden;
+    overflow: hidden;
     text-overflow: ellipsis;
+    .value {
+      display: inline-block;
+      overflow: hidden;
+      text-align: left;
+      text-overflow: ellipsis;
+      vertical-align: bottom;
+      max-width: 100px;
+    }
   }
 
   &-address {
@@ -167,8 +175,11 @@
   }
 
   &-number {
-    width: 270px;
-    // text-transform: uppercase;
+    margin-right: 2em;
+    overflow: hidden;
+    text-align: left;
+    text-overflow: ellipsis;
+    width: 100px;
   }
 
   &-date {
@@ -199,6 +210,10 @@
   &:last-child {
     margin-bottom: 0;
   }
+
+  // span {
+  //   display: inline-block;
+  // }
 }
 
 .ps__rail-x, .ps__rail-x:hover, .ps__rail-y, .ps__rail-y:hover {

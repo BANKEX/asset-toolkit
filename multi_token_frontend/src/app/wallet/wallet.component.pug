@@ -68,11 +68,15 @@
     .tokens-list(*ngIf="tokens")
       perfect-scrollbar
         .token(*ngFor="let key of objectKeys(tokens) | orderBy:key:false")
-          .token-number
-            a((click)="showTokensTransactions(key)", href="javascript:void(0)", title="Show token transactions") 0x{{key}}
+          .token-number(title="Token id: 0x{{key}}") 0x{{key}}
+          .token-sum
+            a((click)="showTokensTransactions(key)", href="javascript:void(0)", title="Show token transactions")
+              span.value(title="Tokens: {{this.$form.from1E18(tokens[key].amount)}}") {{this.$form.from1E18(tokens[key].amount)}}
+              //- span.label tokens
             | &nbsp;/&nbsp;
-            a((click)="showDividendsTransactions(key)", href="javascript:void(0)", title="Show dividends transactions") {{fromWei(dividends[key])}} Eth
-          .token-sum {{this.$form.from1E18(tokens[key].amount)}} tokens
+            a((click)="showDividendsTransactions(key)", href="javascript:void(0)", title="Show dividends transactions")
+              span.value(title="Dividends: {{fromWei(dividends[key])}}") {{fromWei(dividends[key])}}
+              span.label &nbsp; Eth
           .token-sum(*ngIf="tokens[key].pending.length>0") Blocked: {{this.$form.from1E18(calculatePendings(tokens[key]))}}&nbsp;
             img(src="/assets/cool-spinner.gif", alt="transaction in process", width="21px")
           .token-controls
@@ -126,22 +130,3 @@
                   <path d="M7 16H1a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1M15.978 0H9l2.789 2.797-3.496 3.496 1.414 1.414L13.2 4.214 15.978 7z"></path>
                 </g>
               </svg>
-
-
-      //mt-tab(title="Dividends")
-        .tokens-info.no_tokens(*ngIf="!tokens") You haven’t got any tokens.
-        .tokens-list(*ngIf="tokens")
-          perfect-scrollbar
-            .token(*ngFor="let key of objectKeys(dividends) | orderBy:sortBy.id:sortBy.reverse")
-              .token-number
-                a((click)="showDividendsTransactions(key)", href="javascript:void(0)", title="Show") type {{key}}
-              .token-sum {{dividends[key]}} Wei
-              //-.token-sum(*ngIf="tokens[key].pending.length>0") Blocked: {{calculatePendings(tokens[key])}} tokens
-              //-  img(src="/assets/spinner.gif", alt="transaction in process")
-              .token-controls
-                span.token-transfer((click)="openWithdrawModal(key, tokens[key])", title="Withdraw dividends")
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-                    <g fill="#0DA9FF" fill-rule="evenodd">
-                      <path d="M7 16H1a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1M15.978 0H9l2.789 2.797-3.496 3.496 1.414 1.414L13.2 4.214 15.978 7z"></path>
-                    </g>
-                  </svg>
