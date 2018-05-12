@@ -11,7 +11,7 @@
                 </path>
               </g>
             </svg>
-          .transaction-number {{item.address ? fromTokens(item.value) : (fromWei(item.value))}}
+          .transaction-value {{item.address ? fromTokens(item.value) : (fromWei(item.value))}}
           .transaction-address {{item.address}}
           .transaction-date(*ngIf="item.date") {{item.date | date}}
           .transaction-date(*ngIf="!item.date")
