@@ -146,6 +146,7 @@
   &-number,
   &-label,
   &-sum,
+  &-value,
   &-tokens,
   &-dividends {
     display: inline-block;
@@ -167,11 +168,15 @@
       vertical-align: bottom;
       max-width: 100px;
     }
+    &:hover a {
+      text-decoration: none;
+    }
   }
 
   &-address {
     width: 430px;
     text-transform: uppercase;
+    margin-left: 25px;
   }
 
   &-number {

@@ -15,7 +15,7 @@ export class HistoryComponent implements OnInit {
   public transactions: any[];
   public title: string;
 
-  private _title = 'Click on token name to see its transactions history';
+  private _title = 'Click on token or dividends to see transactions history';
 
   public constructor(
     private $connection: ConnectionService,
