@@ -1,7 +1,7 @@
 .tokens {
   padding: 32px 100px;
   padding-top: 90px;
-  max-height: 350px;
+  max-height: 360px;
 
   label {
     margin-right: 10px;
@@ -15,7 +15,7 @@
   &-buttons {
     position: absolute;
     top: -60px;
-    //left: 30%;
+    left: 32%;
     &-add {
       border: 1px solid #0da9ff;
       border-radius: 4px;
@@ -154,19 +154,19 @@
   }
 
   &-sum {
-    width: 450px;
+    width: 315px;
     text-align: left;
-    margin-right: 2em;
     text-transform: uppercase;
     overflow: hidden;
     text-overflow: ellipsis;
     .value {
       display: inline-block;
+      max-width: 100px;
       overflow: hidden;
+      padding-right: 5px;
       text-align: left;
       text-overflow: ellipsis;
       vertical-align: bottom;
-      max-width: 100px;
     }
     &:hover a {
       text-decoration: none;
@@ -175,7 +175,6 @@
 
   &-address {
     width: 430px;
-    text-transform: uppercase;
     margin-left: 25px;
   }
 

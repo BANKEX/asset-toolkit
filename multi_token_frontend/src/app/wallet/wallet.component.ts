@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { MultitokenService, EventService, ConnectionService, FormService } from '../core';
+import { MultitokenService, EventService, ConnectionService, FormService, UIService } from '../core';
 import { Connection } from '../shared/types';
 import { TransferModalComponent } from './transfer-modal/transfer-modal.component';
 import { GetDividendsModalComponent } from './get-dividends-modal/get-dividends-modal.component';
@@ -14,6 +14,8 @@ import { AddTokenModalComponent } from './add-token-modal/add-token-modal.compon
 
 export class WalletComponent implements OnInit {
 
+  public connected = false;
+  public empty = false;
   public tokens: any;
   public dividends: any;
   public sortOptions: any[];
@@ -26,13 +28,19 @@ export class WalletComponent implements OnInit {
     private $events: EventService,
     private $modal: NgbModal,
     private $mt: MultitokenService,
+    private $ui: UIService,
   ) {
     $mt.tokens.distinctUntilChanged().subscribe((_tokens: any) => {
-      this.tokens = _tokens;
+      if (Object.keys(_tokens).length !== 0) {
+        this.tokens = _tokens;
+      } else {
+        this.empty = true;
+      }
     });
     $mt.dividends.distinctUntilChanged().subscribe((_dividends: any) => {
       this.dividends = _dividends;
     });
+    $connection.subscribe(_status => setTimeout(() => this.connected = _status > 2, 2000));
   }
 
   ngOnInit(): void {
@@ -46,11 +54,13 @@ export class WalletComponent implements OnInit {
   public showTokensTransactions(tokenKey) {
     this.$mt.resetTransactionsHistory();
     this.$mt.getDetails(tokenKey);
+    this.$ui.detailsClicked();
   }
 
   public showDividendsTransactions(tokenKey) {
     this.$mt.resetTransactionsHistory();
     this.$mt.getDividendsDetails(tokenKey);
+    this.$ui.detailsClicked();
   }
 
   public openTransferModal(key: any, token): void {

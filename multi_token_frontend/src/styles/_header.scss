@@ -1,5 +1,6 @@
 .header {
   height: 140px;
+  padding: 0 32px;
   &-inner {
     position: relative;
     &-logo {
@@ -37,4 +38,8 @@
       top: 100px;
     }
   }
+.container {
+  min-width: 900px !important;
+}
+
 }
