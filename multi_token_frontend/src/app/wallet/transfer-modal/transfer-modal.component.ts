@@ -96,7 +96,9 @@ export class TransferModalComponent implements OnInit, AfterViewInit {
       ],
       walletAddress: ['', [
         Validators.required,
-        this.$form.walletAddressValidator()
+        this.$form.forbiddenValidator(this.$mt.userAddress),
+        this.$form.forbiddenValidator(this.$mt.contractAddress),
+        this.$form.walletAddressValidator(),
       ]
     ]});
   }

@@ -45,6 +45,14 @@ export class FormService {
     }
   }
 
+  public forbiddenValidator(_value): ValidatorFn {
+    return (control: AbstractControl): {[key: string]: any} => {
+      const error = {};
+      error['forbidden'] = {value: control.value};
+      return !control.value || control.value !== _value ? null : error;
+    }
+  }
+
   public rangeValidator(): ValidatorFn {
     return (control: AbstractControl): {[key: string]: any} => {
       if (!control.value) { return null };

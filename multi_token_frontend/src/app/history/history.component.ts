@@ -57,7 +57,7 @@ export class HistoryComponent implements OnInit {
 
   public prepareValue(transaction) {
     return transaction.address
-      ? this.$form.from1E18(transaction.value.toLocaleString().replace(/[-\s]/g, '')) + ' TOKENS'
+      ? this.$form.from1E18(transaction.value.toLocaleString().replace(/[-\s]/g, '')) + ' TOKEN'
       : this.$form.from1E18(String(Math.floor(transaction.value)).replace(/-/, '')) + ' ETH';
   }
 }

@@ -1,6 +1,6 @@
 .tokens {
   padding: 32px 100px;
-  padding-top: 90px;
+  padding-top: 82px;
   max-height: 360px;
 
   label {
@@ -84,6 +84,7 @@
       cursor: pointer;
       transition: all 0.5s;
 
+      //&:not(.disabled) {
       &:hover {
         background: #0da9ff;
       }
@@ -91,6 +92,7 @@
       &:hover svg * {
         fill: #fff;
       }
+      //}
     }
   }
 
@@ -139,6 +141,7 @@
   margin-bottom: 16px;
   padding: 2px 24px 0 16px;
   margin-right: 15px;
+  font-family: monospace;
 
   &-address,
   &-date,
@@ -174,7 +177,7 @@
   }
 
   &-address {
-    width: 430px;
+    width: 400px;
     margin-left: 25px;
   }
 
@@ -187,7 +190,7 @@
   }
 
   &-date {
-    width: 100px;
+    width: 150px;
   }
 
   &-transfer {

@@ -14,6 +14,7 @@ import { AddTokenModalComponent } from './add-token-modal/add-token-modal.compon
 
 export class WalletComponent implements OnInit {
 
+  public avalableTokensCount = this.$mt.avalableTokensCount;
   public connected = false;
   public empty = false;
   public tokens: any;
@@ -40,7 +41,6 @@ export class WalletComponent implements OnInit {
     $mt.dividends.distinctUntilChanged().subscribe((_dividends: any) => {
       this.dividends = _dividends;
     });
-    $connection.subscribe(_status => setTimeout(() => this.connected = _status > 2, 2000));
   }
 
   ngOnInit(): void {
@@ -65,6 +65,8 @@ export class WalletComponent implements OnInit {
 
   public openTransferModal(key: any, token): void {
     let modalInstance;
+    if (this.avalableTokensCount(token) === '0') { return; }
+    if (+this.avalableTokensCount(token) < 0) { throw Error('Negativ tokem amount. Please report a bug!') }
     modalInstance =	this.$modal.open(
       TransferModalComponent,
       {
