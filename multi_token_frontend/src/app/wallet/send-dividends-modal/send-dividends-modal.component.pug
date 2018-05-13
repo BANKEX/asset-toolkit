@@ -30,7 +30,7 @@ doctype html
           'error': amount.touched && amount.invalid,
           'not-null': amount.touched && !amount.hasError('required')
         }`)
-      .label Amount in Eth
+      .label Amount in ETH
       div(*ngIf="amount.touched && amount.hasError('required')")
         label.error Amount is required
       div(*ngIf="amount.touched && amount.hasError('min')")
@@ -38,6 +38,6 @@ doctype html
       div(*ngIf="amount.touched && amount.hasError('pattern')")
         label.error Amount should be a valid number
   .popup-details
-    .desc You going to send Eth from your personal wallet to selected token
+    .desc You going to send ETH from your personal wallet to selected token
   input.popup-button(type='submit' value='Send', (click)='sendDividends()', [ngClass]='{disabled: form.invalid}')
   a.popup-cancel(href='javascript:void(0)', (click)='closeModal()') Cancel

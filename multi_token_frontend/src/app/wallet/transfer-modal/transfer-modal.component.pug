@@ -18,6 +18,8 @@ doctype html
         label.error Wallet Address is required
       div(*ngIf="address.touched && address.hasError('validAddress')")
         label.error Invalid wallet address
+      div(*ngIf="address.touched && address.hasError('forbidden')")
+        label.error You can't send tokens to this address
     .popup-input.popup-input-add.placeholder
       input.value(
         #focus,
@@ -27,7 +29,7 @@ doctype html
           'error': amount.touched &&amount.invalid,
           'not-null': amount.touched && !amount.hasError('required')
         }`)
-      .label Tokens amount
+      .label Token amount
       div(*ngIf="amount.touched && amount.hasError('required')")
         label.error Amount is required
       //- div(*ngIf="amount.touched && amount.hasError('min')")

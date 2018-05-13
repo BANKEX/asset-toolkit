@@ -21,6 +21,6 @@ doctype html
       div(*ngIf="amount.touched && amount.hasError('pattern')")
         label.error Amount should be a valid number
   .popup-details
-    .desc You going to withdraw {{fromWei(amount)}} Eth to your personal wallet
+    .desc You going to withdraw {{fromWei(amount)}} ETH to your personal wallet
   input.popup-button(type='submit' value='Send', (click)='getDividends(tokenKey, amount)', [ngClass]='{disabled: (!tokenKey || !amount) && form.invalid}')
   a.popup-cancel(href='javascript:void(0)', (click)='closeModal()') Cancel

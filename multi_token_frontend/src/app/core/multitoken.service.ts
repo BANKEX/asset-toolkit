@@ -4,7 +4,7 @@ import {
   EventService,
 } from '.';
 import { Account, Contract, PromiEvent, Tx, Transaction } from 'web3/types';
-import { Connection } from '../shared/types';
+import { Connection, Multitoken } from '../shared/types';
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs/Subject';
 import { ErrorMessageService } from '../shared/services/index';
@@ -15,16 +15,16 @@ declare const web3: any; // Use global instance from Metamask if needed
 @Injectable()
 export class MultitokenService {
 
-  public lastToken: string;
-  public lastDivToken: string;
-  public transactions: Subject<any[]> = new Subject();
-  public tokens: Subject<any> = new Subject();
-  public divTransactions: Subject<any[]> = new Subject();
+  public contractAddress: string;
   public dividends: Subject<any> = new Subject();
+  public divTransactions: Subject<any[]> = new Subject();
+  public lastDivToken: string;
+  public lastToken: string;
+  public tokens: Subject<any> = new Subject();
+  public transactions: Subject<any[]> = new Subject();
+  public userAddress: string;
 
-  private fetchDataDelay = 5000;
-  private userAddress: string;
-  private contractAddress: string;
+  private fetchDataDelay = 500;
   private balances: any;
   private contract: Contract;
 
@@ -171,6 +171,11 @@ export class MultitokenService {
     this.lastToken = undefined;
     this.transactions.next([]);
     this.divTransactions.next([]);
+  }
+
+  public avalableTokensCount(token: Multitoken) {
+    Object.setPrototypeOf(token, new Multitoken);
+    return web3.fromWei(+token.amount - token.totalPending());
   }
 
   //#endregion

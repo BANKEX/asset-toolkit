@@ -32,6 +32,8 @@
       font-weight: 600;
       .address {
         margin-left: 5px;
+        font-family: monospace;
+        font-size: 12px;
       }
     }
     &-contract {
@@ -39,7 +41,7 @@
     }
   }
 .container {
-  min-width: 900px !important;
+  min-width: 1000px !important;
 }
 
 }
