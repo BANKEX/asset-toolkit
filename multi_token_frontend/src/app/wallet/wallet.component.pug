@@ -1,8 +1,6 @@
+doctype html
 .tokens
   .tokens-inner
-    //-h2 Tokens
-    //-mt-tabs((selected)="onTabChanged()")
-    //-mt-tab(title="Tokens with dividends")
     .tokens-buttons
       a.tokens-buttons-add(href="javascript:void(0)", (click)="openAddTokenModal()", title="Create new subtoken")
         i.icon
@@ -64,20 +62,25 @@
       label Sort by
       select([(ngModel)]="sortBy")
         option(*ngFor="let option of sortOptions, let i = index", [ngValue]="option") {{option.name}}
-    .tokens-info.no_tokens(*ngIf="!tokens") You haven’t got any tokens.
+    .tokens-info.no_tokens(*ngIf="!tokens")
+      span(*ngIf="connected; then no_tokens_message else connecting_message")
     .tokens-list(*ngIf="tokens")
       perfect-scrollbar
         .token(*ngFor="let key of objectKeys(tokens) | orderBy:key:false")
-          .token-number(title="Token id: 0x{{key}}") 0x{{key}}
+          .token-number.arrow(title="Token id: 0x{{key}}") 0x{{key}}
           .token-sum
-            a((click)="showTokensTransactions(key)", href="javascript:void(0)", title="Show token transactions")
+            a((click)="showTokensTransactions(key)", href="javascript:void(0)", title="Click to see token transactions")
               span.value(title="Tokens: {{this.$form.from1E18(tokens[key].amount)}}") {{this.$form.from1E18(tokens[key].amount)}}
-              //- span.label tokens
+              span.label tokens
             | &nbsp;/&nbsp;
-            a((click)="showDividendsTransactions(key)", href="javascript:void(0)", title="Show dividends transactions")
+            a((click)="showDividendsTransactions(key)", href="javascript:void(0)", title="Click to see dividends transactions")
               span.value(title="Dividends: {{fromWei(dividends[key])}}") {{fromWei(dividends[key])}}
-              span.label &nbsp; Eth
-          .token-sum(*ngIf="tokens[key].pending.length>0") Blocked: {{this.$form.from1E18(calculatePendings(tokens[key]))}}&nbsp;
+              span.label ETH
+          .token-sum(*ngIf="tokens[key].pending.length>0")
+            span.label Blocked: &nbsp;
+            //-span.value.arrow 0.00000000000000002
+            span.value.arrow(title="{{this.$form.from1E18(calculatePendings(tokens[key]))}}") {{this.$form.from1E18(calculatePendings(tokens[key]))}}
+            span.label tokens &nbsp;
             img(src="/assets/cool-spinner.gif", alt="transaction in process", width="21px")
           .token-controls
             span.token-send-dividends((click)="openDividendsModal(key, tokens[key])", title="Add dividends to this token")
@@ -130,3 +133,7 @@
                   <path d="M7 16H1a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1M15.978 0H9l2.789 2.797-3.496 3.496 1.414 1.414L13.2 4.214 15.978 7z"></path>
                 </g>
               </svg>
+ng-template(#no_tokens_message)
+  | You haven’t got any tokens, try to create one.
+ng-template(#connecting_message)
+  | Connecting...

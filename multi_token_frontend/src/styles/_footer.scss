@@ -1,12 +1,12 @@
-.footer, .header {
+.footer {
   padding-left: 32px;
   padding-right: 32px;
   &-inner {
-    height: 112px;
+    height: 90px;
     position: relative;
     &-copyright, &-link {
       position: absolute;
-      top: 40px;
+      top: 30px;
       line-height: 40px;
       letter-spacing: 1.2px;
       font-size: 14px;
@@ -22,5 +22,8 @@
         color: #0da9ff;
       }
     }
+  }
+  .container {
+    min-width: 700px !important;
   }
 }

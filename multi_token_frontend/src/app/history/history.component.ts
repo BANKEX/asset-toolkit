@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { EventService, MultitokenService, ConnectionService, FormService } from '../core';
+import { EventService, MultitokenService, ConnectionService, FormService, UIService } from '../core';
 import { LoadingOverlayService } from '../shared/services';
 import { to } from 'await-to-js';
 
@@ -9,32 +9,42 @@ import { to } from 'await-to-js';
 })
 export class HistoryComponent implements OnInit {
 
+  public showSpinner = false;
   public sortOptions: any[];
   public sortBy;
   public tokenId;
   public transactions: any[];
   public title: string;
 
-  private _title = 'Click on token or dividends to see transactions history';
+  // private _title = 'Click on token or dividends to see transactions history';
 
   public constructor(
+    public $ui: UIService,
     private $connection: ConnectionService,
     private $events: EventService,
     private $form: FormService,
     private $overlay: LoadingOverlayService,
     private $mt: MultitokenService,
   ) {
-    this.title = this._title;
+    // this.title = this._title;
     $mt.transactions.filter(tr => tr.length > 0).subscribe((_transactions: any[]) => {
       this.transactions = _transactions;
       this.tokenId = $mt.lastToken;
-      this.title = _transactions.length ? `Transactions of type ${this.tokenId} token:` : this._title;
+      if (_transactions.length) {
+        this.title = `Transactions of 0x${this.tokenId} token:`;
+      }
     });
     $mt.divTransactions.filter(tr => tr.length > 0).subscribe((_transactions: any[]) => {
       this.transactions = _transactions.filter((item) => item.value);
       this.tokenId = $mt.lastDivToken;
-      this.title = _transactions.length ? `Dividends transactions for type ${this.tokenId} token:` : this._title;
+      if (_transactions.length) {
+        this.title = `Dividends transactions for 0x${this.tokenId} token:`;
+      }
     });
+    $ui.onDetailsClicked().subscribe(() => {
+      this.transactions = undefined;
+      this.showSpinner = true;
+    })
   }
 
   public ngOnInit(): void {
@@ -45,14 +55,9 @@ export class HistoryComponent implements OnInit {
     this.sortBy = this.sortOptions[0];
   }
 
-  // TODO Нужно убрать этот костыль
-  public fromWei(val) {
-    val = String(Math.floor(val)).replace(/-/, '');
-    return this.$connection.web3.utils.fromWei(val) + ' Eth';
-  }
-
-  public fromTokens(val) {
-    val = val.toLocaleString().replace(/[-\s]/g, '');
-    return this.$form.from1E18(val) + ' tokens'
+  public prepareValue(transaction) {
+    return transaction.address
+      ? this.$form.from1E18(transaction.value.toLocaleString().replace(/[-\s]/g, '')) + ' TOKENS'
+      : this.$form.from1E18(String(Math.floor(transaction.value)).replace(/-/, '')) + ' ETH';
   }
 }

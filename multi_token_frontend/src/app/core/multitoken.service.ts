@@ -10,6 +10,7 @@ import { Subject } from 'rxjs/Subject';
 import { ErrorMessageService } from '../shared/services/index';
 import { to } from 'await-to-js';
 import * as moment from 'moment';
+declare const web3: any; // Use global instance from Metamask if needed
 
 @Injectable()
 export class MultitokenService {
@@ -21,7 +22,7 @@ export class MultitokenService {
   public divTransactions: Subject<any[]> = new Subject();
   public dividends: Subject<any> = new Subject();
 
-  private fetchDataDelay = 500000;
+  private fetchDataDelay = 5000;
   private userAddress: string;
   private contractAddress: string;
   private balances: any;
@@ -211,11 +212,11 @@ export class MultitokenService {
   }
 
   // Dividends Tab
-  private getDividendsBalance = async (tokenId) => {
+  private async getDividendsBalance(tokenId) {
     return await this.contract.methods.dividendsRightsOf(tokenId, this.userAddress).call();
   };
 
-  private getTokenPartOnAcceptDividendsEvent = async (event) => {
+  private async getTokenPartOnAcceptDividendsEvent(event) {
     const tokenId = event.returnValues.tokenId;
     const blockAdded = await this.$connection.web3.eth.getBlock(event.blockHash);
     const transfersOnTokenIdFrom = await this.contract.getPastEvents(
@@ -234,7 +235,7 @@ export class MultitokenService {
     return sum / totalSupply;
   };
 
-  private getCells = async () => {
+  private async getCells() {
     const cells = [];
     const transferedCellsFrom = await this.contract.getPastEvents(
       'Transfer', { fromBlock: 0, filter: { from: this.userAddress }});
@@ -249,7 +250,7 @@ export class MultitokenService {
   };
 
   // Tokens Tab
-  private getBalance = async (tokenId) => {
+  private async getBalance(tokenId) {
     const amount = await this.contract.methods.balanceOf(tokenId, this.userAddress).call();
     const totalSupply = await this.contract.methods.totalSupply(tokenId).call();
     const part = Math.round(amount / totalSupply * 100);
@@ -257,7 +258,7 @@ export class MultitokenService {
     return { amount, part, pending };
   };
 
-  private getPendings = async () => {
+  private async getPendings() {
     const { transactions } = await this.$connection.web3.eth.getBlock('pending', true);
     const userTransactions = transactions.filter((elem) => (elem.from === this.userAddress));
     const pendings = {};
@@ -266,7 +267,7 @@ export class MultitokenService {
       const tokenId = this.$connection.web3.utils.hexToNumber(transaction.input.slice(-192, -128));
       const pending = {
         address: transaction.input.slice(-128, -64).replace(/^0*/, '0x'),
-        value: this.$connection.web3.utils.hexToNumber(transaction.input.slice(-64))
+        value: web3.toDecimal(transaction.input.slice(-64).replace(/^0*/, '0x')) + ''
       };
       if (!Array.isArray(pendings[tokenId])) {
         pendings[tokenId] = [];

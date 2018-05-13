@@ -107,7 +107,7 @@ export class SendDividendsModalComponent implements AfterViewInit, OnInit {
         Validators.pattern(/^0x[1-9](\d+)?$/m),
         this.$form.tokenExistsValidator(this.tokens)
       ]],
-      amount: ['1', [
+      amount: ['', [
         Validators.required,
         Validators.min(this.amountMin),
         Validators.pattern(/^\d+(\.\d+)?$/m)]

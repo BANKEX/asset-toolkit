@@ -23,11 +23,11 @@ export class TransferModalComponent implements OnInit, AfterViewInit {
   public tokenKey: string;
 
   constructor(
+    public $form: FormService,
     private $activeModal: NgbActiveModal,
     private $events: EventService,
     private $error: ErrorMessageService,
     private $fb: FormBuilder,
-    private $form: FormService,
     private $overlay: LoadingOverlayService,
     private $mt: MultitokenService,
   ) {
@@ -38,7 +38,7 @@ export class TransferModalComponent implements OnInit, AfterViewInit {
 
   public ngOnInit() {
     Object.setPrototypeOf(this.transaction.token, new Multitoken());
-    this.tokenKey = this.$form.fromWei(this.transaction.key);
+    this.tokenKey = this.transaction.key;
     this.avalableTokens = this.$form.fromWei(+this.transaction.token.amount - this.transaction.token.totalPending());
     this.initForm();
   }
@@ -88,7 +88,7 @@ export class TransferModalComponent implements OnInit, AfterViewInit {
 
   private initForm() {
     this.transferForm = this.$fb.group({
-      amount: [this.avalableTokens, [
+      amount: ['', [
         Validators.required,
         // Validators.min(1),
         Validators.max(this.avalableTokens),

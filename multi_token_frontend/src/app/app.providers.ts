@@ -4,6 +4,7 @@ import {
   FormService,
   HelperService,
   MultitokenService,
+  UIService,
 } from './core';
 
 export const APP_PROVIDERS = [
@@ -12,4 +13,5 @@ export const APP_PROVIDERS = [
   FormService,
   HelperService,
   MultitokenService,
+  UIService,
 ];

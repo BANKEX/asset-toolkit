@@ -1,7 +1,13 @@
+doctype html
 .history
-  .history-inner
-    h2 {{title}}
-    .history-list.deposit
+  .history-inner(*ngIf="!transactions")
+    .history-placeholder(*ngIf="showSpinner; else default_message")
+      .center-loader
+        img(src="/assets/spinner.gif", alt="Loading transactions...")
+  .history-inner(*ngIf="transactions")
+    h2(*ngIf="!transactions.length") No transactions yet...
+    h2(*ngIf="transactions.length") {{title}}
+    .history-list
       perfect-scrollbar
         .transaction(*ngFor="let item of transactions")
           .transaction-direction([ngClass]="{in: item.value > 0, out: item.value < 0}", title="{{item.value>0?'Incoming transaction':'Outgoing transaction'}}")
@@ -11,8 +17,8 @@
                 </path>
               </g>
             </svg>
-          .transaction-value {{item.address ? fromTokens(item.value) : (fromWei(item.value))}}
-          .transaction-address {{item.address}}
+          .transaction-value(title="{{prepareValue(item)}}") {{prepareValue(item)}}
+          .transaction-address(title="Transaction came from this address") {{item.address}}
           .transaction-date(*ngIf="item.date") {{item.date | date}}
           .transaction-date(*ngIf="!item.date")
             img(src="/assets/spinner.gif", alt="transaction in process")
@@ -20,3 +26,5 @@
       label Sort by
       select([(ngModel)]="sortBy")
         option(*ngFor="let option of sortOptions, let i = index", [ngValue]="option") {{option.name}}
+ng-template(#default_message)
+  .center-message Click on token or dividends to see transactions history
