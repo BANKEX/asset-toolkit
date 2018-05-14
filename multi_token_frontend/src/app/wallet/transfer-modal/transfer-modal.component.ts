@@ -39,7 +39,7 @@ export class TransferModalComponent implements OnInit, AfterViewInit {
   public ngOnInit() {
     Object.setPrototypeOf(this.transaction.token, new Multitoken());
     this.tokenKey = this.transaction.key;
-    this.avalableTokens = this.$form.fromWei(+this.transaction.token.amount - this.transaction.token.totalPending());
+    this.avalableTokens = this.$form.fromWei(this.transaction.token.amount) - this.$form.fromWei(this.transaction.token.totalPending());
     this.initForm();
   }
 
@@ -51,7 +51,7 @@ export class TransferModalComponent implements OnInit, AfterViewInit {
     let err, result;
     const amount = this.$form.toWei(this.transferForm.value.amount);
     const destination = this.transferForm.value.walletAddress;
-    this.$events.transferAdded(amount);
+    this.$events.transferAdded(this.transferForm.value.amount);
     this.$overlay.showOverlay(true);
     try {
         const balance = await this.$mt.getTokenBalance(this.transaction.key);
@@ -63,7 +63,6 @@ export class TransferModalComponent implements OnInit, AfterViewInit {
           this.$events.transferSubmited(this.transaction);
         });
         [err, result] = await to(event);
-      // }
       if (err) {
         if (err.message.indexOf('User denied') > 0) {
           this.$events.transferCanceled(this.transaction.blockNumber);

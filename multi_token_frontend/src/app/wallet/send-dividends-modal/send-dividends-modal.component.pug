@@ -34,9 +34,9 @@ doctype html
       div(*ngIf="amount.touched && amount.hasError('required')")
         label.error Amount is required
       div(*ngIf="amount.touched && amount.hasError('min')")
-        label.error Amount should be >= {{amountMin}}
-      div(*ngIf="amount.touched && amount.hasError('pattern')")
-        label.error Amount should be a valid number
+        label.error Amount should be > {{amountMin}}
+      div(*ngIf="amount.touched && !amount.hasError('min') && amount.hasError('pattern')")
+        label.error Amount should be a valid positive number
   .popup-details
     .desc You going to send ETH from your personal wallet to selected token
   input.popup-button(type='submit' value='Send', (click)='sendDividends()', [ngClass]='{disabled: form.invalid}')

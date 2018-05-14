@@ -34,6 +34,7 @@ export class WalletComponent implements OnInit {
     $mt.tokens.distinctUntilChanged().subscribe((_tokens: any) => {
       if (Object.keys(_tokens).length !== 0) {
         this.tokens = _tokens;
+        this.empty = false;
       } else {
         this.empty = true;
       }
@@ -65,7 +66,7 @@ export class WalletComponent implements OnInit {
 
   public openTransferModal(key: any, token): void {
     let modalInstance;
-    if (this.avalableTokensCount(token) === '0') { return; }
+    if (this.avalableTokensCount(token) === 0) { return; }
     if (+this.avalableTokensCount(token) < 0) { throw Error('Negativ tokem amount. Please report a bug!') }
     modalInstance =	this.$modal.open(
       TransferModalComponent,
@@ -86,7 +87,7 @@ export class WalletComponent implements OnInit {
         windowClass: 'modal-margin-lg'
       }).componentInstance;
     modalInstance.tokenKey = key;
-    modalInstance.amount = this.dividends[key];
+    modalInstance.avalable = this.dividends[key];
   }
 
   public openDividendsModal(key?: string, token?: any): void {

@@ -9,7 +9,24 @@ export class EventService {
 
   //#region Events sources
 
-  // TRANSFER
+  // EMISSION (TOKENS)
+
+  private _onEmissionAdded: Subject<any> = new Subject<any>();
+  private onEmissionAddedSource = this._onEmissionAdded.asObservable().share<any>();
+
+  private _onEmissionSubmited: Subject<ConfirmationResponse> = new Subject<ConfirmationResponse>();
+  private onEmissionSubmitedSource = this._onEmissionSubmited.asObservable().share<ConfirmationResponse>();
+
+  private _onEmissionConfirmed: Subject<ConfirmationResponse> = new Subject<ConfirmationResponse>();
+  private onEmissionConfirmedSource = this._onEmissionConfirmed.asObservable().share<ConfirmationResponse>();
+
+  private _onEmissionFailed: Subject<ConfirmationResponse> = new Subject<ConfirmationResponse>();
+  private onEmissionFailedSource = this._onEmissionFailed.asObservable().share<ConfirmationResponse>();
+
+  private _onEmissionCanceled: Subject<ConfirmationResponse> = new Subject<ConfirmationResponse>();
+  private onEmissionCanceledSource = this._onEmissionCanceled.asObservable().share<ConfirmationResponse>();
+
+  // TRANSFER (TOKENS)
 
   private _onTransferAdded: Subject<any> = new Subject<any>();
   private onTransferAddedSource = this._onTransferAdded.asObservable().share<any>();
@@ -26,37 +43,120 @@ export class EventService {
   private _onTransferCanceled: Subject<ConfirmationResponse> = new Subject<ConfirmationResponse>();
   private onTransferCanceledSource = this._onTransferCanceled.asObservable().share<ConfirmationResponse>();
 
+  // TRANSACTION (DIVIDENDS)
+
+  private _onTransactionAdded: Subject<any> = new Subject<any>();
+  private onTransactionAddedSource = this._onTransactionAdded.asObservable().share<any>();
+
+  private _onTransactionSubmited: Subject<ConfirmationResponse> = new Subject<ConfirmationResponse>();
+  private onTransactionSubmitedSource = this._onTransactionSubmited.asObservable().share<ConfirmationResponse>();
+
+  private _onTransactionConfirmed: Subject<ConfirmationResponse> = new Subject<ConfirmationResponse>();
+  private onTransactionConfirmedSource = this._onTransactionConfirmed.asObservable().share<ConfirmationResponse>();
+
+  private _onTransactionFailed: Subject<ConfirmationResponse> = new Subject<ConfirmationResponse>();
+  private onTransactionFailedSource = this._onTransactionFailed.asObservable().share<ConfirmationResponse>();
+
+  private _onTransactionCanceled: Subject<ConfirmationResponse> = new Subject<ConfirmationResponse>();
+  private onTransactionCanceledSource = this._onTransactionCanceled.asObservable().share<ConfirmationResponse>();
+
   //#endregion
 
   //#region Methods to emit data
 
- // TRANSFER
+  // TRANSFER (TOKENS)
 
- public transferAdded(amount: string): void {
-  this._onTransferAdded.next(amount);
-}
+  public transferAdded(amount: string): void {
+    this._onTransferAdded.next(amount);
+  }
 
-public transferSubmited(transfer: any): void {
-  this._onTransferSubmited.next({internalId: 1});
-}
+  public transferSubmited(transfer: any): void {
+    this._onTransferSubmited.next({internalId: 1});
+  }
 
-public transferConfirmed(transfer: any): void {
-  this._onTransferConfirmed.next(transfer);
-}
+  public transferConfirmed(transfer: any): void {
+    this._onTransferConfirmed.next(transfer);
+  }
 
-public transferFailed(transfer: any): void {
-  this._onTransferFailed.next({internalId: 1});
-}
+  public transferFailed(transfer: any): void {
+    this._onTransferFailed.next({internalId: 1});
+  }
 
-public transferCanceled(internalId: number): void {
-  this._onTransferCanceled.next({internalId: 1});
-}
+  public transferCanceled(internalId: number): void {
+    this._onTransferCanceled.next({internalId: 1});
+  }
+
+  // EMISSION (TOKENS)
+
+  public emissionAdded(amount: string): void {
+    this._onEmissionAdded.next(amount);
+  }
+
+  public emissionSubmited(emission: any): void {
+    this._onEmissionSubmited.next({internalId: 1});
+  }
+
+  public emissionConfirmed(emission: any): void {
+    this._onEmissionConfirmed.next(emission);
+  }
+
+  public emissionFailed(emission: any): void {
+    this._onEmissionFailed.next({internalId: 1});
+  }
+
+  public emissionCanceled(internalId: number): void {
+    this._onEmissionCanceled.next({internalId: 1});
+  }
+
+  // TRANSACTION (DIVIDENDS)
+
+  public transactionAdded(amount: string): void {
+    this._onTransactionAdded.next(amount);
+  }
+
+  public transactionSubmited(transaction: any): void {
+    this._onTransactionSubmited.next({internalId: 1});
+  }
+
+  public transactionConfirmed(transaction: any): void {
+    this._onTransactionConfirmed.next(transaction);
+  }
+
+  public transactionFailed(transaction: any): void {
+    this._onTransactionFailed.next({internalId: 1});
+  }
+
+  public transactionCanceled(internalId: number): void {
+    this._onTransactionCanceled.next({internalId: 1});
+  }
 
   //#endregion
 
   //#region Methods to subscribe on events
 
-  // TRANSSFER
+  // EMISSION (TOKENS)
+
+  public onEmissionAdded(): Observable<number>  {
+    return this.onEmissionAddedSource;
+  }
+
+  public onEmissionSubmited(): Observable <ConfirmationResponse> {
+    return this.onEmissionSubmitedSource;
+  }
+
+  public onEmissionConfirmed(): Observable <ConfirmationResponse> {
+    return this.onEmissionConfirmedSource;
+  }
+
+  public onEmissionFailed(): Observable <ConfirmationResponse> {
+    return this.onEmissionFailedSource;
+  }
+
+  public onEmissionCanceled(): Observable <ConfirmationResponse> {
+    return this.onEmissionCanceledSource;
+  }
+
+  // TRANSSFER (TOKENS)
 
   public onTransferAdded(): Observable<number>  {
     return this.onTransferAddedSource;
@@ -76,6 +176,28 @@ public transferCanceled(internalId: number): void {
 
   public onTransferCanceled(): Observable <ConfirmationResponse> {
     return this.onTransferCanceledSource;
+  }
+
+  // TRANSACTION (DIVIDENDS)
+
+  public onTransactionAdded(): Observable<number>  {
+    return this.onTransactionAddedSource;
+  }
+
+  public onTransactionSubmited(): Observable <ConfirmationResponse> {
+    return this.onTransactionSubmitedSource;
+  }
+
+  public onTransactionConfirmed(): Observable <ConfirmationResponse> {
+    return this.onTransactionConfirmedSource;
+  }
+
+  public onTransactionFailed(): Observable <ConfirmationResponse> {
+    return this.onTransactionFailedSource;
+  }
+
+  public onTransactionCanceled(): Observable <ConfirmationResponse> {
+    return this.onTransactionCanceledSource;
   }
 
   //#endregion

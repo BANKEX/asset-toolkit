@@ -55,25 +55,25 @@ export class AddTokenModalComponent implements AfterViewInit, OnInit {
     let err, result;
     const amount = this.$form.to1E18(this.form.value.amount);
     const tokenType = this.toBN(this.$form.remove0x(this.form.value.tokenKey));
-    this.$events.transferAdded(null);
+    this.$events.emissionAdded(this.form.value.amount);
     this.$overlay.showOverlay(true);
     try {
       const event = this.$mt.initSubTokens(tokenType, amount);
       event.on('transactionHash', (hash) => {
         this.$activeModal.close();
         this.$overlay.hideOverlay();
-        this.$events.transferSubmited(null);
+        this.$events.emissionSubmited(null);
       });
       [err, result] = await to(event);
       if (err) {
         if (err.message.indexOf('User denied') > 0) {
-          this.$events.transferCanceled(undefined);
+          this.$events.emissionCanceled(undefined);
         } else {
-          this.$events.transferFailed(undefined);
+          this.$events.emissionFailed(undefined);
         }
       } else {
         this.closeModal();
-        this.$events.transferConfirmed(undefined);
+        this.$events.emissionConfirmed(undefined);
         this.added.emit();
       }
       this.$overlay.hideOverlay();

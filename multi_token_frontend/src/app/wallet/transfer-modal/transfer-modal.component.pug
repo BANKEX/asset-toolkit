@@ -40,5 +40,5 @@ doctype html
         label.error Amount should be a valid number
   .popup-details
     .desc You going to transfer tokens to another address
-  input.popup-button(type='submit' value='Transfer output', (click)='transfer()', [ngClass]='{disabled: transferForm.invalid}')
+  input.popup-button(type='submit' value='Transfer', (click)='transfer()', [ngClass]='{disabled: transferForm.invalid}')
   a.popup-cancel(href='javascript:void(0)', (click)='closeModal()') Cancel

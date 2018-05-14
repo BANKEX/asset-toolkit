@@ -27,7 +27,7 @@ export class SendDividendsModalComponent implements AfterViewInit, OnInit {
   @Output() public transferred: EventEmitter<string> = new EventEmitter<string>();
   @ViewChildren('focus') public focus;
 
-  public amountMin = 0.001;
+  public amountMin = 0;
   public form: FormGroup;
   public initialDataReady = false;
   public objectKeys = Object.keys;
@@ -66,26 +66,26 @@ export class SendDividendsModalComponent implements AfterViewInit, OnInit {
     const amount = this.form.value.amount;
     const tokenType = this.$form.remove0x(this.form.value.tokenKey);
     const amountBN = this.$form.toWei(amount);
-    this.$events.transferAdded(amount);
+    this.$events.transactionAdded(amount);
     this.$overlay.showOverlay(true);
     try {
       const event = this.$mt.acceptDividends(this.toBN(tokenType), amountBN);
       event.on('transactionHash', (hash) => {
         this.$activeModal.close();
         this.$overlay.hideOverlay();
-        this.$events.transferSubmited(null);
+        this.$events.transactionSubmited(null);
       });
       [err, result] = await to(event);
       // }
       if (err) {
         if (err.message.indexOf('User denied') > 0) {
-          this.$events.transferCanceled(undefined);
+          this.$events.transactionCanceled(undefined);
         } else {
-          this.$events.transferFailed(undefined);
+          this.$events.transactionFailed(undefined);
         }
       } else {
         this.closeModal();
-        this.$events.transferConfirmed(undefined);
+        this.$events.transactionConfirmed(undefined);
         this.transferred.emit(amount);
       }
       this.$overlay.hideOverlay();
@@ -110,8 +110,9 @@ export class SendDividendsModalComponent implements AfterViewInit, OnInit {
       amount: ['', [
         Validators.required,
         Validators.min(this.amountMin),
-        Validators.pattern(/^\d+(\.\d+)?$/m)]
-      ],
+        this.$form.forbiddenValidator('0'),
+        Validators.pattern(/(^\d+(\.\d+)?$)/)]
+      ]
     });
     setTimeout(() => { this.focus.first.nativeElement.focus(); }, 100)
   }

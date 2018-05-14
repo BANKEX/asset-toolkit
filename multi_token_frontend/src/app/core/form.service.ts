@@ -49,7 +49,7 @@ export class FormService {
     return (control: AbstractControl): {[key: string]: any} => {
       const error = {};
       error['forbidden'] = {value: control.value};
-      return !control.value || control.value !== _value ? null : error;
+      return !String(control.value) || control.value !== _value ? null : error;
     }
   }
 
@@ -67,11 +67,21 @@ export class FormService {
     }
   }
 
+  /**
+   * Multiplies value on 1e+18 and transform to BigNumber
+   * @param  {} value
+   * @returns BigNumber
+   */
   public toWei(value) {
     const utils = this.web3.utils;
     return utils.toBN(utils.toWei(value, 'ether'));
   }
 
+  /**
+   *  Divides value on 1e+18
+   * @param  {} value
+   * @returns string
+   */
   public fromWei(value) {
     const utils = this.web3.utils;
     return utils.fromWei(String(value), 'ether');
