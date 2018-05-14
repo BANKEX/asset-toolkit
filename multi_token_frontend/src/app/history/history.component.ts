@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { EventService, MultitokenService, ConnectionService, FormService, UIService } from '../core';
 import { LoadingOverlayService } from '../shared/services';
 import { to } from 'await-to-js';
+import { ClipboardService } from 'ngx-clipboard';
 
 @Component({
   selector: 'mt-history',
@@ -21,6 +22,7 @@ export class HistoryComponent implements OnInit {
   public constructor(
     public $ui: UIService,
     private $connection: ConnectionService,
+    private $clipboard: ClipboardService,
     private $events: EventService,
     private $form: FormService,
     private $overlay: LoadingOverlayService,
@@ -53,6 +55,11 @@ export class HistoryComponent implements OnInit {
       {id: 'eth', name: 'Amount', reverse: true}
     ];
     this.sortBy = this.sortOptions[0];
+  }
+
+  public copyToClipboard(_text) {
+    this.$clipboard.copyFromContent(_text);
+    this.$events.copyToClipboard();
   }
 
   public prepareValue(transaction) {

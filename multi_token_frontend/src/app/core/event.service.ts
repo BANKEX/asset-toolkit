@@ -60,6 +60,11 @@ export class EventService {
   private _onTransactionCanceled: Subject<ConfirmationResponse> = new Subject<ConfirmationResponse>();
   private onTransactionCanceledSource = this._onTransactionCanceled.asObservable().share<ConfirmationResponse>();
 
+  // CLIPBOARD
+
+  private _onCopyToClipboard: Subject<string> = new Subject<string>();
+  private onCopyToClipboardSource = this._onCopyToClipboard.asObservable().share<string>();
+
   //#endregion
 
   //#region Methods to emit data
@@ -130,6 +135,12 @@ export class EventService {
     this._onTransactionCanceled.next({internalId: 1});
   }
 
+  // CLIPBOARD
+
+  public copyToClipboard(title?: string): void {
+    this._onCopyToClipboard.next(title);
+  }
+
   //#endregion
 
   //#region Methods to subscribe on events
@@ -198,6 +209,12 @@ export class EventService {
 
   public onTransactionCanceled(): Observable <ConfirmationResponse> {
     return this.onTransactionCanceledSource;
+  }
+
+  // CLIPBOARD
+
+  public onCopyToClipboard(): Observable <string> {
+    return this.onCopyToClipboardSource;
   }
 
   //#endregion

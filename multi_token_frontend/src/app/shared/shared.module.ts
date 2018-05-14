@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { NotFound404Component } from './common';
 import { CommonModule } from '@angular/common';
+import { ClipboardModule } from 'ngx-clipboard';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { OrderPipe } from './pipes/order-by.pipe';
 import { InfiniteScrollerDirective, TestDirective } from './directives/';
@@ -24,6 +25,7 @@ export function windowFactory() {
 @NgModule({
   imports: [
     CommonModule,
+    ClipboardModule,
     BrowserAnimationsModule,
     FormsModule,
     NgbModule.forRoot(),
@@ -42,6 +44,7 @@ export function windowFactory() {
     BlockingNotificationOverlayComponent,
     // MODULES
     CommonModule,
+    ClipboardModule,
     FormsModule,
     NgbModule,
     PerfectScrollbarModule,
