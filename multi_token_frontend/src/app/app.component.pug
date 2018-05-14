@@ -9,15 +9,15 @@ bnkx-blocking-notification-overlay
         .header-inner-logo
         .header-inner-title Multitoken Demo
         .header-inner-address Client address:
-          span.address {{clientAddress}}
+          span.address((click)="copyToClipboard(clientAddress)") {{clientAddress}}
         .header-inner-contract Contract address:
-          span.address {{contractAddress}}
+          span.address((click)="copyToClipboard(contractAddress)") {{contractAddress}}
 
   mt-content
 
   .footer
     .container
       .footer-inner
-        .footer-inner-copyright="© 2018 bankex"
+        .footer-inner-copyright((click)="copyToClipboard('We building future!')") © 2018 bankex
         .footer-inner-link="Go to "
           a(href="//bankex.com") bankex.com

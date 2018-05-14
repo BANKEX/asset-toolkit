@@ -67,7 +67,7 @@ doctype html
     .tokens-list(*ngIf="tokens && !empty")
       perfect-scrollbar
         .token(*ngFor="let key of objectKeys(tokens) | orderBy:key:false")
-          .token-number.arrow(title="Token id: 0x{{key}}") 0x{{key}}
+          .token-number.address((click)="copyToClipboard('0x'+key)", title="Token id: 0x{{key}}") 0x{{key}}
           .token-sum
             a((click)="showTokensTransactions(key)", href="javascript:void(0)", title="Click to see token transactions")
               span.value(title="Tokens: {{this.$form.from1E18(tokens[key].amount)}}") {{this.$form.from1E18(tokens[key].amount)}}

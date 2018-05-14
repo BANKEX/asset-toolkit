@@ -7,6 +7,7 @@ import { GetDividendsModalComponent } from './get-dividends-modal/get-dividends-
 import { Multitoken } from '../shared/types/multitoken';
 import { SendDividendsModalComponent } from './send-dividends-modal/send-dividends-modal.component';
 import { AddTokenModalComponent } from './add-token-modal/add-token-modal.component';
+import { ClipboardService } from 'ngx-clipboard';
 @Component({
   selector: 'mt-wallet',
   templateUrl: './wallet.component.pug',
@@ -26,6 +27,7 @@ export class WalletComponent implements OnInit {
   constructor(
     public $form: FormService,
     private $connection: ConnectionService,
+    private $clipboard: ClipboardService,
     private $events: EventService,
     private $modal: NgbModal,
     private $mt: MultitokenService,
@@ -50,6 +52,11 @@ export class WalletComponent implements OnInit {
       {id: 'eth', name: 'Amount', reverse: true}
     ];
     this.sortBy = this.sortOptions[0];
+  }
+
+  public copyToClipboard(_text) {
+    this.$clipboard.copyFromContent(_text);
+    this.$events.copyToClipboard();
   }
 
   public showTokensTransactions(tokenKey) {

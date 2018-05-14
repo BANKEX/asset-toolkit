@@ -6,6 +6,7 @@ import { LoadingOverlayService, ErrorMessageService } from './shared/services';
 import { Observable } from 'rxjs/Observable';
 import { ToastyService } from 'ng2-toasty';
 import { NeatComponent } from './shared/common';
+import { ClipboardService } from 'ngx-clipboard';
 import { SendDividendsModalComponent } from './wallet/send-dividends-modal/send-dividends-modal.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
@@ -21,6 +22,7 @@ export class AppComponent extends NeatComponent implements AfterViewInit {
 
   public constructor(
     private $connection: ConnectionService,
+    private $clipboard: ClipboardService,
     private $events: EventService,
     private $error: ErrorMessageService,
     private $form: FormService,
@@ -60,6 +62,11 @@ export class AppComponent extends NeatComponent implements AfterViewInit {
     Observable.timer(1000).subscribe(() => {
       this.$overlay.hideOverlay();
     });
+  }
+
+  public copyToClipboard(_text) {
+    this.$clipboard.copyFromContent(_text);
+    this.$events.copyToClipboard();
   }
 
   public showDividendsModal() {
@@ -132,5 +139,12 @@ export class AppComponent extends NeatComponent implements AfterViewInit {
     this.$events.onEmissionFailed().takeUntil(this.ngUnsubscribe).subscribe((emission) => {
       this.$toasty.error(`Token creation failed!`)
     });
+
+    // CLIPBOARD
+
+    this.$events.onCopyToClipboard().takeUntil(this.ngUnsubscribe).subscribe((title) => {
+      this.$toasty.info(`${title ? title : 'Address'} copied to clipboard`)
+    });
+
   }
 }

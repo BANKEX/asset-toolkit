@@ -18,7 +18,9 @@ doctype html
               </g>
             </svg>
           .transaction-value(title="{{prepareValue(item)}}") {{prepareValue(item)}}
-          .transaction-address(title="Transaction came from this address") {{item.address}}
+          .transaction-address.address(
+            title="{{item.value > 0 ? 'Transaction came from this address' : 'Transaction went to this address'}}",
+            (click)="copyToClipboard(item.address)") {{item.address}}
           .transaction-date(*ngIf="item.date") {{item.date | date}}
           .transaction-date(*ngIf="!item.date")
             img(src="/assets/spinner.gif", alt="transaction in process")
