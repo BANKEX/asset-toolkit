@@ -65,7 +65,7 @@ export class ConnectionService extends BehaviorSubject<Connection> {
     if (!accounts) { throw new Error('No Web3 provider found'); }
     if (!accounts[0]) { throw new Error('Web3 provider is locked'); }
     account = accounts[0];
-    [error, networkId] = await to(web3.eth.net.getId();
+    [error, networkId] = await to(web3.eth.net.getId());
     if (error) { throw new Error(error); }
     return {account, networkId};
   };
