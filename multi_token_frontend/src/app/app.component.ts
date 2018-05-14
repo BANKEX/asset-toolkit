@@ -17,7 +17,6 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 export class AppComponent extends NeatComponent implements AfterViewInit {
 
   public clientAddress: string;
-  public ownerAddress: string;
   public contractAddress: string;
 
   public constructor(
@@ -41,11 +40,6 @@ export class AppComponent extends NeatComponent implements AfterViewInit {
         this.contractAddress = $connection.contractData.address;
         this.$toasty.success('Connected to blockchain.');
         this.listenForEvents();
-        this.$mt.getOwner().then(address => this.ownerAddress = address)
-          .catch(e => {
-            $error.addError('Check if you entered it right', 'Wrong contract address');
-            console.log(e);
-          });
       }
     })
   }
