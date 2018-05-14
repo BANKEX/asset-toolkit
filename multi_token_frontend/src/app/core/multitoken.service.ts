@@ -81,10 +81,6 @@ export class MultitokenService {
     return tokenType;
   };
 
-  public getOwner() {
-    return this.contract.methods.owner().call();
-  }
-
   public async getBalances() {
     const cells = await this.getCells();
     const balances = {};
