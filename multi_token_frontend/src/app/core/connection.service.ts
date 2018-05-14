@@ -19,8 +19,9 @@ export class ConnectionService extends BehaviorSubject<Connection> {
   public err: Subject<Error> = new Subject();
   public web3: any;
   public contract: Contract;
-  public contractData: ContractData = new ContractData;
+  public contractData: ContractData;
   public account: string;
+  public networkId: number;
 
   private useHardcodedContractData = false;
   private balances: any;
@@ -38,49 +39,35 @@ export class ConnectionService extends BehaviorSubject<Connection> {
 
   public async connect(contractHash?: string) {
     this.next(Connection.InProcess);
-    if (contractHash) { this.contractData = new ContractData(contractHash) };
     try {
-      await this.init();
+      ({account: this.account, networkId: this.networkId} = await this.init(this.web3));
+      this.contractData = new ContractData(contractHash, this.networkId);
       this.contract = new this.web3.eth.Contract(this.contractData.abi, this.contractData.address);
       this.next(Connection.Estableshed);
-      // this.$router.navigate(['../'], { queryParams: {contract: this.contractData.address}});
+      // this.$blockingNotificationOverlay.hideOverlay();
       this.startLoops();
     } catch (e) {
       this.$blockingNotificationOverlay.setOverlayMessage(e);
       this.$blockingNotificationOverlay.showOverlay();
       this.next(Connection.None);
-      console.error(e);
+      // console.error(e);
     }
   }
 
   public getAccount = () => this.account;
 
-  private init = () => {
-    return new Promise((resolve, reject) => {
-      if (!this.web3.currentProvider.isMetaMask) {
-        return reject('No Metamask installed, please install Metamask browser extension');
-      }
-      this.web3.eth.getAccounts((err, acc) => {
-        if (err) {
-          reject(err);
-        }
-        if (!acc[0]) {
-          return reject('Metamask is locked, please unlock it');
-        }
-        this.account = acc[0]; // save account data
-        this.web3.eth.net.getNetworkType((e, net) => {
-          if (e) { reject(e); return; }
-          if (net !== 'rinkeby' && net !== 'private') { // && net !== 'private'
-            return reject('Choose Rinkeby Network in Metamask');
-          } else {
-            this.isRinkeby = net === 'rinkeby';
-          }
-          this.next(Connection.InProcess);
-          this.$blockingNotificationOverlay.hideOverlay();
-          resolve();
-        });
-      });
-    });
+  private async init(web3): Promise<{account: string, networkId: number}> {
+    let account, accounts, networkId, error;
+    if (!web3 || !web3.currentProvider) {
+      throw new Error('No Web3 provider found');
+    }
+    [error, accounts] = await to(web3.eth.getAccounts());
+    if (!accounts) { throw new Error('No Web3 provider found'); }
+    if (!accounts[0]) { throw new Error('Web3 provider is locked'); }
+    account = accounts[0];
+    [error, networkId] = await to(web3.eth.net.getId();
+    if (error) { throw new Error(error); }
+    return {account, networkId};
   };
 
   private startLoops() {
@@ -89,7 +76,7 @@ export class ConnectionService extends BehaviorSubject<Connection> {
 
   private checkAndInstantiateWeb3() {
     // tslint:disable:max-line-length
-    // Checking if Web3 has been injected by the browser (Mist/MetaMask)
+    // Checking if Web3 has been injected by the browser
     if (typeof (window as any).web3 !== 'undefined') {
       console.warn(
         'Using web3 detected from external source. If you find that your accounts don\'t appear or you have 0 MetaCoin, ensure you\'ve configured that source properly. If using MetaMask, see the following link. Feel free to delete this warning. :) http://truffleframework.com/tutorials/truffle-and-metamask'
@@ -101,7 +88,7 @@ export class ConnectionService extends BehaviorSubject<Connection> {
         'No web3 detected. Falling back to http://localhost:8545. You should remove this fallback when you deploy live, as it\'s inherently insecure. Consider switching to Metamask for development. More info here: http://truffleframework.com/tutorials/truffle-and-metamask'
       );
       // fallback - use your fallback strategy (local node / hosted node + in-dapp id mgmt / fail)
-      return new this.Web3(new this.Web3.providers.HttpProvider('https://rpcprovider.staging.bankex.team:8635'));
+      return new this.Web3(new this.Web3.providers.HttpProvider('http://localhost:8545'));
     }
   }
 
