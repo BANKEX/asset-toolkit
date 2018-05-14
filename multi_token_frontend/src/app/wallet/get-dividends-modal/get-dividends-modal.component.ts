@@ -24,9 +24,9 @@ import { NeatComponent } from '../../shared/common/index';
 export class GetDividendsModalComponent implements AfterViewInit, OnInit{
 
   @Input() public tokenKey: number;
-  @Input() public amount: string;
+  @Input() public avalable: string;
   @Output() public transferred: EventEmitter<string> = new EventEmitter<string>();
-  @ViewChildren('value') public value;
+  @ViewChildren('focus') public focus;
 
   public form: FormGroup;
   public tokens: any;
@@ -45,51 +45,45 @@ export class GetDividendsModalComponent implements AfterViewInit, OnInit{
     private $mt: MultitokenService,
   ) {
   }
-  // get token() { return this.form.get('tokenKey'); }
-  // get amount() { return this.form.get('amount'); }
+  get amount() { return this.form.get('amount'); }
 
   public ngOnInit() {
     this.toBN = this.$connection.web3.utils.toBN;
     this.initForm();
-    this.$mt.tokens.take(1).subscribe(_tokens => {
-      this.tokens = _tokens;
-      this.form.controls['tokenKey'].setValue(this.objectKeys(_tokens)[0], {onlySelf: true});
-      // this.$cdr.detectChanges();
-    })
+    // this.$mt.tokens.take(1).subscribe(_tokens => {
+    //   this.tokens = _tokens;
+    //   this.form.controls['tokenKey'].setValue(this.objectKeys(_tokens)[0], {onlySelf: true});
+    //   // this.$cdr.detectChanges();
+    // })
   }
 
   ngAfterViewInit() {
-    // this.value.first.nativeElement.focus();
+    this.focus.first.nativeElement.focus();
   }
 
   public async getDividends(_tokenKey?, _amount?) {
     let err, result;
-    const amount = _amount ? _amount : this.form.value.amount;
-    const tokenType = _tokenKey ? _tokenKey : this.form.value.tokenKey;
-    const amountBN = this.$form.toWei(amount);
-    this.$events.transferAdded(amount);
+    const amount = _amount ? this.toBN(_amount) : this.$form.toWei(this.form.value.amount);
+    this.$events.transactionAdded(this.form.value.amount);
     this.$overlay.showOverlay(true);
     try {
-      // Object.setPrototypeOf(this.transaction, new PlasmaDepositImp());
-      // if (amountBN.eq(this.transaction.bn)) {
-        // const balance = await this.$mt.getTokenBalance(this.transaction.key);
-      const event = this.$mt.withdrawDividends(this.toBN(tokenType), this.toBN(amount));
+      const event = this.$mt.withdrawDividends(this.toBN(this.tokenKey), amount);
       event.on('transactionHash', (hash) => {
         this.$activeModal.close();
         this.$overlay.hideOverlay();
-        this.$events.transferSubmited(null);
+        this.$events.transactionSubmited(null);
       });
       [err, result] = await to(event);
       // }
       if (err) {
         if (err.message.indexOf('User denied') > 0) {
-          this.$events.transferCanceled(undefined);
+          this.$events.transactionCanceled(undefined);
         } else {
-          this.$events.transferFailed(undefined);
+          this.$events.transactionFailed(undefined);
         }
       } else {
         this.closeModal();
-        this.$events.transferConfirmed(undefined);
+        this.$events.transactionConfirmed(undefined);
         this.transferred.emit(amount);
       }
       this.$overlay.hideOverlay();
@@ -110,14 +104,13 @@ export class GetDividendsModalComponent implements AfterViewInit, OnInit{
 
   private initForm() {
     this.form = this.$fb.group({
-      amount: [this.amount ? this.amount : '1', [
+      amount: [this.avalable ? this.$form.fromWei(this.avalable) : '', [
         Validators.required,
-        Validators.min(0.001),
-        Validators.pattern(/^\d+(\.\d+)?$/)]
-      ],
-      tokenKey: [this.tokenKey ? +this.tokenKey : '', [
-        Validators.required,
+        Validators.min(0),
+        Validators.max(this.$form.fromWei(this.avalable)),
+        this.$form.forbiddenValidator('0'),
+        Validators.pattern(/(^\d+(\.\d+)?$)/)]
       ]
-    ]});
+    });
   }
 }

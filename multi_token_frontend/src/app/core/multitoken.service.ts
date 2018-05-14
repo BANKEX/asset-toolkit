@@ -175,7 +175,7 @@ export class MultitokenService {
 
   public avalableTokensCount(token: Multitoken) {
     Object.setPrototypeOf(token, new Multitoken);
-    return web3.fromWei(+token.amount - token.totalPending());
+    return web3.fromWei(token.amount) - web3.fromWei(token.totalPending());
   }
 
   //#endregion
@@ -272,7 +272,7 @@ export class MultitokenService {
       const tokenId = this.$connection.web3.utils.hexToNumber(transaction.input.slice(-192, -128));
       const pending = {
         address: transaction.input.slice(-128, -64).replace(/^0*/, '0x'),
-        value: web3.toDecimal(transaction.input.slice(-64).replace(/^0*/, '0x')) + ''
+        value: web3.toBigNumber(transaction.input.slice(-64).replace(/^0*/, '0x'))
       };
       if (!Array.isArray(pendings[tokenId])) {
         pendings[tokenId] = [];

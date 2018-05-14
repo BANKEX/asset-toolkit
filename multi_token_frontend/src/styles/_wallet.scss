@@ -1,5 +1,5 @@
 .tokens {
-  padding: 32px 100px;
+  padding: 30px 90px 30px 75px;
   padding-top: 82px;
   max-height: 360px;
 
@@ -84,7 +84,6 @@
       cursor: pointer;
       transition: all 0.5s;
 
-      //&:not(.disabled) {
       &:hover {
         background: #0da9ff;
       }
@@ -92,7 +91,6 @@
       &:hover svg * {
         fill: #fff;
       }
-      //}
     }
   }
 
