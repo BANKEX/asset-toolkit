@@ -1,6 +1,6 @@
 import { ActivatedRoute, Router, ParamMap } from '@angular/router';
 import { Component, AfterViewInit } from '@angular/core';
-import { Connection } from './shared/types';
+import { Connection, ContractData } from './shared/types';
 import { ConnectionService, EventService, FormService, MultitokenService } from './core';
 import { LoadingOverlayService, ErrorMessageService } from './shared/services';
 import { Observable } from 'rxjs/Observable';
@@ -40,6 +40,7 @@ export class AppComponent extends NeatComponent implements AfterViewInit {
         this.contractAddress = $connection.contractData.address;
         this.$toasty.success('Connected to blockchain.');
         this.listenForEvents();
+        this.$router.navigate(['../'], { queryParams: {contract: this.$connection.contractData.address}});
       }
     })
   }
@@ -50,12 +51,14 @@ export class AppComponent extends NeatComponent implements AfterViewInit {
         this.connect();
       } else {
         this.$route.queryParams.skip(1).take(1).subscribe(params => {
-          this.connect(params.contract);
+          // Prevent old contract loading on network change
+          if (ContractData.getData().address.indexOf(params.contract) === -1) {
+            this.connect(params.contract);
+          } else {
+            this.connect();
+          }
         })
       }
-    Observable.timer(1000).subscribe(() => {
-      this.$overlay.hideOverlay();
-    });
   }
 
   public copyToClipboard(_text) {
@@ -74,8 +77,7 @@ export class AppComponent extends NeatComponent implements AfterViewInit {
   }
 
   private connect(contract?: string) {
-    this.$connection.connect(contract || undefined); // this  will change value of this.$connection.contractData.address
-    this.$router.navigate(['../'], { queryParams: {contract: this.$connection.contractData.address}});
+    this.$connection.connect(contract || undefined);
   }
 
   private listenForEvents() {
