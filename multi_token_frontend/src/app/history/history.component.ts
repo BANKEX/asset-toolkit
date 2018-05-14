@@ -27,14 +27,14 @@ export class HistoryComponent implements OnInit {
     private $mt: MultitokenService,
   ) {
     // this.title = this._title;
-    $mt.transactions.filter(tr => tr.length > 0).subscribe((_transactions: any[]) => {
+    $mt.transactions.subscribe((_transactions: any[]) => {
       this.transactions = _transactions;
       this.tokenId = $mt.lastToken;
       if (_transactions.length) {
         this.title = `Transactions of 0x${this.tokenId} token:`;
       }
     });
-    $mt.divTransactions.filter(tr => tr.length > 0).subscribe((_transactions: any[]) => {
+    $mt.divTransactions.subscribe((_transactions: any[]) => {
       this.transactions = _transactions.filter((item) => item.value);
       this.tokenId = $mt.lastDivToken;
       if (_transactions.length) {
