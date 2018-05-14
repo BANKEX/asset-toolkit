@@ -24,7 +24,7 @@ export class MultitokenService {
   public transactions: Subject<any[]> = new Subject();
   public userAddress: string;
 
-  private fetchDataDelay = 500;
+  private fetchDataDelay = 5000;
   private balances: any;
   private contract: Contract;
 
@@ -102,6 +102,7 @@ export class MultitokenService {
   }
 
   public async getDetails(tokenId) {
+    this.lastToken = tokenId; // should assign before brodcasting transactions!
     const transfersOnTokenIdFrom = await this.contract.getPastEvents(
       'Transfer', { fromBlock: 0, filter: { from: this.userAddress, tokenId }});
     const transfersOnTokenIdTo = await this.contract.getPastEvents(
@@ -126,7 +127,6 @@ export class MultitokenService {
         details.push(pend);
       });
     }
-    this.lastToken = tokenId; // should assign before brodcasting transactions!
     this.transactions.next(details);
   };
 
@@ -141,6 +141,7 @@ export class MultitokenService {
   };
 
   public async getDividendsDetails(tokenId) {
+    this.lastDivToken = tokenId; // should assign before brodcasting transactions!
     const details = [];
     const releaseDividendsRights = await this.contract.getPastEvents(
       'ReleaseDividendsRights', { fromBlock: 0, filter: { _for: this.userAddress, tokenId }});
@@ -162,7 +163,6 @@ export class MultitokenService {
       details.push({ date, accept, part, value });
       return null;
     }));
-    this.lastDivToken = tokenId; // should assign before brodcasting transactions!
     this.divTransactions.next(details);
   };
 
