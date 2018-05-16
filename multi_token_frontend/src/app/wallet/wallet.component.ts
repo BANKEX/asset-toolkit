@@ -46,13 +46,15 @@ export class WalletComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {
+  public ngOnInit(): void {
     this.sortOptions = [
       {id: 'index', name: 'Date added', reverse: true},
       {id: 'eth', name: 'Amount', reverse: true}
     ];
     this.sortBy = this.sortOptions[0];
   }
+
+  public isRinkeby = () => this.$connection.networkId === 4;
 
   public copyToClipboard(_text) {
     this.$clipboard.copyFromContent(_text);
