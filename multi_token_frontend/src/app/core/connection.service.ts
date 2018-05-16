@@ -15,7 +15,6 @@ export class ConnectionService extends BehaviorSubject<Connection> {
   /**
    * Service for Connection to Blockchain
    */
-  public isRinkeby: boolean;
   public err: Subject<Error> = new Subject();
   public web3: any;
   public contract: Contract;
@@ -81,7 +80,6 @@ export class ConnectionService extends BehaviorSubject<Connection> {
       console.warn(
         'Using web3 detected from external source. If you find that your accounts don\'t appear or you have 0 MetaCoin, ensure you\'ve configured that source properly. If using MetaMask, see the following link. Feel free to delete this warning. :) http://truffleframework.com/tutorials/truffle-and-metamask'
       );
-      // Use Mist/MetaMask's provider
       return new this.Web3((window as any).web3.currentProvider);
     } else {
       console.warn(
