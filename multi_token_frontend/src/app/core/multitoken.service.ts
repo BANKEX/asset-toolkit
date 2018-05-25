@@ -1,15 +1,14 @@
-import {
-  ConnectionService,
-  HelperService,
-  EventService,
-} from '.';
 import { Account, Contract, PromiEvent, Tx, Transaction } from 'web3/types';
+import { ErrorMessageService } from '../shared/services/index';
+import { ConnectionService } from './connection.service';
 import { Connection, Multitoken } from '../shared/types';
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs/Subject';
-import { ErrorMessageService } from '../shared/services/index';
 import { to } from 'await-to-js';
+import { TokenService } from './token.service';
+import { TransactionService } from './transaction.service';
 import * as moment from 'moment';
+import { PendingService } from './pending.service';
 declare const web3: any; // Use global instance from Metamask if needed
 
 @Injectable()
@@ -30,13 +29,13 @@ export class MultitokenService {
 
   constructor(
     private $connection: ConnectionService,
-    private $error: ErrorMessageService,
-    private $events: EventService,
-    private $helper: HelperService,
+    private $transaction: TransactionService,
+    private $token: TokenService,
+    private $pending: PendingService,
   ) {
     $connection.subscribe(status => {
       if (status === Connection.Estableshed) {
-        this.contractAddress = $connection.contractData.address;
+        this.contractAddress = $connection.contract.options.address;
         this.userAddress = $connection.account;
         this.contract = $connection.contract;
         this.startLoops();
@@ -81,17 +80,17 @@ export class MultitokenService {
     return tokenType;
   };
 
-  public async getBalances() {
-    const cells = await this.getCells();
-    const balances = {};
-    const pendings = await this.getPendings();
-    await Promise.all(cells.map(async (tokenId) => {
-      balances[tokenId] = await this.getBalance(tokenId);
-      balances[tokenId].pending = pendings[tokenId] || [];
-      return null;
-    }));
-    this.tokens.next(balances);
-  };
+  // public async getBalances() {
+  //   const cells = await this.$token.take(1).toPromise(); // getCells();
+  //   const balances = {};
+  //   const pendings = await this.getPendings();
+  //   await Promise.all(cells.map(async (token) => {
+  //     balances[token.id] = await this.getBalance(token.id);
+  //     balances[token.id].pending = pendings[token.id] || [];
+  //     return null;
+  //   }));
+  //   this.tokens.next(balances);
+  // };
 
   public getTokenBalance(tokenId): Promise<string> {
     return this.contract.methods.balanceOf(tokenId, this.userAddress).call();
@@ -169,19 +168,14 @@ export class MultitokenService {
     this.divTransactions.next([]);
   }
 
-  public avalableTokensCount(token: Multitoken) {
-    Object.setPrototypeOf(token, new Multitoken);
-    return web3.fromWei(token.amount) - web3.fromWei(token.totalPending());
-  }
-
   //#endregion
 
   //#region Private Methods
 
   private startLoops() {
-    this.getBalances();
+    // this.getBalances();
     this.getDividendsBalances();
-    setInterval(this.getBalances.bind(this), this.fetchDataDelay);
+    // setInterval(this.getBalances.bind(this), this.fetchDataDelay);
     setInterval(this.getDividendsBalances.bind(this), this.fetchDataDelay);
     setInterval(() => {
       if (this.lastToken) {
@@ -191,25 +185,6 @@ export class MultitokenService {
         this.getDividendsDetails(this.lastDivToken)
       }
     }, this.fetchDataDelay)
-        /*
-        this.contract.events.Transfer({
-          fromBlock: 'latest',
-          filter: { from: this.userAddress }
-        }).on('data', async (event) => {
-          // const { tokenId } = event.returnValues;
-          // this.balances[tokenId] = await this.getBalance(tokenId);
-          this.getBalances();
-        });
-
-        this.contract.events.Transfer({
-          fromBlock: 'latest',
-          filter: { to: this.userAddress }
-        }).on('data', async (event) => {
-          // const { tokenId } = event.returnValues;
-          // this.balances[tokenId] = await this.getBalance(tokenId);
-          this.getBalances();
-        });
-    */
   }
 
   // Dividends Tab

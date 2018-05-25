@@ -1,6 +1,5 @@
 .tokens {
-  padding: 30px 90px 30px 75px;
-  padding-top: 82px;
+  padding: 82px 90px 30px 75px;
   max-height: 360px;
 
   label {
@@ -149,6 +148,7 @@
   &-sum,
   &-value,
   &-tokens,
+  &-pending,
   &-dividends {
     display: inline-block;
     font-size: 14px;
@@ -171,6 +171,50 @@
     }
     &:hover a {
       text-decoration: none;
+    }
+  }
+
+  &-pending {
+    overflow: hidden;
+    //padding-left: 20px;
+    vertical-align: top;
+    &-transaction {
+      display: inline-block;
+      text-transform: uppercase;
+      .value {
+        display: inline-block;
+        margin-left: 8px;
+        max-width: 90px;
+        overflow: hidden;
+        padding-right: 5px;
+        text-overflow: ellipsis;
+        text-align: left;
+        vertical-align: bottom;
+      }
+      .spinner {
+        padding-left: 10px;
+        margin-bottom: 5px;
+      }
+      &.incoming {
+        //background: url("../assets/svg/in.svg") 40% 15px no-repeat;
+        background-size: 16px;
+        background-position-x: 0;
+      }
+      &.outgoing {
+        //background: url("../assets/svg/out.svg") 40% 15px no-repeat;
+        background-size: 16px;
+        background-position-x: 0;
+        svg {
+          transform: rotate(180deg);
+        }
+      }
+      &:last-child {
+        margin-left: 20px;
+      }
+      .svg {
+        position: relative;
+        top: 1px;
+      }
     }
   }
 
@@ -225,5 +269,11 @@
   background-color: initial !important;
   .ps__thumb-x, .ps__thumb-x:hover, .ps__thumb-y, .ps__thumb-y:hover {
     background-color: #0da9ff !important;
+  }
+}
+@media screen and (max-width: 1200px) {
+  .tokens {
+    padding-right: 40px;
+    padding-left: 25px;
   }
 }

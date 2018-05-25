@@ -1,32 +1,33 @@
 import { ActivatedRoute, Router } from '@angular/router';
-import { Injectable } from '@angular/core';
+import { Injectable, Inject } from '@angular/core';
 import { BehaviorSubject, Observable, Subject } from 'rxjs/Rx';
-import { Connection, ContractData } from '../shared/types';
+import { Connection } from '../shared/types';
 import { Account, Contract, Tx } from 'web3/types';
 import { to } from 'await-to-js';
-import { HelperService } from '.';
 import { ErrorMessageService } from '../shared/services';
 import { ToastyService } from 'ng2-toasty';
+// import { abiDecoder } from 'abi-decoder';
 import { BlockingNotificationOverlayService } from '../shared/services';
 import * as Web3 from 'web3';
+const abiDecoder = require('abi-decoder'); // NodeJS
 
 @Injectable()
 export class ConnectionService extends BehaviorSubject<Connection> {
   /**
-   * Service for Connection to Blockchain
+   * Service for managing connection to Blockchain
    */
-  public err: Subject<Error> = new Subject();
-  public web3: any;
+  public account: string;   // user address
   public contract: Contract;
-  public contractData: ContractData;
-  public account: string;
+  public decoder: any;      // instance of Abi-Decoder
+  public err: Subject<Error> = new Subject();
   public networkId: number;
+  public web3: any;
 
-  private useHardcodedContractData = false;
   private balances: any;
   private Web3: any = Web3;
 
   public constructor(
+    @Inject('AppConfig') private $config,
     private $blockingNotificationOverlay: BlockingNotificationOverlayService,
     private $error: ErrorMessageService,
     private $toasty: ToastyService,
@@ -39,9 +40,9 @@ export class ConnectionService extends BehaviorSubject<Connection> {
   public async connect(contractHash?: string) {
     this.next(Connection.InProcess);
     try {
+      this.decoder = abiDecoder.addABI(this.$config.abi);
       ({account: this.account, networkId: this.networkId} = await this.init(this.web3));
-      this.contractData = new ContractData(contractHash, this.networkId);
-      this.contract = new this.web3.eth.Contract(this.contractData.abi, this.contractData.address);
+      this.contract = new this.web3.eth.Contract(this.$config.abi, contractHash || this.$config.contracts[this.networkId]);
       this.next(Connection.Estableshed);
       // this.$blockingNotificationOverlay.hideOverlay();
       this.startLoops();

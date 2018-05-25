@@ -1,3 +1,4 @@
+const APP_CONFIG = require('./app.config')
 const commonConfig = require('./webpack.common.js');
 const helpers = require('./helpers');
 const webpackMerge = require('webpack-merge');
@@ -13,11 +14,12 @@ const AOT = process.env.BUILD_AOT || helpers.hasNpmFlag('aot');
 const HOST = process.env.HOST || 'localhost';
 const PORT = process.env.PORT || 8000;
 
-const metadata = webpackMerge(commonConfig({ENV}).metadata, {
+const metadata = {
   HOST,
   PORT,
   ENV,
-});
+  APP_CONFIG
+};
 
 console.log('AOT: ', AOT)
 module.exports = webpackMerge(commonConfig({ENV}), {
@@ -85,6 +87,12 @@ module.exports = webpackMerge(commonConfig({ENV}), {
       mainPath: "./src/main.ts",
       tsConfigPath: "./tsconfig.app.json",
       skipCodeGeneration: !AOT
+    }),
+    new webpack.DefinePlugin({
+      'APP_CONFIG': JSON.stringify(metadata.APP_CONFIG),
+      'process.env': {
+        'APP_CONFIG' : JSON.stringify(metadata.APP_CONFIG),
+      }
     }),
   ],
   devServer: {

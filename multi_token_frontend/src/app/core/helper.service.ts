@@ -22,7 +22,12 @@ export class HelperService {
       console.error('No data to logging!')
     }
   }
-  public rnd(num) {
-    return Math.floor(Math.random() * Math.pow(10, num));
+
+  /**
+   * Generate random number of given length
+   * @param  {number} len
+   */
+  public rnd(len): number {
+    return Math.floor(Math.random() * Math.pow(10, len));
   }
 }
