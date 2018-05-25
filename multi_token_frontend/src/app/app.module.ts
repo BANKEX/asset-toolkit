@@ -27,6 +27,7 @@ import { RouterModule } from '@angular/router';
   ],
   providers: [
     APP_PROVIDERS,
+    [{provide: 'AppConfig', useValue: process.env.APP_CONFIG}],
   ],
   bootstrap: [AppComponent]
 })

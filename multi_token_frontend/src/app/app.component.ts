@@ -1,6 +1,6 @@
 import { ActivatedRoute, Router, ParamMap } from '@angular/router';
-import { Component, AfterViewInit } from '@angular/core';
-import { Connection, ContractData } from './shared/types';
+import { Component, AfterViewInit, Inject } from '@angular/core';
+import { Connection } from './shared/types';
 import { ConnectionService, EventService, FormService, MultitokenService } from './core';
 import { LoadingOverlayService, ErrorMessageService } from './shared/services';
 import { Observable } from 'rxjs/Observable';
@@ -20,6 +20,7 @@ export class AppComponent extends NeatComponent implements AfterViewInit {
   public contractAddress: string;
 
   public constructor(
+    @Inject('AppConfig') private $config,
     private $connection: ConnectionService,
     private $clipboard: ClipboardService,
     private $events: EventService,
@@ -36,11 +37,11 @@ export class AppComponent extends NeatComponent implements AfterViewInit {
     $connection.subscribe((state: Connection) => {
       if (state === Connection.Estableshed) {
         $overlay.hideOverlay();
-        this.clientAddress = $connection.account;
-        this.contractAddress = $connection.contractData.address;
+        this.clientAddress = $connection.account.toLowerCase();
+        this.contractAddress = $connection.contract.options.address.toLowerCase();
         this.$toasty.success('Connected to blockchain.');
         this.listenForEvents();
-        this.$router.navigate(['../'], { queryParams: {contract: this.$connection.contractData.address}});
+        this.$router.navigate(['../'], { queryParams: {contract: this.contractAddress}});
       }
     })
   }
@@ -52,7 +53,7 @@ export class AppComponent extends NeatComponent implements AfterViewInit {
       } else {
         this.$route.queryParams.skip(1).take(1).subscribe(params => {
           // Prevent old contract loading on network change
-          if (ContractData.getData().address.indexOf(params.contract) === -1) {
+          if (this.$config.contracts.map(item => item.toUpperCase()).indexOf(params.contract.toUpperCase()) === -1) {
             this.connect(params.contract);
           } else {
             this.connect();
@@ -79,6 +80,8 @@ export class AppComponent extends NeatComponent implements AfterViewInit {
   private connect(contract?: string) {
     this.$connection.connect(contract || undefined);
   }
+
+  //#region EVENTS
 
   private listenForEvents() {
 
@@ -142,5 +145,6 @@ export class AppComponent extends NeatComponent implements AfterViewInit {
       this.$toasty.info(`${title ? title : 'Address'} copied to clipboard`)
     });
 
+    //#endregion
   }
 }

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { EventService, MultitokenService, ConnectionService, FormService, UIService } from '../core';
+import { EventService, MultitokenService, ConnectionService, FormService, UIService, TransactionService, TokenService } from '../core';
 import { LoadingOverlayService } from '../shared/services';
 import { to } from 'await-to-js';
 import { ClipboardService } from 'ngx-clipboard';
@@ -27,6 +27,8 @@ export class HistoryComponent implements OnInit {
     private $form: FormService,
     private $overlay: LoadingOverlayService,
     private $mt: MultitokenService,
+    private $transaction: TransactionService,
+    //private $token: TokenService,
   ) {
     // this.title = this._title;
     $mt.transactions.subscribe((_transactions: any[]) => {

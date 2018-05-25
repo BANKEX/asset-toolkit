@@ -1,3 +1,4 @@
+const APP_CONFIG = require('./app.config')
 const commonConfig = require('./webpack.common.js');
 const path = require('path');
 const helpers = require('./helpers');
@@ -16,13 +17,15 @@ const ENV = process.env.NODE_ENV = process.env.ENV = 'production';
 const HOST = process.env.HOST || 'localhost';
 const PORT = process.env.PORT || 9090;
 
-const metadata = webpackMerge(commonConfig({ENV}).metadata, {
+const metadata = {
   HOST,
   PORT,
   ENV,
-  HMR: false
-});
+  HMR: false,
+  APP_CONFIG
+};
 
+console.log('metadata: '+ metadata);
 module.exports = webpackMerge(commonConfig({ENV}), {
   devtool: 'source-map',
   entry: {
@@ -86,12 +89,14 @@ module.exports = webpackMerge(commonConfig({ENV}), {
   },
   plugins: [
     new webpack.DefinePlugin({
+      // 'APP_CONFIG': JSON.stringify(metadata.APP_CONFIG),
       'ENV': JSON.stringify(metadata.ENV),
       'HMR': metadata.HMR,
       'process.env': {
-          'ENV': JSON.stringify(metadata.ENV),
-          'NODE_ENV': JSON.stringify(metadata.ENV),
-          'HMR': metadata.HMR,
+        'APP_CONFIG' : JSON.stringify(metadata.APP_CONFIG),
+        'ENV': JSON.stringify(metadata.ENV),
+        'NODE_ENV': JSON.stringify(metadata.ENV),
+        'HMR': metadata.HMR,
       }
     }),
     new NoEmitOnErrorsPlugin(),

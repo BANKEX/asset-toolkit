@@ -1,8 +1,6 @@
-import {
-  Injectable
-} from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
-import { ConfirmationResponse } from '../shared/types';
+import { ConfirmationResponse, Token } from '../shared/types';
 
 @Injectable()
 export class EventService {
@@ -75,12 +73,12 @@ export class EventService {
     this._onTransferAdded.next(amount);
   }
 
-  public transferSubmited(transfer: any): void {
+  public transferSubmited(token: Token, amount: BigNumber): void {
     this._onTransferSubmited.next({internalId: 1});
   }
 
-  public transferConfirmed(transfer: any): void {
-    this._onTransferConfirmed.next(transfer);
+  public transferConfirmed(token: Token, amount: BigNumber): void {
+    this._onTransferConfirmed.next(null);
   }
 
   public transferFailed(transfer: any): void {

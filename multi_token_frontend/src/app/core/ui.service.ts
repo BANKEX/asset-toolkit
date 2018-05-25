@@ -4,7 +4,9 @@ import { Observable } from 'rxjs/Observable';
 
 @Injectable()
 export class UIService {
-
+  /**
+  * Service for basic UI events broadcasting
+  */
   private _onDetailsClicked: Subject<any> = new Subject();
   private onDetailsClickedSource = this._onDetailsClicked.asObservable().share<any>();
 

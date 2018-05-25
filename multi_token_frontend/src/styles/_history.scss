@@ -1,7 +1,7 @@
 .history {
   max-height: 350px;
   min-height: 350px;
-  padding: 32px 100px;
+  padding: 30px 90px 30px 75px;
   background: #0da9ff;
   color: #fff;
   border-bottom-right-radius: 4px;
@@ -125,5 +125,11 @@
     line-height: 32px;
     padding: 24px 0 20px 0;
     // font-family: 'Lora';
+  }
+}
+@media screen and (max-width: 1200px) {
+  .history {
+    padding-right: 40px;
+    padding-left: 25px;
   }
 }

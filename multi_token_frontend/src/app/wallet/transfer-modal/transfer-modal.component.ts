@@ -6,6 +6,7 @@ import { LoadingOverlayService, ErrorMessageService } from '../../shared/service
 import { BigNumber } from 'bignumber.js';
 import { to } from 'await-to-js';
 import { Multitoken } from '../../shared/types/multitoken';
+import { Token } from '../../shared/types';
 
 @Component({
   selector: 'mt-transfer-modal',
@@ -15,7 +16,8 @@ import { Multitoken } from '../../shared/types/multitoken';
 export class TransferModalComponent implements OnInit, AfterViewInit {
 
   @Output() public transferred: EventEmitter<string> = new EventEmitter<string>();
-  @Input() public transaction: any;
+  @Input() public token: Token;
+  @Input() public avalable: BigNumber;
   @ViewChildren('focus') public focus;
 
   public transferForm: FormGroup;
@@ -37,9 +39,7 @@ export class TransferModalComponent implements OnInit, AfterViewInit {
   get amount() { return this.transferForm.get('amount'); }
 
   public ngOnInit() {
-    Object.setPrototypeOf(this.transaction.token, new Multitoken());
-    this.tokenKey = this.transaction.key;
-    this.avalableTokens = this.$form.fromWei(this.transaction.token.amount) - this.$form.fromWei(this.transaction.token.totalPending());
+    this.avalableTokens = +this.avalable.toString();
     this.initForm();
   }
 
@@ -49,30 +49,30 @@ export class TransferModalComponent implements OnInit, AfterViewInit {
 
   public async transfer() {
     let err, result;
-    const amount = this.$form.toWei(this.transferForm.value.amount);
+    const amount = new BigNumber(this.transferForm.value.amount);
     const destination = this.transferForm.value.walletAddress;
     this.$events.transferAdded(this.transferForm.value.amount);
     this.$overlay.showOverlay(true);
     try {
-        const balance = await this.$mt.getTokenBalance(this.transaction.key);
-        const event = this.$mt.transferTokens(this.transaction.key, destination, amount);
-        if (+balance < +amount) { throw new Error('not enough tokens'); }
+        const balance = this.token.amount;
+        const event = this.$mt.transferTokens(this.token.id, destination, amount.multipliedBy(1e+18));
+        if (balance.isLessThan(new BigNumber(amount))) { throw new Error('not enough tokens'); }
         event.on('transactionHash', (hash) => {
           this.$activeModal.close();
           this.$overlay.hideOverlay();
-          this.$events.transferSubmited(this.transaction);
+          this.$events.transferSubmited(this.token, amount);
         });
         [err, result] = await to(event);
       if (err) {
         if (err.message.indexOf('User denied') > 0) {
-          this.$events.transferCanceled(this.transaction.blockNumber);
+          this.$events.transferCanceled(null);
         } else {
-          this.$events.transferFailed(this.transaction);
+          this.$events.transferFailed(null);
         }
       } else {
         this.closeModal();
-        this.$events.transferConfirmed(this.transaction);
-        this.transferred.emit(amount);
+        this.$events.transferConfirmed(this.token, amount);
+        this.transferred.emit(amount.toString());
       }
       this.$overlay.hideOverlay();
 
