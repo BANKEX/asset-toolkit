@@ -1,9 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { EventService, MultitokenService, ConnectionService, FormService, UIService, DividendService, TokenService } from '../core';
+import { EventService, MultitokenService, ConnectionService, FormService, UIService, DividendService, TokenService, PendingService } from '../core';
 import { LoadingOverlayService } from '../shared/services';
 import { to } from 'await-to-js';
 import { ClipboardService } from 'ngx-clipboard';
-import { Details } from '../shared/types/details.enum';
 import { from } from 'rxjs/observable/from';
 import { Operation, OperationType, OperationDirection } from '../shared/types';
 import { Observable } from 'rxjs';
@@ -15,37 +14,39 @@ import { BlockchainEvent } from '../shared/types/blockchain-event';
 })
 export class HistoryComponent implements OnInit {
 
+  public currentlyShowing: OperationType;
+  public operations: Operation[];
+  public pendings: Operation[] = [];
   public showSpinner = false;
   public sortOptions: any[];
   public sortBy;
   public tokenId;
-  public operations: Operation[];
   public title: string;
 
   public getDate = this.$mt.dateByBlockHash;
-
-  // private _title = 'Click on token or dividends to see transactions history';
 
   public constructor(
     public $ui: UIService,
     private $connection: ConnectionService,
     private $clipboard: ClipboardService,
+    private $dividend: DividendService,
     private $events: EventService,
     private $form: FormService,
     private $overlay: LoadingOverlayService,
+    private $pending: PendingService,
     private $mt: MultitokenService,
-    private $dividend: DividendService,
     private $token: TokenService,
   ) {
-    const sub = $ui.onDetailsClicked()
+    const historySub = $ui.onDetailsClicked()
+      .do(({token, details}) => this.tokenId = token.id)
       .do(this.onHistoryShowSignalReceved.bind(this))
       .combineLatest($token.transfers, $dividend.transactions)
       .map(([{token, details}, transfers, transactions]) => {
-        const source: BlockchainEvent[] = details === Details.Transactions
+        const source: BlockchainEvent[] = details === OperationType.Transaction
           ? transactions
           : transfers.filter(e => e.returnValues.tokenId === token.id);
         if (!source || source.length === 0) { return source }
-        return (source[0].returnValues.tokenId !== token.id)
+        return (source[0].returnValues.tokenId !== this.tokenId)
           ? undefined // to filter old values that comes from 'combineLatest'
           : source.reduce((result, item) => {
             result.push(Operation.fromBlockchainEvent(item, $connection.account))
@@ -58,8 +59,26 @@ export class HistoryComponent implements OnInit {
           return operation;
         }))) : Observable.of(operations); // had to pass initial undefined value somehow...
       })
-      sub.subscribe((_operations: any[]) => {
-        this.operations = _operations as Operation[];
+
+    historySub.combineLatest($pending, $token).subscribe(([_operations, _pendings, _tokens]) => {
+      if (!this.currentlyShowing) { return }
+      switch (this.currentlyShowing) {
+        case OperationType.Transfer:
+          this.pendings = _pendings.transfers.filter((item: Operation) => item.token === this.tokenId);
+        break;
+        case OperationType.Transaction:
+          console.log(_tokens);
+          this.pendings = _pendings.transactions.filter((item: Operation) => {
+            return item.token === this.tokenId && (
+              item.direction === OperationDirection.In ||
+                item.token === OperationDirection.Out && (_tokens[item.token].amount as BigNumber).isGreaterThan(0)
+            )
+          });
+        break;
+        default:
+          throw Error('Unknown operation type!');
+      }
+    this.operations = _operations ? this.pendings.concat(_operations as Operation[]) : _operations;
     });
   }
 
@@ -90,14 +109,14 @@ export class HistoryComponent implements OnInit {
   }
 
   private onHistoryShowSignalReceved({token, details}) {
-    this.tokenId = token.id;
+    this.currentlyShowing = details;
     this.operations = undefined;
     this.showSpinner = true;
-    if (details === Details.Transfers) {
-      this.$dividend.stopEmitHistory();
+    if (details === OperationType.Transfer) {
+      this.$dividend.resetHistory();
       this.title = `Transactions of 0x${this.tokenId} token:`;
-    } else if (details === Details.Transactions) {
-      this.$dividend.startEmitHistory(token.id);
+    } else if (details === OperationType.Transaction) {
+      this.$dividend.emitHistory(token.id);
       this.title = `Dividends transactions for 0x${this.tokenId} token:`;
     }
   }

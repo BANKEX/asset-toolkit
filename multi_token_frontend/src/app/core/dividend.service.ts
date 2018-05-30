@@ -18,10 +18,11 @@ export class DividendService extends Subject<any> {
 
   private contract: Contract;
   private user: string;
+  private tokenId: string;
 
   public constructor(
     @Inject('AppConfig') private $config,
-    $token: TokenService,
+    private $token: TokenService,
     private $connection: ConnectionService,
   ) {
     super();
@@ -37,15 +38,17 @@ export class DividendService extends Subject<any> {
           return null;
         }));
         this.next(balances);
-        // if (this.emittingHistoryForToken) { this.emitDividendEvents(this.emittingHistoryForToken) }
+        if (this.tokenId) { this.emitHistory(this.tokenId) }
     });
   }
 
-  public async startEmitHistory(tokenId) {
-    this.transactions.next(await this.getDividendEvents(tokenId))
+  public async emitHistory(tokenId) {
+    this.tokenId = tokenId;
+    this.transactions.next(await this.getDividendEvents(tokenId));
   }
 
-  public stopEmitHistory() {
+  public resetHistory() {
+    this.tokenId = undefined;
     this.transactions.next(undefined);
   }
 
@@ -69,23 +72,15 @@ export class DividendService extends Subject<any> {
     const details = [];
     const releaseDividendsRights = await this.contract.getPastEvents(
       'ReleaseDividendsRights', { fromBlock: 0, filter: { _for: this.user, tokenId }});
-    // await Promise.all(
     releaseDividendsRights.map(async (e) => details.push(e));
-    //   const blockAdded = await this.$connection.web3.eth.getBlock(ev.blockHash);
-    //   const date = blockAdded.timestamp * 1000;
-    //   const value = -Number(ev.returnValues.value);
-    //   return null;
-    // }));
     const acceptDividends = await this.contract.getPastEvents(
       'AcceptDividends', { fromBlock: 0, filter: { tokenId }});
     await Promise.all(acceptDividends.map(async (e) => {
-      // const blockAdded = await this.$connection.web3.eth.getBlock(ev.blockHash);
-      // const date = blockAdded.timestamp * 1000;
       const part = await this.getTokenPartOnAcceptDividendsEvent(e);
       const accept = Number(e.returnValues.value);
       e.returnValues.value = String(accept * part);
       e.returnValues.value_original = String(accept);
-      details.push(e);
+      if (+e.returnValues.value > 0) { details.push(e); } // filter "empty" dividends
       return null;
     }));
     return details;

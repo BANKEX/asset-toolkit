@@ -2,14 +2,13 @@ import { BigNumber } from 'bignumber.js';
 import { Component, OnInit } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { MultitokenService, EventService, ConnectionService, FormService, UIService, TokenService, PendingService, DividendService } from '../core';
-import { Connection, Pending, Token, Operation, OperationDirection } from '../shared/types';
+import { Connection, Pending, Token, Operation, OperationDirection, OperationType } from '../shared/types';
 import { TransferModalComponent } from './transfer-modal/transfer-modal.component';
 import { GetDividendsModalComponent } from './get-dividends-modal/get-dividends-modal.component';
 import { Multitoken } from '../shared/types/multitoken';
 import { SendDividendsModalComponent } from './send-dividends-modal/send-dividends-modal.component';
 import { AddTokenModalComponent } from './add-token-modal/add-token-modal.component';
 import { ClipboardService } from 'ngx-clipboard';
-import { Details } from '../shared/types/details.enum';
 @Component({
   selector: 'mt-wallet',
   templateUrl: './wallet.component.pug',
@@ -98,15 +97,11 @@ export class WalletComponent implements OnInit {
   }
 
   public showTokensTransactions(token: Token) {
-    // this.$mt.resetTransactionsHistory();
-    // this.$mt.getDetails(token.id);
-    this.$ui.detailsClicked(token, Details.Transfers);
+    this.$ui.detailsClicked(token, OperationType.Transfer);
   }
 
   public showDividendsTransactions(token: Token) {
-    // this.$mt.resetTransactionsHistory();
-    this.$mt.getDividendsDetails(token.id);
-    this.$ui.detailsClicked(token, Details.Transactions);
+    this.$ui.detailsClicked(token, OperationType.Transaction);
   }
 
   public openTransferModal(token): void {
@@ -162,6 +157,7 @@ export class WalletComponent implements OnInit {
    * @param  {Pending} pendings
    */
   private formatPendings(pendings: Pending) {
+    let emissions = [];
     const transactions = {in: {}, out: {}};
     const transfers = {in: {}, out: {}};
     pendings.transactions.forEach((operation: Operation) => {
@@ -194,7 +190,8 @@ export class WalletComponent implements OnInit {
         }
       }
     });
-    return {transfers, transactions};
+    emissions = pendings.emissions.filter((item) => item.initiator === this.$connection.account)
+    return {transfers, transactions, emissions};
   }
 
 }

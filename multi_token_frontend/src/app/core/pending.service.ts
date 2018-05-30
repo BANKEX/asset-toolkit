@@ -4,13 +4,14 @@ import { Contract, Transaction } from 'web3/types';
 import { DecoderService } from './decoder.service';
 import { Injectable, Inject } from '@angular/core';
 import { Subject, Observable, BehaviorSubject } from 'rxjs';
-import { Pending, Connection, Token } from '../shared/types';
+import { Pending, Connection, Token, OperationType } from '../shared/types';
 import Web3 from 'web3';
 
 @Injectable()
 export class PendingService extends Subject<Pending> {
+
   /**
-  * Service to provide all pending events in blockchein
+  * Service to provide all pending events from blockchein
   */
 
   private contract: Contract;
@@ -58,6 +59,7 @@ export class PendingService extends Subject<Pending> {
           pendings.emissions.push({
             initiator: encodedTransaction.from,
             token: tokenId,
+            type: OperationType.Emission,
             value: (new BigNumber(method.params.find(el => el.name === '_value').value)).div(new BigNumber(1e+18))
           })
           break;
@@ -68,15 +70,17 @@ export class PendingService extends Subject<Pending> {
             direction: target === this.$connection.account ? 'in' : 'out',
             token: tokenId,
             to: target,
+            type: OperationType.Transfer,
             value: (new BigNumber(method.params.find(el => el.name === '_value').value)).div(new BigNumber(1e+18))
           })
           break;
         case 'acceptDividends':
+          // TODO: не добавлять транзакцию если у человека 0 данных токенов
           pendings.transactions.push({
             initiator: encodedTransaction.from,
             direction: 'in',
             token: tokenId,
-            type: 'acceptence',
+            type: OperationType.Transaction,
             value: (new BigNumber(encodedTransaction.value)).div(new BigNumber(1e+18))
           })
           break;
@@ -85,7 +89,7 @@ export class PendingService extends Subject<Pending> {
             initiator: encodedTransaction.from,
             direction: 'out',
             token: tokenId,
-            type: 'withdrawal',
+            type: OperationType.Transaction,
             value: (new BigNumber(method.params.find(el => el.name === '_value').value)).div(new BigNumber(1e+18))
           })
           break;

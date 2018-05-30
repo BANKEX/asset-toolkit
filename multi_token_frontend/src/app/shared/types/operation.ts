@@ -36,7 +36,7 @@ export class Operation {
 }
 
 export enum OperationType {
-  Emission,
+  Emission = 1,
   Transfer,
   Transaction
 }

@@ -76,6 +76,11 @@ doctype html
       span(*ngIf="empty; then no_tokens_message else connecting_message")
     .tokens-list(*ngIf="tokens && !empty")
       perfect-scrollbar
+        .token.pending(*ngFor="let item of pendings.emissions | orderBy:'id':false")
+          .token-number.address((click)="copyToClipboard('0x'+item.token)", title="Token id: 0x{{item.token}}") 0x{{item.token}}
+          .token-sum
+            a(href="javascript:void(0)", title="Token emission in process...")
+              img.spinner(src="/assets/cool-spinner.gif", alt="transaction in process", width="21px", style="top: 0px;position: relative;")
         .token(*ngFor="let token of tokens | orderBy:'id':false")
           .token-number.address((click)="copyToClipboard('0x'+token.id)", title="Token id: 0x{{token.id}}") 0x{{token.id}}
           .token-sum
