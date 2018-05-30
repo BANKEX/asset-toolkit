@@ -1,9 +1,9 @@
+import { BigNumber } from 'bignumber.js';
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild, ViewChildren, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { FormService, EventService, MultitokenService, ConnectionService } from '../../core';
 import { LoadingOverlayService, ErrorMessageService } from '../../shared/services';
-import { BigNumber } from 'bignumber.js';
 import { to } from 'await-to-js';
 import { NeatComponent } from '../../shared/common/index';
 
@@ -24,7 +24,7 @@ import { NeatComponent } from '../../shared/common/index';
 export class GetDividendsModalComponent implements AfterViewInit, OnInit{
 
   @Input() public tokenKey: number;
-  @Input() public avalable: string;
+  @Input() public avalable: BigNumber;
   @Output() public transferred: EventEmitter<string> = new EventEmitter<string>();
   @ViewChildren('focus') public focus;
 
@@ -104,10 +104,10 @@ export class GetDividendsModalComponent implements AfterViewInit, OnInit{
 
   private initForm() {
     this.form = this.$fb.group({
-      amount: [this.avalable ? this.$form.fromWei(this.avalable) : '', [
+      amount: [this.avalable ? this.avalable.toNumber() : '', [
         Validators.required,
         Validators.min(0),
-        Validators.max(this.$form.fromWei(this.avalable)),
+        Validators.max(this.avalable.toNumber()),
         this.$form.forbiddenValidator('0'),
         Validators.pattern(/(^\d+(\.\d+)?$)/)]
       ]

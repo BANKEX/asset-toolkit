@@ -74,7 +74,7 @@ export class FormService {
    */
   public toWei(value) {
     const utils = this.web3.utils;
-    return utils.toBN(utils.toWei(value, 'ether'));
+    return utils.toBN(utils.toWei(String(value), 'ether'));
   }
 
   /**

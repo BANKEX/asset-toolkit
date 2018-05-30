@@ -1,16 +1,16 @@
 doctype html
 .history
-  .history-inner(*ngIf="!transactions")
+  .history-inner(*ngIf="!operations")
     .history-placeholder(*ngIf="showSpinner; else default_message")
       .center-loader
         img(src="/assets/spinner.gif", alt="Loading transactions...")
-  .history-inner(*ngIf="transactions")
-    h2(*ngIf="!transactions.length") No transactions yet...
-    h2(*ngIf="transactions.length") {{title}}
+  .history-inner(*ngIf="operations")
+    h2(*ngIf="!operations.length") No transactions yet...
+    h2(*ngIf="operations.length") {{title}}
     .history-list
       perfect-scrollbar
-        .transaction(*ngFor="let item of transactions")
-          .transaction-direction([ngClass]="{in: item.value > 0, out: item.value < 0}", title="{{item.value>0?'Incoming transaction':'Outgoing transaction'}}")
+        .transaction(*ngFor="let item of operations")
+          .transaction-direction([ngClass]="{in: item.direction == 'in', out: item.direction == 'out'}", title="{{getDirectionTitle(item)}}")
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
               <g fill="#fff" fill-rule="evenodd">
                 <path d="M0 16h4V0H0zM11 2.6L9.6 4l3 3H6v2h6.6l-3 3 1.4 1.4 4.7-4.7c.4-.4.4-1 0-1.4L11 2.6z">
@@ -19,10 +19,10 @@ doctype html
             </svg>
           .transaction-value(title="{{prepareValue(item)}}") {{prepareValue(item)}}
           .transaction-address.address(
-            title="{{item.value > 0 ? 'Transaction came from this address' : 'Transaction went to this address'}}",
-            (click)="copyToClipboard(item.address)") {{item.address}}
-          .transaction-date(*ngIf="item.date") {{item.date | date}}
-          .transaction-date(*ngIf="!item.date")
+            title="{{item.direction == 'in' ? 'Transaction came from this address' : 'Transaction went to this address'}}",
+            (click)="copyToClipboard(item.address)") {{item.direction == 'in' ? item.initiator : item.to}}
+          .transaction-date(*ngIf="item.blockHash") {{item.date | date}}
+          .transaction-date(*ngIf="!item.blockHash")
             img(src="/assets/spinner.gif", alt="transaction in process")
     //-.history-sort
       label Sort by

@@ -90,18 +90,10 @@ export class PendingService extends Subject<Pending> {
           })
           break;
       }
-      // const pending = {
-      //   address: transaction.input.slice(-128, -64).replace(/^0*/, '0x'),
-      //   value: this.web3.utils.toBN(transaction.input.slice(-64).replace(/^0*/, '0x'))
-      // };
-      // if (!Array.isArray(pendings[tokenId])) {
-      //   pendings[tokenId] = [];
-      // }
-      // pendings[tokenId].push(pending);
       return true;
     }));
     flagman.next(false);
-    console.log(pendings);
+    // console.log(pendings);
     return pendings;
   };
 
