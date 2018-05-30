@@ -1,8 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { EventService, MultitokenService, ConnectionService, FormService, UIService, TransactionService, TokenService } from '../core';
+import { EventService, MultitokenService, ConnectionService, FormService, UIService, DividendService, TokenService, PendingService } from '../core';
 import { LoadingOverlayService } from '../shared/services';
 import { to } from 'await-to-js';
 import { ClipboardService } from 'ngx-clipboard';
+import { from } from 'rxjs/observable/from';
+import { Operation, OperationType, OperationDirection } from '../shared/types';
+import { Observable } from 'rxjs';
+import { BlockchainEvent } from '../shared/types/blockchain-event';
 
 @Component({
   selector: 'mt-history',
@@ -10,45 +14,71 @@ import { ClipboardService } from 'ngx-clipboard';
 })
 export class HistoryComponent implements OnInit {
 
+  public currentlyShowing: OperationType;
+  public operations: Operation[];
+  public pendings: Operation[] = [];
   public showSpinner = false;
   public sortOptions: any[];
   public sortBy;
   public tokenId;
-  public transactions: any[];
   public title: string;
 
-  // private _title = 'Click on token or dividends to see transactions history';
+  public getDate = this.$mt.dateByBlockHash;
 
   public constructor(
     public $ui: UIService,
     private $connection: ConnectionService,
     private $clipboard: ClipboardService,
+    private $dividend: DividendService,
     private $events: EventService,
     private $form: FormService,
     private $overlay: LoadingOverlayService,
+    private $pending: PendingService,
     private $mt: MultitokenService,
-    private $transaction: TransactionService,
-    //private $token: TokenService,
+    private $token: TokenService,
   ) {
-    // this.title = this._title;
-    $mt.transactions.subscribe((_transactions: any[]) => {
-      this.transactions = _transactions;
-      this.tokenId = $mt.lastToken;
-      if (_transactions.length) {
-        this.title = `Transactions of 0x${this.tokenId} token:`;
+    const historySub = $ui.onDetailsClicked()
+      .do(({token, details}) => this.tokenId = token.id)
+      .do(this.onHistoryShowSignalReceved.bind(this))
+      .combineLatest($token.transfers, $dividend.transactions)
+      .map(([{token, details}, transfers, transactions]) => {
+        const source: BlockchainEvent[] = details === OperationType.Transaction
+          ? transactions
+          : transfers.filter(e => e.returnValues.tokenId === token.id);
+        if (!source || source.length === 0) { return source }
+        return (source[0].returnValues.tokenId !== this.tokenId)
+          ? undefined // to filter old values that comes from 'combineLatest'
+          : source.reduce((result, item) => {
+            result.push(Operation.fromBlockchainEvent(item, $connection.account))
+            return result;
+          }, [])
+      })
+      .switchMap(operations => {
+        return operations ? Observable.fromPromise(Promise.all(operations.map(async (operation): Promise<Operation> => {
+          operation.date = await this.getDate(operation.blockHash);
+          return operation;
+        }))) : Observable.of(operations); // had to pass initial undefined value somehow...
+      })
+
+    historySub.combineLatest($pending, $token).subscribe(([_operations, _pendings, _tokens]) => {
+      if (!this.currentlyShowing) { return }
+      switch (this.currentlyShowing) {
+        case OperationType.Transfer:
+          this.pendings = _pendings.transfers.filter((item: Operation) => item.token === this.tokenId);
+        break;
+        case OperationType.Transaction:
+          this.pendings = _pendings.transactions.filter((item: Operation) => {
+            return item.token === this.tokenId && (
+              item.direction === OperationDirection.In ||
+                item.token === OperationDirection.Out && (_tokens[item.token].amount as BigNumber).isGreaterThan(0)
+            )
+          });
+        break;
+        default:
+          throw Error('Unknown operation type!');
       }
+    this.operations = _operations ? this.pendings.concat(_operations as Operation[]) : _operations;
     });
-    $mt.divTransactions.subscribe((_transactions: any[]) => {
-      this.transactions = _transactions.filter((item) => item.value);
-      this.tokenId = $mt.lastDivToken;
-      if (_transactions.length) {
-        this.title = `Dividends transactions for 0x${this.tokenId} token:`;
-      }
-    });
-    $ui.onDetailsClicked().subscribe(() => {
-      this.transactions = undefined;
-      this.showSpinner = true;
-    })
   }
 
   public ngOnInit(): void {
@@ -64,9 +94,30 @@ export class HistoryComponent implements OnInit {
     this.$events.copyToClipboard();
   }
 
-  public prepareValue(transaction) {
-    return transaction.address
-      ? this.$form.from1E18(transaction.value.toLocaleString().replace(/[-\s]/g, '')) + ' TOKEN'
-      : this.$form.from1E18(String(Math.floor(transaction.value)).replace(/-/, '')) + ' ETH';
+  public getDirectionTitle(operation: Operation) {
+    if (operation.type === OperationType.Transfer) {
+      return operation.direction === OperationDirection.In ? 'Incoming transaction' : 'Outgoing transaction'
+    } else if (operation.type === OperationType.Transaction) {
+      return operation.direction === OperationDirection.In ? 'Receipt of dividends' : 'Dividends withdrawal'
+    }
   }
+
+  public prepareValue(operation: Operation) {
+    const value = operation.value.toString();
+    return operation.type === OperationType.Transfer ? value + ' TOKEN' : value + ' ETH';
+  }
+
+  private onHistoryShowSignalReceved({token, details}) {
+    this.currentlyShowing = details;
+    this.operations = undefined;
+    this.showSpinner = true;
+    if (details === OperationType.Transfer) {
+      this.$dividend.resetHistory();
+      this.title = `Transactions of 0x${this.tokenId} token:`;
+    } else if (details === OperationType.Transaction) {
+      this.$dividend.emitHistory(token.id);
+      this.title = `Dividends transactions for 0x${this.tokenId} token:`;
+    }
+  }
+
 }

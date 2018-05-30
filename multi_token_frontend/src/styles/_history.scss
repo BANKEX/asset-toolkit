@@ -45,6 +45,9 @@
         }
       }
     }
+    &-value {
+      text-transform: uppercase;
+    }
   }
   .pane {
     height: 250px;

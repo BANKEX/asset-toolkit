@@ -1,8 +1,8 @@
 import { BigNumber } from 'bignumber.js';
 import { Component, OnInit } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { MultitokenService, EventService, ConnectionService, FormService, UIService, TokenService, PendingService } from '../core';
-import { Connection, Pending, Token, Operation, OperationDirection } from '../shared/types';
+import { MultitokenService, EventService, ConnectionService, FormService, UIService, TokenService, PendingService, DividendService } from '../core';
+import { Connection, Pending, Token, Operation, OperationDirection, OperationType } from '../shared/types';
 import { TransferModalComponent } from './transfer-modal/transfer-modal.component';
 import { GetDividendsModalComponent } from './get-dividends-modal/get-dividends-modal.component';
 import { Multitoken } from '../shared/types/multitoken';
@@ -30,6 +30,7 @@ export class WalletComponent implements OnInit {
     public $form: FormService,
     private $connection: ConnectionService,
     private $clipboard: ClipboardService,
+    private $dividend: DividendService,
     private $events: EventService,
     private $modal: NgbModal,
     private $mt: MultitokenService,
@@ -41,7 +42,7 @@ export class WalletComponent implements OnInit {
       if (Object.keys(_tokens).length !== 0) {
         this.tokens = _tokens;
         this.empty = false;
-        console.log(_tokens);
+        // console.log(_tokens);
       } else {
         this.empty = true;
       }
@@ -50,7 +51,7 @@ export class WalletComponent implements OnInit {
       this.pending = _pending;
       this.pendings = this.formatPendings(this.pending);
     });
-    $mt.dividends.distinctUntilChanged().subscribe((_dividends: any) => {
+    $dividend.subscribe((_dividends: any) => {
       this.dividends = _dividends;
     });
   }
@@ -89,26 +90,17 @@ export class WalletComponent implements OnInit {
 
   }
 
-  public totalPending() {
-    let total = new BigNumber('0');
-    return total.toString(10);
-  }
-
   public copyToClipboard(_text) {
     this.$clipboard.copyFromContent(_text);
     this.$events.copyToClipboard();
   }
 
-  public showTokensTransactions(tokenKey) {
-    this.$mt.resetTransactionsHistory();
-    this.$mt.getDetails(tokenKey);
-    this.$ui.detailsClicked();
+  public showTokensTransactions(token: Token) {
+    this.$ui.detailsClicked(token, OperationType.Transfer);
   }
 
-  public showDividendsTransactions(tokenKey) {
-    this.$mt.resetTransactionsHistory();
-    this.$mt.getDividendsDetails(tokenKey);
-    this.$ui.detailsClicked();
+  public showDividendsTransactions(token: Token) {
+    this.$ui.detailsClicked(token, OperationType.Transaction);
   }
 
   public openTransferModal(token): void {
@@ -159,19 +151,12 @@ export class WalletComponent implements OnInit {
       }).componentInstance;
   }
 
-  public onTabChanged() {
-    this.$mt.resetTransactionsHistory();
-  }
-
-  public fromWei(val) {
-    return this.$connection.web3.utils.fromWei(val);
-  }
-
   /**
    * Format pendings for future use
    * @param  {Pending} pendings
    */
   private formatPendings(pendings: Pending) {
+    let emissions = [];
     const transactions = {in: {}, out: {}};
     const transfers = {in: {}, out: {}};
     pendings.transactions.forEach((operation: Operation) => {
@@ -204,7 +189,8 @@ export class WalletComponent implements OnInit {
         }
       }
     });
-    return {transfers, transactions};
+    emissions = pendings.emissions.filter((item) => item.initiator === this.$connection.account)
+    return {transfers, transactions, emissions};
   }
 
 }

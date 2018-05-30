@@ -7,7 +7,7 @@ import {
   MultitokenService,
   PendingService,
   TokenService,
-  TransactionService,
+  DividendService,
   UIService,
 } from './core';
 
@@ -19,7 +19,7 @@ export const APP_PROVIDERS = [
   HelperService,
   TokenService,
   MultitokenService,
-  TransactionService,
+  DividendService,
   PendingService,
   UIService,
 ];
