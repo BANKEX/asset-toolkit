@@ -53,7 +53,6 @@ export class WalletComponent implements OnInit {
     });
     $dividend.subscribe((_dividends: any) => {
       this.dividends = _dividends;
-      console.log(this.dividends)
     });
   }
 

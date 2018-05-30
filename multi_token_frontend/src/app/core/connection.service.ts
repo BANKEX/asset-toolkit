@@ -6,16 +6,17 @@ import { Account, Contract, Tx } from 'web3/types';
 import { to } from 'await-to-js';
 import { ErrorMessageService } from '../shared/services';
 import { ToastyService } from 'ng2-toasty';
-// import { abiDecoder } from 'abi-decoder';
 import { BlockingNotificationOverlayService } from '../shared/services';
 import * as Web3 from 'web3';
 const abiDecoder = require('abi-decoder'); // NodeJS
 
 @Injectable()
 export class ConnectionService extends BehaviorSubject<Connection> {
+
   /**
    * Service for managing connection to Blockchain
    */
+
   public account: string;   // user address
   public contract: Contract;
   public decoder: any;      // instance of Abi-Decoder

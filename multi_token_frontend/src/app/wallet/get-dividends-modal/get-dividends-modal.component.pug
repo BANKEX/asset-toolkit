@@ -19,7 +19,7 @@ doctype html
       div(*ngIf="amount.touched && amount.hasError('min')")
         label.error Amount should be >= 0
       div(*ngIf="amount.touched && amount.hasError('max')")
-        label.error Amount shouldn't exceed {{this.$form.fromWei(avalable)}}
+        label.error Amount shouldn't exceed {{avalable.toFixed()}}
       div(*ngIf="amount.touched && !amount.hasError('min') && amount.hasError('pattern')")
         label.error Amount should be a valid positive number
   .popup-details

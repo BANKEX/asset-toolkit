@@ -72,7 +72,6 @@ export class TokenService extends Subject<any[]> {
       );
     }));
     flagman.next(false);
-    // console.log(tokens)
     return {tokens, transfers: transferedTokens};
   };
 }

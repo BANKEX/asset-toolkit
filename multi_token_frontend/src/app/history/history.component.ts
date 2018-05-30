@@ -67,7 +67,6 @@ export class HistoryComponent implements OnInit {
           this.pendings = _pendings.transfers.filter((item: Operation) => item.token === this.tokenId);
         break;
         case OperationType.Transaction:
-          console.log(_tokens);
           this.pendings = _pendings.transactions.filter((item: Operation) => {
             return item.token === this.tokenId && (
               item.direction === OperationDirection.In ||

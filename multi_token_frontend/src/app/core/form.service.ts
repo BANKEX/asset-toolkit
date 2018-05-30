@@ -8,10 +8,6 @@ export class FormService {
   public web3 = new Web3;
   public utils = this.web3.utils;
 
-  constructor(
-  ) {
-  }
-
   public  walletAddressValidator(): ValidatorFn {
     return (control: AbstractControl): {[key: string]: any} => {
       const isAddress = this.web3.utils.isAddress(control.value);
@@ -87,12 +83,13 @@ export class FormService {
     return utils.fromWei(String(value), 'ether');
   }
 
+  /**
+   * Multiplies value on 1e+18
+   * @param  {} value
+   * @returns number
+   */
   public to1E18(value) {
     return this.utils.toWei(value, 'ether');
-  }
-
-  public from1E18(value) {
-    return this.utils.fromWei(value, 'ether');
   }
 
   public remove0x(value: string) {
