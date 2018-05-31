@@ -1,0 +1,9 @@
+doxity
+node_modules
+.idea/
+.vscode/
+.editorconfig
+build/
+/*.cmd
+*.sh
+/*.deprecated
