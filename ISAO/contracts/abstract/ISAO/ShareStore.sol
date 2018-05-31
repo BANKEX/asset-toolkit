@@ -150,8 +150,13 @@ contract ShareStore is ICassette, IRoleModel, IShareStore, IStateModel{
     emit ReleaseTokenToStakeholder(_for, _afor, _value);
     return releaseAbstractToken_(_afor, _value);
   }
-
-
+  
+  /**
+  * @dev Release amount of ETH to stakeholder by admin or paybot
+  * @param _for stakeholder role (for example: 2)
+  * @param _value amount of ETH in wei
+  * @return result of operation, true if success
+  */
   function releaseEtherToStakeholderForce(uint8 _for, uint _value) external returns(bool) {
     uint8 _role = getRole_();
     uint8 _state = getState_();
@@ -159,14 +164,24 @@ contract ShareStore is ICassette, IRoleModel, IShareStore, IStateModel{
     require((_role==RL_ADMIN) || (_role==RL_PAYBOT));
     return releaseEtherToStakeholder_(_for, _value);
   }
-
-
+  
+  /**
+  * @dev Release amount of tokens to msg.sender
+  * @param _value amount of tokens
+  * @return result of operation, true if success
+  */
   function releaseToken(uint _value) external returns(bool) {
     uint8 _state = getState_();
     require(_state == ST_TOKEN_DISTRIBUTION);
     return releaseToken_(msg.sender, _value);
   }
-
+  
+  /**
+  * @dev Release amount of tokens to person by admin or paybot
+  * @param _for address of person
+  * @param _value amount of tokens
+  * @return result of operation, true if success
+  */
   function releaseTokenForce(address _for, uint _value) external returns(bool) {
     uint8 _role = getRole_();
     uint8 _state = getState_();
@@ -174,13 +189,24 @@ contract ShareStore is ICassette, IRoleModel, IShareStore, IStateModel{
     require((_role==RL_ADMIN) || (_role==RL_PAYBOT));
     return releaseToken_(_for, _value);
   }
-
+  
+  /**
+  * @dev Allow to return ETH back to msg.sender if state Money back
+  * @param _value amount of ETH in wei
+  * @return result of operation, true if success
+  */
   function refundShare(uint _value) external returns(bool) {
     uint8 _state = getState_();
     require (_state == ST_MONEY_BACK);
     return refundShare_(msg.sender, _value);
   }
   
+  /**
+  * @dev Allow to return ETH back to person by admin or paybot if state Money back
+  * @param _for address of person
+  * @param _value amount of ETH in wei
+  * @return result of operation, true if success
+  */
   function refundShareForce(address _for, uint _value) external returns(bool) {
     uint8 _state = getState_();
     uint8 _role = getRole_();
@@ -213,8 +239,5 @@ contract ShareStore is ICassette, IRoleModel, IShareStore, IStateModel{
     revert();
   }
 
-
-
-
-
+  
 }
