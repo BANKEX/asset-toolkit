@@ -1,7 +1,7 @@
 import { Account, Contract, PromiEvent, Tx, Transaction } from 'web3/types';
 import { ErrorMessageService } from '../shared/services/index';
 import { ConnectionService } from './connection.service';
-import { Connection, Multitoken } from '../shared/types';
+import { Connection, Multitoken, Feature } from '../shared/types';
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs/Subject';
 import { to } from 'await-to-js';
@@ -9,7 +9,6 @@ import { TokenService } from './token.service';
 import * as moment from 'moment';
 import { PendingService } from './pending.service';
 import { BigNumber } from 'bignumber.js';
-declare const web3: any; // Use global instance from Metamask if needed
 
 @Injectable()
 export class MultitokenService {
@@ -17,6 +16,7 @@ export class MultitokenService {
   public contractAddress: string;
   public dividends: Subject<any> = new Subject();
   public divTransactions: Subject<any[]> = new Subject();
+   // {[Feature.Dividends]: false, [Feature.Emission]: false}; // initial features setup
   public lastDivToken: string;
   public lastToken: string;
   public tokens: Subject<any> = new Subject();
@@ -29,14 +29,16 @@ export class MultitokenService {
 
   constructor(
     private $connection: ConnectionService,
+    private $error: ErrorMessageService,
     private $token: TokenService,
     private $pending: PendingService,
   ) {
-    $connection.subscribe(status => {
+    $connection.subscribe(async status => {
       if (status === Connection.Estableshed) {
         this.contractAddress = $connection.contract.options.address;
         this.userAddress = $connection.account;
         this.contract = $connection.contract;
+        // this.test()
       }
     })
   }

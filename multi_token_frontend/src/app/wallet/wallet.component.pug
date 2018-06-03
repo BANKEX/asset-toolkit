@@ -1,8 +1,8 @@
 doctype html
-.tokens
+.tokens([class.controls]="tokens && (this.contractFeatures[Feature.Dividends] || this.contractFeatures[Feature.Emission])")
   .tokens-inner
     .tokens-buttons
-      a.tokens-buttons-add(href="javascript:void(0)", (click)="openAddTokenModal()", title="Create new subtoken")
+      a.tokens-buttons-add(href="javascript:void(0)", (click)="openAddTokenModal()", title="Create new subtoken", *ngIf="tokens && this.contractFeatures[Feature.Emission]")
         i.icon
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 31.059 31.059" width="30px" height="30px">
             <g>
@@ -18,7 +18,7 @@ doctype html
             </g>
           </svg>
         span.label Add Token
-      a.tokens-buttons-add(href="javascript:void(0)", (click)="openAddDividendsModal()", title="Add dividends")
+      a.tokens-buttons-add(href="javascript:void(0)", (click)="openAddDividendsModal()", title="Add dividends", *ngIf="tokens && this.contractFeatures[Feature.Dividends]")
         i.icon
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 484.88 484.88" width="32px" height="32px">
             <g>
@@ -58,7 +58,7 @@ doctype html
             </g>
           </svg>
         span.label Add Dividends
-      a.tokens-buttons-add(*ngIf="isRinkeby()", href="https://faucet.rinkeby.io/", target="_blank", title="Get free ETH")
+      a.tokens-buttons-add(*ngIf="isRinkeby() && tokens && this.contractFeatures[Feature.Dividends]", href="https://faucet.rinkeby.io/", target="_blank", title="Get free ETH")
         i.icon
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="32" viewBox="0 0 20 32">
             <g fill="#0da9ff" fill-rule="evenodd">
@@ -83,14 +83,16 @@ doctype html
               img.spinner(src="/assets/cool-spinner.gif", alt="transaction in process", width="21px", style="top: 0px;position: relative;")
         .token(*ngFor="let token of tokens | orderBy:'id':false")
           .token-number.address((click)="copyToClipboard('0x'+token.id)", title="Token id: 0x{{token.id}}") 0x{{token.id}}
-          .token-sum(*ngIf="dividends")
-            a((click)="showTokensTransactions(token)", href="javascript:void(0)", title="Click to see token transactions")
-              span.value(title="Tokens: {{token.amount.toString()}}") {{token.amount.toString()}}
-              span.label token
-            | &nbsp;/&nbsp;
-            a((click)="showDividendsTransactions(token)", href="javascript:void(0)", title="Click to see dividends transactions")
-              span.value(title="Dividends: {{dividends[token.id].toFixed()}} ETH") {{dividends[token.id].toFixed()}}
-              span.label ETH
+          .token-sum
+            span
+              a((click)="showTokensTransactions(token)", href="javascript:void(0)", title="Click to see token transactions")
+                span.value(title="Tokens: {{token.amount.toString()}}") {{token.amount.toString()}}
+                span.label token
+            span(*ngIf="dividends")
+              | &nbsp;/&nbsp;
+              a((click)="showDividendsTransactions(token)", href="javascript:void(0)", title="Click to see dividends transactions")
+                span.value(title="Dividends: {{dividends[token.id].toFixed()}} ETH") {{dividends[token.id].toFixed()}}
+                span.label ETH
           .token-pending
             .token-pending-transaction.incoming.arrow(
                   *ngIf="!!pendings && pendings.transfers.in[token.id]",
@@ -120,7 +122,7 @@ doctype html
               img.spinner(src="/assets/cool-spinner.gif", alt="transaction in process", width="21px")
 
           .token-controls
-            span.token-send-dividends((click)="openAddDividendsModal(token)", title="Add dividends to this token")
+            span.token-send-dividends((click)="openAddDividendsModal(token)", title="Add dividends to this token", *ngIf="this.contractFeatures[Feature.Dividends]")
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 484.88 484.88" width="16px" height="16px">
                 <g>
                   <g>
@@ -159,7 +161,7 @@ doctype html
                 </g>
               </svg>
             span.token-get-dividends(
-                  *ngIf="!pendings || (pendings && !pendings.transactions.in[token.id] && !pendings.transactions.out[token.id]); else processing_dividends",
+                  *ngIf="this.contractFeatures[Feature.Dividends] && (!pendings || (pendings && !pendings.transactions.in[token.id] && !pendings.transactions.out[token.id])); else processing_dividends",
                   (click)="openWithdrawModal(token)",
                   title="Withdraw dividends from this token",
                   [ngClass]="{disabled: dividends && dividends[token.id].toNumber() <= 0 || !pendings}")
@@ -182,6 +184,5 @@ ng-template(#no_tokens_message)
 ng-template(#connecting_message)
   | Connecting...
 ng-template(#processing_dividends)
-  span(style="width:48px;background: initial;cursor: initial;", title="Processing dividends transaction, please wait...")
-    img.spinner(src="/assets/cool-spinner.gif", alt="transaction in process", width="21px", style="top: -10px;position: relative;")
-
+    span(*ngIf="tokens && this.contractFeatures[Feature.Dividends]", style="width:48px;background: initial;cursor: initial;", title="Processing dividends transaction, please wait...")
+      img.spinner(src="/assets/cool-spinner.gif", alt="transaction in process", width="21px", style="top: -10px;position: relative;")

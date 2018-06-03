@@ -6,6 +6,7 @@ import { LoadingOverlayService, ErrorMessageService } from '../../shared/service
 import { BigNumber } from 'bignumber.js';
 import { to } from 'await-to-js';
 import { NeatComponent } from '../../shared/common/index';
+import { Feature } from '../../shared/types';
 
 @Component({
   selector: 'mt-add-token-modal',
@@ -52,6 +53,7 @@ export class AddTokenModalComponent implements AfterViewInit, OnInit {
   }
 
   public async createToken() {
+    if (!this.$connection.features[Feature.Emission]) { this.$error.addError('Emission feature disabled in this contract'); return; }
     let err, result;
     const amount = this.$form.to1E18(this.form.value.amount);
     const tokenType = this.toBN(this.$form.remove0x(this.form.value.tokenKey));

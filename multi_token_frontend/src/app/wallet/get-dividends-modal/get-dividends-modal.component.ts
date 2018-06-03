@@ -6,6 +6,7 @@ import { FormService, EventService, MultitokenService, ConnectionService } from 
 import { LoadingOverlayService, ErrorMessageService } from '../../shared/services';
 import { to } from 'await-to-js';
 import { NeatComponent } from '../../shared/common/index';
+import { Feature } from '../../shared/types';
 
 @Component({
   selector: 'mt-get-dividends-modal',
@@ -56,6 +57,7 @@ export class GetDividendsModalComponent implements AfterViewInit, OnInit{
   }
 
   public async getDividends(_tokenKey?, _amount?) {
+    if (!this.$connection.features[Feature.Dividends]) { this.$error.addError('Dividends feature disabled in this contract'); return; }
     let err, result;
     const amount = _amount ? this.toBN(_amount) : this.$form.toWei(this.form.value.amount);
     this.$events.transactionAdded(this.form.value.amount);

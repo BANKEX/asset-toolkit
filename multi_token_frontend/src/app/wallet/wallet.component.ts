@@ -2,7 +2,7 @@ import { BigNumber } from 'bignumber.js';
 import { Component, OnInit } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { MultitokenService, EventService, ConnectionService, FormService, UIService, TokenService, PendingService, DividendService } from '../core';
-import { Connection, Pending, Token, Operation, OperationDirection, OperationType } from '../shared/types';
+import { Connection, Pending, Token, Operation, OperationDirection, OperationType, Feature } from '../shared/types';
 import { TransferModalComponent } from './transfer-modal/transfer-modal.component';
 import { GetDividendsModalComponent } from './get-dividends-modal/get-dividends-modal.component';
 import { Multitoken } from '../shared/types/multitoken';
@@ -19,6 +19,8 @@ export class WalletComponent implements OnInit {
   public connected = false;
   public dividends: any;
   public empty = false;
+  public Feature = Feature; // expose enum to the view
+  public contractFeatures: any;
   public objectKeys = Object.keys;
   public pending: Pending;
   public pendings: any;    //  formatted version of pendigs
@@ -40,6 +42,7 @@ export class WalletComponent implements OnInit {
   ) {
     $token.subscribe((_tokens: any) => {
       if (Object.keys(_tokens).length !== 0) {
+        this.contractFeatures = $connection.features;
         this.tokens = _tokens;
         this.empty = false;
         // console.log(_tokens);
@@ -130,7 +133,7 @@ export class WalletComponent implements OnInit {
     modalInstance.avalable = this.dividends[token.id];
   }
 
-  public openAddDividendsModal(token?: any): void {
+  public openAddDividendsModal(token?: Token): void {
     let modalInstance;
     modalInstance =	this.$modal.open(
       SendDividendsModalComponent,
@@ -138,7 +141,7 @@ export class WalletComponent implements OnInit {
         size: 'lg',
         windowClass: 'modal-margin-lg'
       }).componentInstance;
-    modalInstance.tokenKey = token.id;
+    modalInstance.tokenKey = token ? token.id : token;
   }
 
   public openAddTokenModal(): void {

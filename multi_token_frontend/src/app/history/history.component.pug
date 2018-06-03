@@ -9,7 +9,7 @@ doctype html
     h2(*ngIf="operations.length") {{title}}
     .history-list
       perfect-scrollbar
-        .transaction(*ngFor="let item of operations")
+        .transaction(*ngFor="let item of operations | orderBy:'date':true")
           .transaction-direction([ngClass]="{in: item.direction == 'in', out: item.direction == 'out'}", title="{{getDirectionTitle(item)}}")
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
               <g fill="#fff" fill-rule="evenodd">

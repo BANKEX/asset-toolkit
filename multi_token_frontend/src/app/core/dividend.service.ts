@@ -1,7 +1,7 @@
 import { BigNumber } from 'bignumber.js';
 import { Injectable, Inject } from '@angular/core';
 import { Subject, Subscription } from 'rxjs';
-import { Operation, Token } from '../shared/types';
+import { Operation, Token, Feature } from '../shared/types';
 import { TokenService } from './token.service';
 import { BlockchainEvent } from '../shared/types/blockchain-event';
 import { Contract } from 'web3/types';
@@ -30,6 +30,7 @@ export class DividendService extends Subject<any> {
     $token
       .map((tokens: Token[]) => tokens.map(item => item.id))
       .subscribe(async (tokens: string[]) => {
+        if (!$connection.features[Feature.Dividends]) { return } // No dividend features enabled in the deployed contract
         const balances = {};
         this.contract = $connection.contract;
         this.user = $connection.account;
@@ -43,6 +44,7 @@ export class DividendService extends Subject<any> {
   }
 
   public async emitHistory(tokenId) {
+    if (!this.$connection.features[Feature.Dividends]) { return }
     this.tokenId = tokenId;
     this.transactions.next(await this.getDividendEvents(tokenId));
   }
