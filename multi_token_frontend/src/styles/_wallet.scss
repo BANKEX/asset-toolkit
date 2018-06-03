@@ -1,6 +1,10 @@
 .tokens {
-  padding: 82px 90px 30px 75px;
+  padding: 40px 90px 30px 75px;
   max-height: 360px;
+
+  &.controls {
+    padding-top: 82px;
+  }
 
   label {
     margin-right: 10px;

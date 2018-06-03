@@ -6,6 +6,7 @@ import { LoadingOverlayService, ErrorMessageService } from '../../shared/service
 import { BigNumber } from 'bignumber.js';
 import { to } from 'await-to-js';
 import { NeatComponent } from '../../shared/common/index';
+import { Feature } from '../../shared/types';
 
 @Component({
   selector: 'mt-send-dividends-modal',
@@ -62,6 +63,7 @@ export class SendDividendsModalComponent implements AfterViewInit, OnInit {
   }
 
   public async sendDividends() {
+    if (!this.$connection.features[Feature.Dividends]) { this.$error.addError('Dividends feature disabled in this contract'); return; }
     let err, result;
     const amount = this.form.value.amount;
     const tokenType = this.$form.remove0x(this.form.value.tokenKey);

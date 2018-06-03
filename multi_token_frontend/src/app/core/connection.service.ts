@@ -1,7 +1,7 @@
 import { ActivatedRoute, Router } from '@angular/router';
 import { Injectable, Inject } from '@angular/core';
 import { BehaviorSubject, Observable, Subject } from 'rxjs/Rx';
-import { Connection } from '../shared/types';
+import { Connection, Feature } from '../shared/types';
 import { Account, Contract, Tx } from 'web3/types';
 import { to } from 'await-to-js';
 import { ErrorMessageService } from '../shared/services';
@@ -21,8 +21,9 @@ export class ConnectionService extends BehaviorSubject<Connection> {
   public contract: Contract;
   public decoder: any;      // instance of Abi-Decoder
   public err: Subject<Error> = new Subject();
+  public features: any;
   public networkId: number;
-  public web3: any;
+  public web3: any;         // setted up instance of Web3
 
   private balances: any;
   private Web3: any = Web3;
@@ -44,6 +45,7 @@ export class ConnectionService extends BehaviorSubject<Connection> {
       this.decoder = abiDecoder.addABI(this.$config.abi);
       ({account: this.account, networkId: this.networkId} = await this.init(this.web3));
       this.contract = new this.web3.eth.Contract(this.$config.abi, contractHash || this.$config.contracts[this.networkId]);
+      this.features = await this.getContractFeatures();
       this.next(Connection.Estableshed);
       // this.$blockingNotificationOverlay.hideOverlay();
       this.startLoops();
@@ -51,7 +53,6 @@ export class ConnectionService extends BehaviorSubject<Connection> {
       this.$blockingNotificationOverlay.setOverlayMessage(e);
       this.$blockingNotificationOverlay.showOverlay();
       this.next(Connection.None);
-      // console.error(e);
     }
   }
 
@@ -63,8 +64,8 @@ export class ConnectionService extends BehaviorSubject<Connection> {
       throw new Error('No Web3 provider found');
     }
     [error, accounts] = await to(web3.eth.getAccounts());
-    if (!accounts) { throw new Error('No Web3 provider found'); }
-    if (!accounts[0]) { throw new Error('Web3 provider is locked'); }
+    if (!accounts) { throw new Error('No Web3 provider found. Have you installed Metamask?'); }
+    if (!accounts[0]) { throw new Error('Metamask is locked!'); }
     account = accounts[0];
     [error, networkId] = await to(web3.eth.net.getId());
     if (error) { throw new Error(error); }
@@ -79,15 +80,9 @@ export class ConnectionService extends BehaviorSubject<Connection> {
     // tslint:disable:max-line-length
     // Checking if Web3 has been injected by the browser
     if (typeof (window as any).web3 !== 'undefined') {
-      console.warn(
-        'Using web3 detected from external source. If you find that your accounts don\'t appear or you have 0 MetaCoin, ensure you\'ve configured that source properly. If using MetaMask, see the following link. Feel free to delete this warning. :) http://truffleframework.com/tutorials/truffle-and-metamask'
-      );
       return new this.Web3((window as any).web3.currentProvider);
     } else {
-      console.warn(
-        'No web3 detected. Falling back to http://localhost:8545. You should remove this fallback when you deploy live, as it\'s inherently insecure. Consider switching to Metamask for development. More info here: http://truffleframework.com/tutorials/truffle-and-metamask'
-      );
-      // fallback - use your fallback strategy (local node / hosted node + in-dapp id mgmt / fail)
+      console.warn('No web3 detected. Falling back to http://localhost:8545.');
       return new this.Web3(new this.Web3.providers.HttpProvider('http://localhost:8545'));
     }
   }
@@ -105,4 +100,38 @@ export class ConnectionService extends BehaviorSubject<Connection> {
       }
     })
   }
+
+  //#region Contract features detection
+
+  private async hasMethod(contract, signature) {
+    const w3 = this.web3;
+    const code = await w3.eth.getCode(contract);
+    let hash = w3.eth.abi.encodeFunctionSignature(signature);
+    return code.indexOf('578063' + hash.slice(2, hash.length)) > 0;
+  }
+
+  private async getContractFeatures() {
+    const interfaces = this.getInterfaces();
+    const features = {};
+    // tslint:disable-next-line:forin
+    for (let key in interfaces) {
+      const arr = await Promise.all(interfaces[key].map(item => this.hasMethod(this.contract.options.address, item)));
+      features[key] = arr.reduce((result, item) => result && item, true); // all signatures must be presented
+    }
+    return features;
+  }
+
+  private getInterfaces() {
+    const features = {};
+    features[Feature.Dividends] = [
+      'dividendsRightsOf(uint256,address)',
+      'releaseDividendsRights(uint256,uint256)'
+    ];
+    features[Feature.Emission] = [
+      'init(uint256,uint256)'
+    ]
+    return features;
+  }
+
+  //#endregion
 }
