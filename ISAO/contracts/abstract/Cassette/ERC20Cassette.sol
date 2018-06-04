@@ -25,7 +25,7 @@ contract ERC20Cassette is ICassette, IRoleModel, IStateModel {
     tokenAddress = _tokenAddress;
   }
 
-  function setERC20Token (address _tokenAddress) external returns(bool) {
+  function setERC20Token(address _tokenAddress) external returns(bool) {
     uint8 _role = getRole_();
     uint8 _state = getState_();
     require(_role == RL_ADMIN || _role == RL_PAYBOT);
