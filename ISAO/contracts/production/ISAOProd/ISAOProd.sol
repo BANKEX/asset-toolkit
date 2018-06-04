@@ -4,7 +4,7 @@ import "../../abstract/ISAO/ISAO.sol";
 import "../../abstract/TimeMachine/TimeMachineP.sol";
 import "../../abstract/Cassette/ERC20Cassette.sol";
 
-contract ISAOProd is ISAO, TimeMachineP, ERC20Cassette{
+contract ISAOProd is ISAO, TimeMachineP, ERC20Cassette {
   uint constant DECIMAL_MULTIPLIER = 1e18;
   
   constructor(uint _raisingPeriod, 
