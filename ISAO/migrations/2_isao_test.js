@@ -1,6 +1,6 @@
 
 
-var ISAOProd = artifacts.require("./ISAOProd.sol");
+var ISAOTest = artifacts.require("./ISAOTest.sol");
 
 
 
@@ -35,12 +35,12 @@ module.exports = function(deployer, network, accounts) {
     console.log(JSON.stringify([RAISING_PERIOD, DISTRIBUTION_PERIOD, 
       MINIMAL_FUND_SIZE, LIMITS, COSTS, MINIMAL_DEPOSIT, PAYBOT_ADDRESS].map(x=>x.toString())))
 
-    await deployer.deploy(ISAOProd, 
+    await deployer.deploy(ISAOTest, 
       RAISING_PERIOD, DISTRIBUTION_PERIOD, 
       MINIMAL_FUND_SIZE, LIMITS, COSTS, MINIMAL_DEPOSIT,
       PAYBOT_ADDRESS,
       {from:operator});
-    await ISAOProd.deployed();
+    await ISAOTest.deployed();
 
   })();
 };
