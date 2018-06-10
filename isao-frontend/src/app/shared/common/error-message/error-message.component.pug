@@ -1,0 +1,15 @@
+.error-messages(*ngIf="errorMessages.length")
+  .text-right(*ngFor="let item of errorMessages.slice().reverse(); let i = index")
+    .alert.alert-danger
+      .alert-content
+        span.alert-heading.text-bold(*ngIf="item.title", (click)="hideMessages[i] = !hideMessages[i]")
+          | {{ item.title }}
+        i.fa(*ngIf="item.title", [ngClass]="{'fa-caret-right': !hideMessages[i], 'fa-caret-down': hideMessages[i]}")
+        span(*ngIf="!hideMessages[i]")
+          | {{ item.message }}
+      button.close.mrg-left-15(
+        type="button",
+        (click)="closeMessage(i)",
+        data-dismiss="alert",
+        aria-label="Close")
+        span(aria-hidden="true") &times;

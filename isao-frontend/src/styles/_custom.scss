@@ -1,0 +1,63 @@
+body {
+  // background: #fefefe url("../assets/svg/blockchain1.svg") 40% 15px no-repeat;
+  background-size: 166px;
+  background-color: #f7f7f7;
+}
+.arrow {
+  cursor: default;
+}
+.btn {
+  border-radius: 20px;
+
+  &.pl {
+    box-shadow: -2px 2px 5px lightgrey;
+    margin-left: 15px;
+    padding-left: 30px;
+    padding-right: 30px;
+
+  }
+
+  &.spinner {
+    background: white;
+    img {
+      position: absolute;
+      right: 24px;
+      top: -2px;
+    }
+  }
+}
+
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+}
+
+button {
+  position: relative;
+}
+
+select {
+  outline: none;
+  option {
+    color: grey;
+    padding: 2px 3px;
+  }
+}
+
+.send-dividends {
+  display: inline-block;
+  text-align: center;
+  width: 48px;
+  height: 48px;
+  padding-top: 10px;
+  cursor: pointer;
+  transition: all 0.5s;
+
+  // &:hover {
+  //   background: #0da9ff;
+  // }
+
+  // &:hover svg * {
+  //   fill: #fff;
+  // }
+}
