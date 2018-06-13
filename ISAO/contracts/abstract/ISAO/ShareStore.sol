@@ -215,6 +215,12 @@ contract ShareStore is ICassette, IRoleModel, IShareStore, IStateModel{
     return refundShare_(_for, _value);
   }
   
+  function acceptAbstractToken(uint _value) external returns(bool) {
+    uint8 _role = getRole_();
+    require(_role == RL_ADMIN);
+    return acceptAbstractToken_(_value);
+  }
+  
   function buyShare() external payable returns(bool) {
     uint8 _state = getState_();
     require(_state == ST_RAISING);
