@@ -33,22 +33,42 @@ module.exports = function(deployer, network, accounts) {
 
   (async () => {
 
-    await deployer.deploy(TestToken, TOKEN_SUPPLY, {from: operator});
-    await TestToken.deployed();
+    // await deployer.deploy(TestToken, TOKEN_SUPPLY, {from: operator});
+    // await TestToken.deployed();
+    //
+    // console.log("Token ERC20 address:");
+    // console.log((TestToken.address).toString());
+    //
+    // console.log(JSON.stringify([RAISING_PERIOD, DISTRIBUTION_PERIOD,
+    //   MINIMAL_FUND_SIZE, LIMITS, COSTS, MINIMAL_DEPOSIT, PAYBOT_ADDRESS].map(x=>x.toString())))
+    //
+    // await deployer.deploy(ISAOTest,
+    //   RAISING_PERIOD, DISTRIBUTION_PERIOD,
+    //   MINIMAL_FUND_SIZE, LIMITS, COSTS, MINIMAL_DEPOSIT,
+    //   PAYBOT_ADDRESS,
+    //   {from:operator});
+    //
+    // await ISAOTest.deployed();
 
-    console.log("Token ERC20 address:");
-    console.log((TestToken.address).toString());
+      deployer.then(async function() {
+          let token = await TestToken.new(TOKEN_SUPPLY);
+          let isao = await ISAOTest.new(
+                      RAISING_PERIOD, DISTRIBUTION_PERIOD,
+                      MINIMAL_FUND_SIZE, LIMITS, COSTS, MINIMAL_DEPOSIT,
+                      PAYBOT_ADDRESS,
+                      {from:operator});
 
-    console.log(JSON.stringify([RAISING_PERIOD, DISTRIBUTION_PERIOD, 
-      MINIMAL_FUND_SIZE, LIMITS, COSTS, MINIMAL_DEPOSIT, PAYBOT_ADDRESS].map(x=>x.toString())))
+          await token.approve(isao.address, TOKEN_SUPPLY, {from: operator});
+          await isao.setERC20Token(token.address, {from: operator});
+          await isao.acceptAbstractToken(TOKEN_SUPPLY, {from: operator});
 
-    await deployer.deploy(ISAOTest, 
-      RAISING_PERIOD, DISTRIBUTION_PERIOD, 
-      MINIMAL_FUND_SIZE, LIMITS, COSTS, MINIMAL_DEPOSIT,
-      PAYBOT_ADDRESS,
-      {from:operator});
+          let a = (await isao.tokenAddress()).toString();
+          let b = (isao.address).toString();
 
-    await ISAOTest.deployed();
+          console.log(`Address of ERC20 token: ${a}`);
+          console.log(`Address of ISAO: ${b}`);
+      });
+
 
   })();
 };
