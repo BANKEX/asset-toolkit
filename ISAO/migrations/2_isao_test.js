@@ -2,7 +2,7 @@
 
 var ISAOTest = artifacts.require("./ISAOTest.sol");
 
-
+var TestToken = artifacts.require("./ERC20/TestToken.sol");
 
 const tbn = v => web3._extend.utils.toBigNumber(v);
 const fbn = v => v.toString();
@@ -32,6 +32,13 @@ module.exports = function(deployer, network, accounts) {
 
 
   (async () => {
+
+    await deployer.deploy(TestToken, TOKEN_SUPPLY, {from: operator});
+    await TestToken.deployed();
+
+    console.log("Token ERC20 address:");
+    console.log((TestToken.address).toString());
+
     console.log(JSON.stringify([RAISING_PERIOD, DISTRIBUTION_PERIOD, 
       MINIMAL_FUND_SIZE, LIMITS, COSTS, MINIMAL_DEPOSIT, PAYBOT_ADDRESS].map(x=>x.toString())))
 
@@ -40,6 +47,7 @@ module.exports = function(deployer, network, accounts) {
       MINIMAL_FUND_SIZE, LIMITS, COSTS, MINIMAL_DEPOSIT,
       PAYBOT_ADDRESS,
       {from:operator});
+
     await ISAOTest.deployed();
 
   })();
