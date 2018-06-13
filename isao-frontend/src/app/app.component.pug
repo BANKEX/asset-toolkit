@@ -13,8 +13,24 @@ bnkx-blocking-notification-overlay
         .header-inner-contract Contract address:
           span.address((click)="copyToClipboard(contractAddress)") {{contractAddress}}
 
-  //- mt-content
-  span Content will be here
+
+  .wrapper
+    .container
+      .wrapper-inner
+        isao-stage
+        .content(*ngIf="($stage|async) === Stage.DEFAULT")
+          isao-info
+        .content(*ngIf="($stage|async) === Stage.RAISING")
+          isao-raising
+        .content(*ngIf="($stage|async) === Stage.TOKEN_DISTRIBUTION")
+          isao-distribution
+        .content(*ngIf="($stage|async) === Stage.MONEY_BACK")
+          isao-money-back
+        .content(*ngIf="($stage|async) === Stage.FUND_DEPRECATED")
+          isao-info
+        .content
+          isao-admin
+
   .footer
     .container
       .footer-inner

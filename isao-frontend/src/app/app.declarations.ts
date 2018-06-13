@@ -1,3 +1,10 @@
+import { StageComponent } from './stage/stage.component';
+import { RaisingComponent } from './raising/raising.component';
+import { DistributionComponent } from './distribution/distribution.component';
+import { MoneyBackComponent } from './moneyback/money-back.component';
+import { AdminComponent } from './admin/admin.component';
+import { InfoComponent } from './info/info.component';
+
 // import { ContentComponent } from './content/content.component';
 // import { WalletComponent } from './wallet/wallet.component';
 // import { HistoryComponent } from './history/history.component';
@@ -17,4 +24,10 @@ export const APP_DECLARATIONS = [
   // TabsComponent,
   // TransferModalComponent,
   // WalletComponent,
+  StageComponent,
+  RaisingComponent,
+  DistributionComponent,
+  MoneyBackComponent,
+  AdminComponent,
+  InfoComponent
 ];

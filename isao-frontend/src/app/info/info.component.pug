@@ -1,0 +1,32 @@
+.info
+  h4 Info
+  .flex
+    .left
+      .entry
+        .title Launch time:
+        .value {{$isao.launchTime ? $isao.launchTime : 'not started'}}
+      .entry
+        .title Rising Period:
+        .value {{$isao.rPeriod}} days
+      .entry
+        .title Distribution Period:
+        .value {{$isao.dPeriod}} days
+      .entry
+        .title Minimal funds:
+        .value {{$isao.minimalFundSize}} ETH
+      .entry
+        .title Minimal deposit:
+        .value {{$isao.minimalDeposit}} ETH
+    .right
+      span.k-i-loading.k-icon(*ngIf="!ready", style="font-size: 64px; color: #ff6358")
+      kendo-chart(*ngIf="ready", style="height: 200px; margin-top: 10px;")
+        kendo-chart-title(text="Funding 'stairs'")
+        kendo-chart-tooltip(format="{0} Token")
+        kendo-chart-category-axis
+          kendo-chart-category-axis-item([categories]="costs", [title]="'Tokens amount'")
+        kendo-chart-series
+          kendo-chart-series-item(
+                [style]="'step'",
+                type="line",
+                [data]="limits",
+                [markers]="{ visible: false }")

@@ -11,7 +11,7 @@ module.exports = {
   },
   // Set intervals in miliseconds
   intervals: {
-    //tokenFetch: 10000,
+    stageFetch: 5000,
     //pendingsFetch: 5000,
   }
 }

@@ -25,7 +25,7 @@ module.exports = function makeWebpackConfig(options) {
   //console.log(`Using developement Webpack configuration...`);
   return {
     resolve: {
-      extensions: ['.ts', '.js'],
+      extensions: ['.ts', '.js', '.styl'],
       alias: Object.assign({
         config: path.join(__dirname, './src/environments/environment.' + environment.toLowerCase())
       }, rxPaths())
@@ -48,14 +48,17 @@ module.exports = function makeWebpackConfig(options) {
         },
         {
           test: /\.styl$/,
-          use: ExtractTextPlugin.extract({
-            use: [
-              {
-                loader: 'stylus-loader',
-                options: { sourceMap: true },
-              },
-            ]
-          })
+          use: [
+            'style-loader',
+            {
+              loader: 'css-loader',
+              options: {
+                modules: true,
+                localIdentName: '[name]__[local]___[hash:base64:5]'
+              }
+            },
+            'stylus-loader'
+          ]
         },
         {
           test: /\.scss$/,

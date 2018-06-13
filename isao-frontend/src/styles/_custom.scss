@@ -3,6 +3,41 @@ body {
   background-size: 166px;
   background-color: #f7f7f7;
 }
+
+h4 {
+  text-align: center;
+  margin-top: 10px;
+  line-height: 39px;
+  font-size: 16px;
+  letter-spacing: 1.3px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.info, .raising, .distribution, .money-back {
+  min-height: 400px
+}
+
+.admin {
+  min-height: 200px;
+}
+
+.content {
+  padding: 0 5%;
+  margin: 15px;
+  .entry {
+    margin: 10px 0;
+    .title {
+      display: inline;
+      margin-right: 10px;
+    }
+    .value {
+      display: inline;
+
+    }
+  }
+}
+
 .arrow {
   cursor: default;
 }
@@ -32,6 +67,13 @@ body {
   justify-content: space-between;
 }
 
+.nopadding {
+  padding: 0 !important;
+}
+.nomargin {
+  margin: 0 !important;
+}
+
 button {
   position: relative;
 }
@@ -44,20 +86,12 @@ select {
   }
 }
 
-.send-dividends {
-  display: inline-block;
-  text-align: center;
-  width: 48px;
-  height: 48px;
-  padding-top: 10px;
-  cursor: pointer;
-  transition: all 0.5s;
+// Kendo buttons stuling
 
-  // &:hover {
-  //   background: #0da9ff;
-  // }
-
-  // &:hover svg * {
-  //   fill: #fff;
-  // }
+kendo-buttongroup {
+  outline: none;
+  .k-button {
+    padding: 10px 15px;
+  }
 }
+

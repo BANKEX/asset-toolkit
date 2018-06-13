@@ -1,6 +1,5 @@
 export * from './alert-message';
 export * from './blockchain-receipt';
-export * from './connection.enum';
 export * from './feature.enum';
 export * from './token';
 export * from './confirmation-response';

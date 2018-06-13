@@ -1,0 +1,7 @@
+export enum Stage {
+  DEFAULT = 0,
+  RAISING = 1,
+  MONEY_BACK = 4,
+  TOKEN_DISTRIBUTION = 8,
+  FUND_DEPRECATED = 10
+}

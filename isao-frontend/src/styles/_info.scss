@@ -1,0 +1,18 @@
+.info {
+  .flex {
+    display: flex;
+    justify-content: space-around;
+    .left {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .right {
+      margin: auto 0;
+    }
+  }
+  kendo-chart {
+    width: 500px !important;
+    height: 300px !important;
+  }
+}

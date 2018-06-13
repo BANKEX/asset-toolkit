@@ -1,0 +1,3 @@
+.admin
+  .text-center(*ngIf="($stage|async) === Stage.DEFAULT")
+    button.start-funding(kendoButton (click)="startFunding()") Start fund rising fase
