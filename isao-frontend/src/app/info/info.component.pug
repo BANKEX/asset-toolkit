@@ -13,10 +13,15 @@
         .value {{$isao.dPeriod}} days
       .entry
         .title Minimal funds:
-        .value {{$isao.minimalFundSize}} ETH
+        .value {{$isao.minimalFundSize}} Token
       .entry
         .title Minimal deposit:
         .value {{$isao.minimalDeposit}} ETH
+      .entry
+        .title Token address:
+        br
+        .value
+          small {{$isao.token ? $isao.token : '-'}}
     .right
       span.k-i-loading.k-icon(*ngIf="!ready", style="font-size: 64px; color: #ff6358")
       kendo-chart(*ngIf="ready", style="height: 200px; margin-top: 10px;")
@@ -30,3 +35,8 @@
                 type="line",
                 [data]="limits",
                 [markers]="{ visible: false }")
+          kendo-chart-series-item(
+            type="line",
+            [style]="'step'",
+            [data]="minimal",
+            [markers]="{ visible: false }")

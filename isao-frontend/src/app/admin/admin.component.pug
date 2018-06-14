@@ -1,3 +1,9 @@
 .admin
   .text-center(*ngIf="($stage|async) === Stage.DEFAULT")
-    button.start-funding(kendoButton (click)="startFunding()") Start fund rising fase
+    p(*ngIf="!$isao.token")
+      input([(ngModel)]="str", type="text", id="contractAddressInput", size="60", maxlength="42", placeholder="Enter token contract address here...")
+      button(kendoButton, id="initContractFromAddressBtn", (click)="connectToken(str)") Подключить токен
+    button.start-funding(*ngIf="$isao.token", kendoButton, (click)="$admin.startFunding()") Start fund rising fase
+    span.k-i-loading.k-icon(
+      *ngIf="(!$isao.token && $admin.process.connectingToken) || $admin.process.runningFunding",
+      style="font-size: 64px; color: #ff6358")

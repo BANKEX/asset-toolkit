@@ -7,7 +7,7 @@ module.exports = {
     2 : '0x', // Morden
     3 : '0x', // Ropsten
     4 : '0x02a2f8482658a3da0bbe078f3c0316e94d00a148',   // Rinkeby
-    5777: '0x345ca3e014aaf5dca488057592ee47305d9b3e10'  // Ganache
+    5777: '0x75c35c980c0d37ef46df04d31a140b65503c0eed'  // Ganache
   },
   // Set intervals in miliseconds
   intervals: {

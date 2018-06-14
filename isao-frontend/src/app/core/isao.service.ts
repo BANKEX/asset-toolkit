@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ConnectionService } from './connection.service';
 import { Connection } from './types';
-import { Subject } from 'rxjs';
+import { Subject, TimeInterval } from 'rxjs';
 import { ErrorMessageService } from '../shared/services';
 import { EventLog } from 'web3/types';
 import { to } from 'await-to-js';
@@ -9,6 +9,7 @@ import { to } from 'await-to-js';
 @Injectable()
 export class IsaoService {
 
+  public token: string;
   public rPeriod: number;
   public dPeriod: number;
   public launchTime: Date;
@@ -16,6 +17,8 @@ export class IsaoService {
   public minimalDeposit: number;
   public stairs: Subject<any> = new Subject();
   public w3Utils: any;
+
+  private getTokenInterval;
 
   constructor (
     private $connection: ConnectionService,
@@ -41,10 +44,22 @@ export class IsaoService {
             if (costs.length !== limits.length || costs.length < 1) { throw Error(`Wrong costs/limits length`); }
             limits.forEach((limit, i) => stairs[limit / 1e18] = costs[i] / 1e18);
             this.stairs.next(stairs);
+          this.getTokenInterval = setInterval(async() => {
+            const [error, address] = await to(this.$connection.contract.methods.tokenAddress().call());
+            console.log(address);
+            if (err) { console.error(err)};
+            if (!address || address === '0x0000000000000000000000000000000000000000') {
+              this.token = undefined;
+            } else {
+              clearInterval(this.getTokenInterval);
+              this.token = address;
+            }
+          }, 1000);
         } catch (err) {
           $error.addError(err.message, 'Error fetching initial contract data. Pls double check the contract address.')
         }
       }
     })
   }
+
 }

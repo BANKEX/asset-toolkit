@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { StageService, AdminService } from '../core';
 import { Connection, Stage } from '../core/types';
+import { IsaoService } from '../core/isao.service';
 
 @Component({
   selector: 'isao-admin',
@@ -9,10 +10,12 @@ import { Connection, Stage } from '../core/types';
 export class AdminComponent implements OnInit {
 
   public Stage = Stage;
+  public connectToken = this.$admin.connectToken.bind(this.$admin);
 
   public constructor(
     public $stage: StageService,
-    private $admin: AdminService,
+    public $admin: AdminService,
+    public $isao: IsaoService,
   ) {
     $stage.subscribe(stage => {
 
@@ -21,7 +24,5 @@ export class AdminComponent implements OnInit {
 
   public ngOnInit(): void { }
 
-  public startFunding() {
 
-  }
 }

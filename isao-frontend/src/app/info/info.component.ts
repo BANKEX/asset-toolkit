@@ -11,6 +11,7 @@ export class InfoComponent implements OnInit {
   public ready;
   public limits: number[] = [];
   public costs: string[] = [];
+  public minimal: number[] = [];
 
   constructor(
     public $isao: IsaoService
@@ -20,6 +21,7 @@ export class InfoComponent implements OnInit {
       keys.forEach((key, index) => {
         this.limits[index] = Number(key);
         this.costs[index] = stairs[key] + ' ETH';
+        this.minimal[index] = $isao.minimalFundSize;
       })
       this.ready = true;
     })

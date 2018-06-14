@@ -22,10 +22,10 @@ export class ConnectionService extends BehaviorSubject<Connection> {
   public decoder: any;      // instance of Abi-Decoder
   public err: Subject<Error> = new Subject();
   public networkId: number;
+  public Web3: any = Web3;
   public web3: any;         // setted up instance of Web3
 
   private balances: any;
-  private Web3: any = Web3;
 
   public constructor(
     @Inject('AppConfig') private $config,
