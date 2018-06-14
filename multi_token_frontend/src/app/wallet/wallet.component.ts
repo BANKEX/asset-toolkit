@@ -41,14 +41,9 @@ export class WalletComponent implements OnInit {
     private $ui: UIService,
   ) {
     $token.subscribe((_tokens: any) => {
-      if (Object.keys(_tokens).length !== 0) {
-        this.contractFeatures = $connection.features;
-        this.tokens = _tokens;
-        this.empty = false;
-        // console.log(_tokens);
-      } else {
-        this.empty = true;
-      }
+      this.empty = Object.keys(_tokens).length === 0 ? true : false;
+      this.contractFeatures = $connection.features;
+      this.tokens = _tokens;
     });
     $pending.subscribe((_pending) => {
       this.pending = _pending;
