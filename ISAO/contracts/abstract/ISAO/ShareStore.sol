@@ -192,7 +192,7 @@ contract ShareStore is ICassette, IRoleModel, IShareStore, IStateModel{
   
   /**
   * @dev Allow to return ETH back to msg.sender if state Money back
-  * @param _value amount of ETH in wei
+  * @param _value share of person
   * @return result of operation, true if success
   */
   function refundShare(uint _value) external returns(bool) {
@@ -204,7 +204,7 @@ contract ShareStore is ICassette, IRoleModel, IShareStore, IStateModel{
   /**
   * @dev Allow to return ETH back to person by admin or paybot if state Money back
   * @param _for address of person
-  * @param _value amount of ETH in wei
+  * @param _value share of person
   * @return result of operation, true if success
   */
   function refundShareForce(address _for, uint _value) external returns(bool) {
@@ -215,18 +215,34 @@ contract ShareStore is ICassette, IRoleModel, IShareStore, IStateModel{
     return refundShare_(_for, _value);
   }
   
+  /**
+  * @dev Allow to send tokens from ERC20 contract to ISAO contract
+  * @param amount of tokens
+  * @return result of operation, true if success
+  */
   function acceptAbstractToken(uint _value) external returns(bool) {
     uint8 _role = getRole_();
     require(_role == RL_ADMIN);
     return acceptAbstractToken_(_value);
   }
   
+  /**
+  * @dev Allow to buy part of tokens if current state is RAISING
+  * @return result of operation, true if success
+  */
   function buyShare() external payable returns(bool) {
     uint8 _state = getState_();
     require(_state == ST_RAISING);
     return buyShare_();
   }
 
+  /**
+  * @dev payable function which does:
+  * If current state = ST_RASING - allows to send ETH for future tokens
+  * If current state = ST_MONEY_BACK - will send back all ETH that msg.sender has on balance
+  * If current state = ST_TOKEN_DISTRIBUTION - will reurn all ETH and Tokens that msg.sender has on balance
+  * in case of ST_MONEY_BACK or ST_TOKEN_DISTRIBUTION all ETH sum will be sent back (sum to trigger this function)
+  */
   function () public payable {
     uint8 _state = getState_();
     if (_state == ST_RAISING){
