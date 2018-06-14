@@ -22,13 +22,14 @@ export class StageService extends BehaviorSubject<Stage> {
           .startWith(0)
           .switchMap(() => Observable.fromPromise(this.getStateValue()))
           .subscribe(stage => this.next(stage));
+          // .subscribe(stage => this.next(Stage.RAISING));
       }
     })
   }
 
   private async getStateValue() {
     const [err, stage] = await to(this.$connection.contract.methods.getState().call());
-    switch (stage) {
+    switch (+stage) {
       case 1 :
         return Stage.RAISING;
       case 4 :
