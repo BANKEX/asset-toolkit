@@ -7,6 +7,15 @@ import "../../abstract/Cassette/ERC20Cassette.sol";
 contract ISAOProd is ISAO, TimeMachineP, ERC20Cassette {
   uint constant DECIMAL_MULTIPLIER = 1e18;
   
+  /** 
+  * @param _raisingPeriod time to raise ETH
+  * @param _distributionPeriod time to distribute tokens and remaining ETH to investors
+  * @param _minimalFundSize minimal collected fund in tokens
+  * @param _limits fund stages
+  * @param _costs stages prices
+  * @param _minimalDeposit minimal amount of ETH in wei which is allowed to become investor
+  * @param _paybotAddress address of pay bot
+  */
   constructor(uint _raisingPeriod, 
               uint _distributionPeriod, 
               uint _minimalFundSize, 
