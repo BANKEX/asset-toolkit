@@ -128,7 +128,7 @@ contract StateModel is ICassette, IRoleModel, IShareStore, IStateModel, ITimeMac
   
   /**
   * @dev Returns state of pooling (for example: raising)
-  * @return state (0 if ST_DEFAULT, 1 if ST_RAISING, 2 if ST_WAIT_FOR_ICO, 4 if ST_MONEY_BACK, 8 if ST_TOKEN_DISTRIBUTION, 10 if ST_FUND_DEPRECATED)
+  * @return state (0 if ST_DEFAULT, 1 if ST_RAISING, 4 if ST_MONEY_BACK, 8 if ST_TOKEN_DISTRIBUTION, 10 if ST_FUND_DEPRECATED)
   */
   function getState() external view returns(uint8) {
     return getState_();
