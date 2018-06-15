@@ -217,7 +217,7 @@ contract ShareStore is ICassette, IRoleModel, IShareStore, IStateModel{
   
   /**
   * @dev Allow to send tokens from ERC20 contract to ISAO contract
-  * @param amount of tokens
+  * @param _value amount of tokens
   * @return result of operation, true if success
   */
   function acceptAbstractToken(uint _value) external returns(bool) {
