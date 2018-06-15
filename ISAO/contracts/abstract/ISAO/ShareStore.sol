@@ -78,6 +78,8 @@ contract ShareStore is ICassette, IRoleModel, IShareStore, IStateModel{
 
     if (_remainValue > 0) 
       msg.sender.transfer(_remainValue);
+
+    emit BuyShare(msg.sender, msg.value.sub(_remainValue));
     return true;
   }
 
