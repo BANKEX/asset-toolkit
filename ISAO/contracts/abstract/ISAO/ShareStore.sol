@@ -106,7 +106,7 @@ contract ShareStore is ICassette, IRoleModel, IShareStore, IStateModel{
     stPrice[_limits[_stSize - 1]] = _costs[_stSize - 1];
     stPos = _limits[0];
     minimalFundSize = _minimalFundSize;
-    maximalFundSize = _costs[_stSize - 1];
+    maximalFundSize = _limits[_stSize - 1];
     return true;
   }
 
