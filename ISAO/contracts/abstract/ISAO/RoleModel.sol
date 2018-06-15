@@ -29,7 +29,7 @@ contract RoleModel is IRoleModel{
   
   /**
   * @dev It returns role in pooling of account address that you sent via param
-  * @param _targetAddress ethereum addrees of person who's role will be returned
+  * @param _targetAddress ethereum address of person who's role will be returned
   * @return role if person (0 if RL_DEFAULT, 4 if RL_ADMIN, 8 if RL_PAYBOT)
   */
   function getRole(address _targetAddress) external view returns(uint8){
