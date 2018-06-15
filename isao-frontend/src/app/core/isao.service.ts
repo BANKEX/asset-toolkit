@@ -9,6 +9,7 @@ import { to } from 'await-to-js';
 @Injectable()
 export class IsaoService {
 
+  public process: any = {};
   public token: string;
   public rPeriod: number;
   public dPeriod: number;
@@ -18,13 +19,15 @@ export class IsaoService {
   public stairs: Subject<any> = new Subject();
   public w3Utils: any;
 
+  private from: any;
   private getTokenInterval;
 
-  constructor (
+  public constructor (
     private $connection: ConnectionService,
     private $error: ErrorMessageService
   ) {
     $connection.subscribe(async(status) => {
+      this.from = {from: this.$connection.account};
       if (status === Connection.Estableshed) {
         const methods = $connection.contract.methods;
         this.w3Utils = $connection.web3.utils;
@@ -60,6 +63,18 @@ export class IsaoService {
         }
       }
     })
+  }
+
+  public buyTokens(amount) {
+    if (!amount) { this.$error.addError('Empty amount!'); return }
+    const pEvent = this.$connection.web3.eth.sendTransaction({
+      from: this.$connection.account, 
+      to: this.$connection.contract.options.address, 
+      value:this.w3Utils.toWei(amount, "ether")
+    });
+    // const pEvent = this.$connection.contract.methods.buyShare(this.token, amount * 1e18).send(this.from);
+    pEvent.on('transactionHash', () => this.process.buyingTokens = true);
+    pEvent.then(() => this.process.buyingTokens = false);
   }
 
 }
