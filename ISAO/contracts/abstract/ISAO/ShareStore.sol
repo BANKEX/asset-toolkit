@@ -28,7 +28,7 @@ contract ShareStore is ICassette, IRoleModel, IShareStore, IStateModel{
   mapping (uint8=>uint) stakeholderEtherReleased_;
   mapping (uint8=>uint) stakeholderTokenReleased_;
 
-  uint totalShare;
+  uint public totalShare;
 
   uint constant DECIMAL_MULTIPLIER = 1e18;
 
@@ -236,6 +236,10 @@ contract ShareStore is ICassette, IRoleModel, IShareStore, IStateModel{
     uint8 _state = getState_();
     require(_state == ST_RAISING);
     return buyShare_();
+  }
+  
+  function getBalanceTokenOf(address _for) external view returns(uint) {
+    return getBalanceTokenOf_(_for);
   }
 
   /**
