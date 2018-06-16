@@ -6,7 +6,7 @@ import { Connection, Stage } from './types';
 @Injectable()
 export class AdminService {
 
-  public process: any = {};        // List of all procecced actions
+  public process: any = {};        // List of all currently procecced actions
   private contract: Contract;
 
   public constructor (
@@ -23,6 +23,20 @@ export class AdminService {
     const pEvent: PromiEvent<boolean> =
       this.contract.methods.setState(Stage.RAISING).send({from: this.$connection.account});
     pEvent.on('transactionHash', () => this.process.runningFunding = true);
+    // pEvent.then(() => this.process.runningFunding = false);
+  }
+
+  public startDistribution() {
+    const pEvent: PromiEvent<boolean> =
+      this.contract.methods.setState(Stage.TOKEN_DISTRIBUTION).send({from: this.$connection.account});
+    pEvent.on('transactionHash', () => this.process.runningDistribution = true);
+    // pEvent.then(() => this.process.runningFunding = false);
+  }
+
+  public startMoneyback() {
+    const pEvent: PromiEvent<boolean> =
+      this.contract.methods.setState(Stage.MONEY_BACK).send({from: this.$connection.account});
+    pEvent.on('transactionHash', () => this.process.runningMoneyback = true);
     // pEvent.then(() => this.process.runningFunding = false);
   }
 

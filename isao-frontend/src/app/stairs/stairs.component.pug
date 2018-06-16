@@ -1,0 +1,16 @@
+span ready: {{ready}}
+span.k-i-loading.k-icon(*ngIf="!ready", style="font-size: 24px; color: #ff6358")
+kendo-chart(*ngIf="ready", style="height: 200px; margin-top: 10px;")
+  kendo-chart-title(text="Funding monitor")
+  kendo-chart-tooltip(format="{0} Token")
+  kendo-chart-legend(position="bottom", orientation="horizontal")
+  kendo-chart-category-axis
+    kendo-chart-category-axis-item([categories]="costs", [title]="'Tokens amount'")
+  kendo-chart-series
+    kendo-chart-series-item(
+      *ngFor="let item of series",
+      type="line",
+      style="step",
+      [data]="item.data",
+      [name]="item.name",
+      [markers]="{ visible: false }")

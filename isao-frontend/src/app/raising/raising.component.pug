@@ -1,8 +1,14 @@
 .rising
-  .entry(*ngIf="!$isao.process.tokenBuying")
-    input([(ngModel)]="str", type="text", id="byTokenAmountInput", size="60", maxlength="42", placeholder="Enter amount here...")
-    button(kendoButton, id="initContractFromAddressBtn", (click)="buyTokens(str)") By tokens
-  span.k-i-loading.k-icon(
-    *ngIf="$isao.process.tokenBuying",
-    style="font-size: 64px; color: #ff6358")
-
+  .flex
+    .left
+      .entry
+        .title You have
+        .value <b>{{$isao.tokensOrderedByUser|async}}</b> Tokens
+      .entry(*ngIf="!$isao.process.tokenBuying")
+        input([(ngModel)]="str", type="text", id="byTokenAmountInput", size="20", maxlength="20", placeholder="Enter amount here...")
+        button(kendoButton, id="initContractFromAddressBtn", (click)="buyTokens(str)") By tokens
+      span.k-i-loading.k-icon(
+        *ngIf="$isao.process.tokenBuying",
+        style="font-size: 64px; color: #ff6358")
+    .right
+      isao-stairs

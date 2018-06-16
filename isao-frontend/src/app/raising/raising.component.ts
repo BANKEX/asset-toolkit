@@ -7,7 +7,7 @@ import { IsaoService } from '../core/isao.service';
 })
 export class RaisingComponent implements OnInit {
 
-  public ready;
+  // public ready;
   public process: any = {};
   public buyTokens = this.$isao.buyTokens.bind(this.$isao);
 
@@ -15,7 +15,7 @@ export class RaisingComponent implements OnInit {
     public $isao: IsaoService
   ) {
     $isao.stairs.subscribe(stairs => {
-      this.ready = true;
+      // this.ready = true;
     });
   }
 

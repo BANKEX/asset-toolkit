@@ -1,5 +1,12 @@
 .admin {
+  display: flex;
+  button {
+    margin: 10px;
+  }
   .start-funding {
     padding: 10px;
+  }
+  .text-center {
+    margin: auto;
   }
 }

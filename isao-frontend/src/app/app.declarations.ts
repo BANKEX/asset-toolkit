@@ -4,6 +4,7 @@ import { DistributionComponent } from './distribution/distribution.component';
 import { MoneyBackComponent } from './moneyback/money-back.component';
 import { AdminComponent } from './admin/admin.component';
 import { InfoComponent } from './info/info.component';
+import { StairsComponent } from './stairs/stairs.component';
 
 // import { ContentComponent } from './content/content.component';
 // import { WalletComponent } from './wallet/wallet.component';
@@ -29,5 +30,6 @@ export const APP_DECLARATIONS = [
   DistributionComponent,
   MoneyBackComponent,
   AdminComponent,
-  InfoComponent
+  InfoComponent,
+  StairsComponent,
 ];

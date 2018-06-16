@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ConnectionService } from './connection.service';
 import { Connection } from './types';
-import { Subject, TimeInterval } from 'rxjs';
+import { Subject, TimeInterval, BehaviorSubject } from 'rxjs';
 import { ErrorMessageService } from '../shared/services';
 import { EventLog } from 'web3/types';
 import { to } from 'await-to-js';
@@ -16,7 +16,9 @@ export class IsaoService {
   public launchTime: Date;
   public minimalFundSize: number;
   public minimalDeposit: number;
-  public stairs: Subject<any> = new Subject();
+  public stairs: BehaviorSubject<any> = new BehaviorSubject({});
+  public tokensOrdered: Subject<any> = new Subject();
+  public tokensOrderedByUser: Subject<any> = new Subject();
   public w3Utils: any;
 
   private from: any;
@@ -49,7 +51,6 @@ export class IsaoService {
             this.stairs.next(stairs);
           this.getTokenInterval = setInterval(async() => {
             const [error, address] = await to(this.$connection.contract.methods.tokenAddress().call());
-            console.log(address);
             if (err) { console.error(err)};
             if (!address || address === '0x0000000000000000000000000000000000000000') {
               this.token = undefined;
@@ -58,6 +59,13 @@ export class IsaoService {
               this.token = address;
             }
           }, 1000);
+          const getBalanceInterval = setInterval(async() => {
+            let error, userOrdered, totalOrdered;
+            [error, totalOrdered] = await to(this.$connection.contract.methods.totalShare().call());
+            if (err) { console.error(err)} else { this.tokensOrdered.next(totalOrdered / 1e18); }
+            [error, userOrdered] = await to(this.$connection.contract.methods.getBalanceTokenOf($connection.account).call());
+            if (err) { console.error(err)} else { this.tokensOrderedByUser.next(userOrdered / 1e18); }
+          }, 2000);
         } catch (err) {
           $error.addError(err.message, 'Error fetching initial contract data. Pls double check the contract address.')
         }
@@ -68,9 +76,9 @@ export class IsaoService {
   public buyTokens(amount) {
     if (!amount) { this.$error.addError('Empty amount!'); return }
     const pEvent = this.$connection.web3.eth.sendTransaction({
-      from: this.$connection.account, 
-      to: this.$connection.contract.options.address, 
-      value:this.w3Utils.toWei(amount, "ether")
+      from: this.$connection.account,
+      to: this.$connection.contract.options.address,
+      value: this.w3Utils.toWei(amount, 'ether')
     });
     // const pEvent = this.$connection.contract.methods.buyShare(this.token, amount * 1e18).send(this.from);
     pEvent.on('transactionHash', () => this.process.buyingTokens = true);

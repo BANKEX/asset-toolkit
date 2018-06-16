@@ -25,6 +25,22 @@ h4 {
 .content {
   padding: 0 5%;
   margin: 15px;
+  .flex {
+    display: flex;
+    justify-content: space-around;
+    .left {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .right {
+      margin: auto 0;
+    }
+  }
+  kendo-chart {
+    width: 500px !important;
+    height: 300px !important;
+  }
   .entry {
     margin: 10px 0;
     .title {
@@ -33,7 +49,6 @@ h4 {
     }
     .value {
       display: inline;
-
     }
   }
 }

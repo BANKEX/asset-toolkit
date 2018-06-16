@@ -9,8 +9,26 @@
       style="font-size: 64px; color: #ff6358")
   .text-center(*ngIf="($stage|async) === Stage.RAISING")
     p(*ngIf="!$admin.process.timeIncreasing")
-      input([(ngModel)]="str", type="text", id="contractAddressInput", size="60", maxlength="42", placeholder="Enter value here...")
+      input([(ngModel)]="str", type="text", id="contractAddressInput", size="20", maxlength="20", placeholder="Enter value here...")
       button(kendoButton, id="initContractFromAddressBtn", (click)="connectToken(str)") Increase timestamp
     span.k-i-loading.k-icon(
       *ngIf="$admin.process.timeIncreasing",
       style="font-size: 64px; color: #ff6358")
+
+    button.start-distribution(
+      kendoButton,
+      *ngIf="!$admin.process.runningDistribution && !$admin.process.runningMoneyback",
+      (click)="$admin.startDistribution()") Start distribution fase
+    span.k-i-loading.k-icon(
+      *ngIf="$admin.process.runningDistribution",
+      style="font-size: 24px; color: #ff6358")
+
+    button.start-moneyback(
+      kendoButton,
+      *ngIf="!$admin.process.runningDistribution && !$admin.process.runningMoneyback",
+      (click)="$admin.startMoneyback()") Start money back fase
+    span.k-i-loading.k-icon(
+      *ngIf="$admin.process.runningMoneyback",
+      style="font-size: 24px; color: #ff6358")
+
+
