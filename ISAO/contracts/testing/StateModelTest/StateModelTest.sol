@@ -1,12 +1,24 @@
 pragma solidity ^0.4.23;
 
 import "../../abstract/ISAO/StateModel.sol";
-import "../../abstract/ISAO/ShareStore.sol";
 import "../../abstract/TimeMachine/TimeMachineT.sol";
+import "../../abstract/Cassette/ERC20Cassette.sol";
 
-contract StateModelTest is StateModel, ShareStore, TimeMachineT {
+contract StateModelTest is StateModel, TimeMachineT, ERC20Cassette {
   uint totalShare_;
   uint8 role_;
+  uint public minimalFundSize;
+  uint public maximalFundSize;
+  
+  function getMinimalFundSize_() internal view returns(uint) {
+    return minimalFundSize;
+  }
+
+  function getMaximalFundSize_() internal view returns(uint) {
+    return maximalFundSize;
+  }
+
+
 
   function getTotalShare_() internal view returns(uint) {
     return totalShare_;
@@ -47,11 +59,11 @@ contract StateModelTest is StateModel, ShareStore, TimeMachineT {
   }
 
 
-  constructor(uint _raisingPeriod, uint _distributionPeriod, uint _minimalFundSize, uint _maximalFundSize) public {
+  constructor(uint _raisingPeriod, uint _distributionPeriod) public {
     raisingPeriod = _raisingPeriod;
     distributionPeriod = _distributionPeriod;
 
-    minimalFundSize = _minimalFundSize;
-    maximalFundSize = _maximalFundSize;
+//    minimalFundSize = _minimalFundSize;
+//    maximalFundSize = _maximalFundSize;
   }
 }
