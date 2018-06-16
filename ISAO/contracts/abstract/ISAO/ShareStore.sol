@@ -27,7 +27,10 @@ contract ShareStore is ICassette, IRoleModel, IShareStore, IStateModel{
 
   mapping (uint8=>uint) stakeholderEtherReleased_;
   mapping (uint8=>uint) stakeholderTokenReleased_;
-
+ 
+  /** dev amount of Tokens on contract
+  *
+  */
   uint public totalShare;
 
   uint constant DECIMAL_MULTIPLIER = 1e18;
@@ -82,7 +85,7 @@ contract ShareStore is ICassette, IRoleModel, IShareStore, IStateModel{
     emit BuyShare(msg.sender, msg.value.sub(_remainValue));
     return true;
   }
-
+  
   function refundShare_(address _for, uint _value) internal returns(bool) {
     uint _share = share[_for];
     uint _tokenReleased = tokenReleased_[_for];
@@ -100,7 +103,7 @@ contract ShareStore is ICassette, IRoleModel, IShareStore, IStateModel{
     uint _stSize = _limits.length;
     require(_stSize == _costs.length);
     require(_stSize > 0);
-    for (uint _i = 0; _i < (_stSize - 1); _i++){
+    for (uint _i = 0; _i < (_stSize - 1); _i++) {
       stNext[_limits[_i]] = _limits[_i+1];
       stPrice[_limits[_i]] = _costs[_i];
     }
@@ -125,7 +128,7 @@ contract ShareStore is ICassette, IRoleModel, IShareStore, IStateModel{
     if (_for != RL_ADMIN) return 0;
     return address(this).balance - stakeholderEtherReleased_[_for];
   }
-
+  
   function releaseToken_(address _for, uint _value) internal returns (bool) {
     uint _balance = getBalanceTokenOf_(_for);
     require(_balance >= _value);
