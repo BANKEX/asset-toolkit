@@ -17,9 +17,7 @@ contract StateModelTest is StateModel, TimeMachineT, ERC20Cassette {
   function getMaximalFundSize_() internal view returns(uint) {
     return maximalFundSize;
   }
-
-
-
+  
   function getTotalShare_() internal view returns(uint) {
     return totalShare_;
   }
