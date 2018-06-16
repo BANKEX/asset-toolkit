@@ -24,6 +24,7 @@
     "@ngtools/webpack": "^6.0.0-beta.5",
     "@progress/kendo-angular-buttons": "^4.1.1",
     "@progress/kendo-angular-charts": "^3.2.0",
+    "@progress/kendo-angular-gauges": "^2.3.0",
     "@progress/kendo-angular-intl": "^1.4.1",
     "@progress/kendo-angular-l10n": "^1.2.0",
     "@progress/kendo-angular-layout": "^3.1.0",

@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { IsaoService } from '../core/isao.service';
 import { NeatComponent } from '../shared/common';
 import 'hammerjs';
@@ -19,7 +19,6 @@ export class StairsComponent extends NeatComponent implements OnInit {
 
   constructor(
     public $isao: IsaoService,
-    private $cdr: ChangeDetectorRef,
   ) {
     super();
     $isao.stairs.takeUntil(this.ngUnsubscribe).subscribe(stairs => {
@@ -48,7 +47,7 @@ export class StairsComponent extends NeatComponent implements OnInit {
       name: 'Funding stairs',
       data: this.limits
     }, {
-      name: 'Minimal funds',
+      name: 'Minimum required',
       data: this.minimal
     }, {
       name: 'Total funded',

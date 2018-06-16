@@ -11,6 +11,7 @@ export class AdminComponent implements OnInit {
 
   public Stage = Stage;
   public connectToken = this.$admin.connectToken.bind(this.$admin);
+  public incTimestamp = this.$admin.incTimestamp.bind(this.$admin);
 
   public constructor(
     public $stage: StageService,

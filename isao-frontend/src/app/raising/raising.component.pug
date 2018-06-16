@@ -1,14 +1,20 @@
-.rising
+.raising
   .flex
     .left
       .entry
         .title You have
         .value <b>{{$isao.tokensOrderedByUser|async}}</b> Tokens
-      .entry(*ngIf="!$isao.process.tokenBuying")
-        input([(ngModel)]="str", type="text", id="byTokenAmountInput", size="20", maxlength="20", placeholder="Enter amount here...")
-        button(kendoButton, id="initContractFromAddressBtn", (click)="buyTokens(str)") By tokens
-      span.k-i-loading.k-icon(
-        *ngIf="$isao.process.tokenBuying",
-        style="font-size: 64px; color: #ff6358")
+      .entry
+        input([(ngModel)]="str", type="text", id="byTokenInput", size="20", maxlength="20", placeholder="Enter amount in ETH")
+        button(
+          *ngIf="!$isao.process.buyingTokens",
+          kendoButton,
+          id="byTokensBtn",
+          (click)="buyTokens(str)") Order tokens
+        span.k-i-loading.k-icon(
+          *ngIf="$isao.process.buyingTokens",
+          style="font-size: 24px; color: #ff6358")
+      .text-center
+        isao-timer
     .right
       isao-stairs

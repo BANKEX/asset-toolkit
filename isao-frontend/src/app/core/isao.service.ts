@@ -14,6 +14,7 @@ export class IsaoService {
   public rPeriod: number;
   public dPeriod: number;
   public launchTime: Date;
+  public currentTime: Subject<Date> = new Subject();
   public minimalFundSize: number;
   public minimalDeposit: number;
   public stairs: BehaviorSubject<any> = new BehaviorSubject({});
@@ -34,10 +35,10 @@ export class IsaoService {
         const methods = $connection.contract.methods;
         this.w3Utils = $connection.web3.utils;
         try {
-          methods.raisingPeriod().call().then(rSec => this.rPeriod = rSec / 3600 / 24);
-          methods.distributionPeriod().call().then(dSec => this.dPeriod = dSec / 3600 / 24);
+          methods.raisingPeriod().call().then(rSec => this.rPeriod = rSec);
+          methods.distributionPeriod().call().then(dSec => this.dPeriod = dSec);
           methods.launchTimestamp().call().then(sec =>
-            Number(sec) ? (() => {this.launchTime = new Date(); this.launchTime.setDate(sec * 1000)})() : undefined);
+                sec ? (() => {this.launchTime = new Date(); this.launchTime.setTime(sec * 1000)})() : undefined);
           methods.minimalFundSize().call().then(size => this.minimalFundSize = size / 1e18);
           methods.minimalDeposit().call().then(size => this.minimalDeposit = size / 1e18);
           const [err, events] = await to($connection.contract.getPastEvents('CostStairs', {fromBlock: 0, filter: {}}))
@@ -80,9 +81,25 @@ export class IsaoService {
       to: this.$connection.contract.options.address,
       value: this.w3Utils.toWei(amount, 'ether')
     });
-    // const pEvent = this.$connection.contract.methods.buyShare(this.token, amount * 1e18).send(this.from);
     pEvent.on('transactionHash', () => this.process.buyingTokens = true);
     pEvent.then(() => this.process.buyingTokens = false);
+  }
+
+  public async getCurrentTime() {
+    const [err, isTestContract] = await to(this.hasMethod('getTimestamp()'));
+    if (err) { console.error(err.message); return Date.now() }
+    let time = new Date;
+    const timestamp = isTestContract ? 1000 * await this.$connection.contract.methods.getTimestamp().call() : Date.now();
+    time.setTime(timestamp);
+    this.currentTime.next(time);
+
+  }
+
+  private async hasMethod(signature) {
+    const w3 = this.$connection.web3;
+    const code = await w3.eth.getCode(this.$connection.contract.options.address);
+    const hash = w3.eth.abi.encodeFunctionSignature(signature);
+    return code.indexOf(hash.slice(2, hash.length)) > 0;
   }
 
 }

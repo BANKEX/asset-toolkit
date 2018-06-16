@@ -8,12 +8,10 @@
       *ngIf="(!$isao.token && $admin.process.connectingToken) || $admin.process.runningFunding",
       style="font-size: 64px; color: #ff6358")
   .text-center(*ngIf="($stage|async) === Stage.RAISING")
-    p(*ngIf="!$admin.process.timeIncreasing")
-      input([(ngModel)]="str", type="text", id="contractAddressInput", size="20", maxlength="20", placeholder="Enter value here...")
-      button(kendoButton, id="initContractFromAddressBtn", (click)="connectToken(str)") Increase timestamp
-    span.k-i-loading.k-icon(
-      *ngIf="$admin.process.timeIncreasing",
-      style="font-size: 64px; color: #ff6358")
+    p
+      input([(ngModel)]="str", type="text", id="contractAddressInput", size="20", maxlength="20", placeholder="Enter value in hours", style="margin: 10px")
+      button(*ngIf="!$admin.process.runningTimeInc", kendoButton, id="initContractFromAddressBtn", (click)="incTimestamp(str)") Increase timestamp
+      span.k-i-loading.k-icon(*ngIf="$admin.process.runningTimeInc", style="font-size: 24px; color: #ff6358")
 
     button.start-distribution(
       kendoButton,

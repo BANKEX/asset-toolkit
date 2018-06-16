@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { ConnectionService } from './connection.service';
 import { Account, Contract, Tx, PromiEvent } from 'web3/types';
 import { Connection, Stage } from './types';
+import { IsaoService } from './isao.service';
 
 @Injectable()
 export class AdminService {
@@ -10,13 +11,24 @@ export class AdminService {
   private contract: Contract;
 
   public constructor (
-    private $connection: ConnectionService
+    private $connection: ConnectionService,
+    private $isao: IsaoService,
   ) {
     $connection.subscribe(status => {
       if (status === Connection.Estableshed) {
         this.contract = $connection.contract;
       }
     })
+  }
+
+  public incTimestamp(hours) {
+    const pEvent: PromiEvent<boolean> =
+      this.contract.methods.incTimestamp(hours * 3600).send({from: this.$connection.account});
+    pEvent.on('transactionHash', () => this.process.runningTimeInc = true);
+    pEvent.then(() => {
+      this.process.runningTimeInc = false;
+      this.$isao.getCurrentTime();
+    });
   }
 
   public startFunding() {

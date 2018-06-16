@@ -7,10 +7,10 @@
         .value {{$isao.launchTime ? $isao.launchTime : 'not started'}}
       .entry
         .title Rising Period:
-        .value {{$isao.rPeriod}} days
+        .value {{$isao.rPeriod / 86400}} days
       .entry
         .title Distribution Period:
-        .value {{$isao.dPeriod}} days
+        .value {{$isao.dPeriod / 86400}} days
       .entry
         .title Minimal funds:
         .value {{$isao.minimalFundSize}} Token
