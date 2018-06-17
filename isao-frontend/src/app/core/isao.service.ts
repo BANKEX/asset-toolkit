@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { ConnectionService } from './connection.service';
-import { Connection } from './types';
+import { Connection, Stage } from './types';
 import { Subject, TimeInterval, BehaviorSubject } from 'rxjs';
 import { ErrorMessageService } from '../shared/services';
 import { EventLog } from 'web3/types';
 import { to } from 'await-to-js';
+import { StageService } from './stage.service';
 
 @Injectable()
 export class IsaoService {
@@ -19,7 +20,7 @@ export class IsaoService {
   public minimalDeposit: number;
   public stairs: BehaviorSubject<any> = new BehaviorSubject({});
   public tokensOrdered: Subject<any> = new Subject();
-  public tokensOrderedByUser: Subject<any> = new Subject();
+  public tokensOrderedByUser: BehaviorSubject<number> = new BehaviorSubject(0);
   public w3Utils: any;
 
   private from: any;
@@ -27,18 +28,21 @@ export class IsaoService {
 
   public constructor (
     private $connection: ConnectionService,
-    private $error: ErrorMessageService
+    private $error: ErrorMessageService,
+    private $stage: StageService,
   ) {
     $connection.subscribe(async(status) => {
       this.from = {from: this.$connection.account};
       if (status === Connection.Estableshed) {
         const methods = $connection.contract.methods;
         this.w3Utils = $connection.web3.utils;
+        this.adjustLaunchTime();
+        $stage.subscribe(stage => { if (stage === Stage.RAISING) { this.adjustLaunchTime() }})
         try {
           methods.raisingPeriod().call().then(rSec => this.rPeriod = rSec);
           methods.distributionPeriod().call().then(dSec => this.dPeriod = dSec);
-          methods.launchTimestamp().call().then(sec =>
-                sec ? (() => {this.launchTime = new Date(); this.launchTime.setTime(sec * 1000)})() : undefined);
+          // methods.launchTimestamp().call().then(sec =>
+          //   +sec ? (() => {this.launchTime = new Date(); this.launchTime.setTime(sec * 1000)})() : undefined);
           methods.minimalFundSize().call().then(size => this.minimalFundSize = size / 1e18);
           methods.minimalDeposit().call().then(size => this.minimalDeposit = size / 1e18);
           const [err, events] = await to($connection.contract.getPastEvents('CostStairs', {fromBlock: 0, filter: {}}))
@@ -85,6 +89,22 @@ export class IsaoService {
     pEvent.then(() => this.process.buyingTokens = false);
   }
 
+  public reseiveTokens(amount) {
+    if (!amount) { this.$error.addError('Empty amount!'); return }
+    if (+amount > this.tokensOrderedByUser.value) { this.$error.addError('Too mutch!'); return }
+    const pEvent = this.$connection.contract.methods.releaseToken(amount * 1e18).send(this.from);
+    pEvent.on('transactionHash', () => this.process.reseivingTokens = true);
+    pEvent.then(() => this.process.reseivingTokens = false);
+  }
+
+  public refundTokens(amount) {
+    if (!amount) { this.$error.addError('Empty amount!'); return }
+    if (+amount > this.tokensOrderedByUser.value) { this.$error.addError('Too mutch!'); return }
+    const pEvent = this.$connection.contract.methods.refundShare(amount * 1e18).send(this.from);
+    pEvent.on('transactionHash', () => this.process.refundingTokens = true);
+    pEvent.then(() => this.process.refundingTokens = false);
+  }
+
   public async getCurrentTime() {
     const [err, isTestContract] = await to(this.hasMethod('getTimestamp()'));
     if (err) { console.error(err.message); return Date.now() }
@@ -92,7 +112,14 @@ export class IsaoService {
     const timestamp = isTestContract ? 1000 * await this.$connection.contract.methods.getTimestamp().call() : Date.now();
     time.setTime(timestamp);
     this.currentTime.next(time);
+  }
 
+  public adjustLaunchTime() {
+    this.$connection.contract.methods.launchTimestamp().call().then(sec => {
+      if (!+sec) { return undefined } // not yet set
+      this.launchTime = new Date();
+      this.launchTime.setTime(sec * 1000);
+    })
   }
 
   private async hasMethod(signature) {

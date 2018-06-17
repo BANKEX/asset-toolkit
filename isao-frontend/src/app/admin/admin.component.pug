@@ -1,3 +1,4 @@
+doctype html
 .admin
   .text-center(*ngIf="($stage|async) === Stage.DEFAULT")
     p(*ngIf="!$isao.token")
@@ -7,16 +8,15 @@
     span.k-i-loading.k-icon(
       *ngIf="(!$isao.token && $admin.process.connectingToken) || $admin.process.runningFunding",
       style="font-size: 64px; color: #ff6358")
+
   .text-center(*ngIf="($stage|async) === Stage.RAISING")
-    p
-      input([(ngModel)]="str", type="text", id="contractAddressInput", size="20", maxlength="20", placeholder="Enter value in hours", style="margin: 10px")
-      button(*ngIf="!$admin.process.runningTimeInc", kendoButton, id="initContractFromAddressBtn", (click)="incTimestamp(str)") Increase timestamp
-      span.k-i-loading.k-icon(*ngIf="$admin.process.runningTimeInc", style="font-size: 24px; color: #ff6358")
+    ng-container(*ngTemplateOutlet="time_control")
 
     button.start-distribution(
       kendoButton,
       *ngIf="!$admin.process.runningDistribution && !$admin.process.runningMoneyback",
       (click)="$admin.startDistribution()") Start distribution fase
+
     span.k-i-loading.k-icon(
       *ngIf="$admin.process.runningDistribution",
       style="font-size: 24px; color: #ff6358")
@@ -25,8 +25,19 @@
       kendoButton,
       *ngIf="!$admin.process.runningDistribution && !$admin.process.runningMoneyback",
       (click)="$admin.startMoneyback()") Start money back fase
+
     span.k-i-loading.k-icon(
       *ngIf="$admin.process.runningMoneyback",
       style="font-size: 24px; color: #ff6358")
 
+  .text-center(*ngIf="($stage|async) === Stage.TOKEN_DISTRIBUTION")
+    ng-container(*ngTemplateOutlet="time_control")
 
+  //- .text-center(*ngIf="($stage|async) === Stage.MONEY_BACK")
+  //-   ng-container(*ngTemplateOutlet="time_control")
+
+ng-template(#time_control)
+  p
+    input([(ngModel)]="str", type="text", id="contractAddressInput", size="20", maxlength="20", placeholder="Enter value in hours", style="margin: 10px")
+    button(*ngIf="!$admin.process.runningTimeInc", kendoButton, id="initContractFromAddressBtn", (click)="incTimestamp(str)") Increase timestamp
+    span.k-i-loading.k-icon(*ngIf="$admin.process.runningTimeInc", style="font-size: 24px; color: #ff6358")

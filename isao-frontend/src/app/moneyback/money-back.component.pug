@@ -1,2 +1,24 @@
 .money-back
-  h4 Return money
+  .flex
+    .left
+      .entry
+        .title You can refund
+        .value <b>{{$isao.tokensOrderedByUser|async}}</b> tokens
+      .entry
+        input([(ngModel)]="str",
+          type="text",
+          id="byTokenInput",
+          size="20",
+          maxlength="20",
+          placeholder="Enter amount in tokens")
+        button(
+          *ngIf="!$isao.process.refundingTokens",
+          kendoButton,
+          id="byTokensBtn",
+          (click)="refundTokens(str)") Refund
+        span.k-i-loading.k-icon(
+          *ngIf="$isao.process.refundingTokens",
+          style="font-size: 24px; color: #ff6358")
+    .right
+      isao-stairs
+

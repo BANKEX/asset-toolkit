@@ -1,11 +1,17 @@
 import { Component, OnInit } from '@angular/core';
+import { IsaoService } from '../core/isao.service';
 
 @Component({
   selector: 'isao-distribution',
   templateUrl: './distribution.component.pug',
 })
 export class DistributionComponent implements OnInit {
-  constructor() { }
+
+  public reseiveTokens = this.$isao.reseiveTokens.bind(this.$isao);
+
+  public constructor(
+    public $isao: IsaoService
+  ) { }
 
   ngOnInit(): void { }
 }

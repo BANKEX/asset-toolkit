@@ -7,17 +7,11 @@ import { IsaoService } from '../core/isao.service';
 })
 export class RaisingComponent implements OnInit {
 
-  // public ready;
-  public process: any = {};
   public buyTokens = this.$isao.buyTokens.bind(this.$isao);
 
   public constructor(
     public $isao: IsaoService
-  ) {
-    $isao.stairs.subscribe(stairs => {
-      // this.ready = true;
-    });
-  }
+  ) { }
 
   ngOnInit(): void { }
 }
