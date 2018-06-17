@@ -6,6 +6,8 @@ import "../../abstract/Cassette/ERC20Cassette.sol";
 
 contract ISAOProd is ISAO, TimeMachineP, ERC20Cassette {
   uint constant DECIMAL_MULTIPLIER = 1e18;
+
+  event CostStairs(uint[] limits, uint[] costs);
   
   /** 
   * @param _raisingPeriod time to raise ETH
@@ -31,5 +33,6 @@ contract ISAOProd is ISAO, TimeMachineP, ERC20Cassette {
 
     setRole_(RL_ADMIN, msg.sender);
     setRole_(RL_PAYBOT, _paybotAddress);
+    emit CostStairs(_limits, _costs);
   }
 }
