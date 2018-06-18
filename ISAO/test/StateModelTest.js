@@ -36,7 +36,7 @@ const RL_PAYBOT = tbn(0x08);
 
 contract('StateModelTest COMMON TEST', (accounts) => {
     beforeEach(async function() {
-        stateModelTest = await StateModelTest.new(0,0);
+        stateModelTest = await StateModelTest.new(RAISING_PERIOD,DISTRIBUTION_PERIOD);
     });
 
     it("default state should be ST_DEFAULT", async function() {

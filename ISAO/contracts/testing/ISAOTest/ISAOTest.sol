@@ -11,13 +11,17 @@ contract ISAOTest is ISAO, TimeMachineT, ERC20Cassette {
   
   constructor(uint _raisingPeriod, 
               uint _distributionPeriod, 
-              uint _minimalFundSize, 
+              uint _minimalFundSize,
+              uint _maximalFundSize,
               uint[] _limits, 
               uint[] _costs,
               uint _minimalDeposit,
               address _paybotAddress) public {
     raisingPeriod = _raisingPeriod;
     distributionPeriod = _distributionPeriod;
+    
+    minimalFundSize = _minimalFundSize;
+    maximalFundSize = _maximalFundSize;
 
     minimalDeposit = _minimalDeposit;
     setCosts_(_minimalFundSize, _limits, _costs);
