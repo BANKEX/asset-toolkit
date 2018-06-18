@@ -38,4 +38,12 @@ contract TimeMachineT {
     timestampOffset_ += _dTime;
     return true;
   }
+
+  /**
+  * @dev getter for internal getTimestamp_()
+  */
+  function getTimestamp() external view returns(uint) {
+    return getTimestamp_();
+  }
+
 }
