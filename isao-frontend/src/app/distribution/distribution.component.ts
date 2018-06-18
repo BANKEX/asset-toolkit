@@ -8,6 +8,7 @@ import { IsaoService } from '../core/isao.service';
 export class DistributionComponent implements OnInit {
 
   public reseiveTokens = this.$isao.reseiveTokens.bind(this.$isao);
+  public str;
 
   public constructor(
     public $isao: IsaoService

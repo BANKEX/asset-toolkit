@@ -1,8 +1,7 @@
-import { ActivatedRoute, Router } from '@angular/router';
 import { Injectable, Inject } from '@angular/core';
 import { BehaviorSubject, Observable, Subject } from 'rxjs/Rx';
 import { Connection } from './types';
-import { Account, Contract, Tx } from 'web3/types';
+import { Contract } from 'web3/types';
 import { to } from 'await-to-js';
 import { ErrorMessageService } from '../shared/services';
 import { ToastyService } from 'ng2-toasty';

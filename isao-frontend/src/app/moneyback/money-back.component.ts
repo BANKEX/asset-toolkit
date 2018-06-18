@@ -8,6 +8,7 @@ import { IsaoService } from '../core/isao.service';
 export class MoneyBackComponent implements OnInit {
 
   public refundTokens = this.$isao.refundTokens.bind(this.$isao);
+  public str;
 
   public constructor(
     public $isao: IsaoService,
