@@ -20,7 +20,7 @@ export class AdminComponent implements OnInit {
   ) {
     $stage.subscribe(stage => {
 
-    })
+    });
   }
 
   public ngOnInit(): void { }

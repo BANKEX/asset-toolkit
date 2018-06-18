@@ -14,7 +14,7 @@ export class StageComponent implements OnInit {
   constructor(
     private $stage: StageService
   ) {
-    $stage.subscribe(_stage => this.stage = _stage)
+    $stage.subscribe(_stage => this.stage = _stage);
   }
 
   ngOnInit(): void { }

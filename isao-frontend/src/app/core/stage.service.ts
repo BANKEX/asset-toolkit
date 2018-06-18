@@ -24,7 +24,7 @@ export class StageService extends BehaviorSubject<Stage> {
           .subscribe(stage => this.next(stage));
           // .subscribe(stage => this.next(Stage.RAISING));
       }
-    })
+    });
   }
 
   private async getStateValue() {
