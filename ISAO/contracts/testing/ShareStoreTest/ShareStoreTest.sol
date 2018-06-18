@@ -16,14 +16,13 @@ contract ShareStoreTest is ShareStore, TimeMachineT, ERC20Cassette {
   uint8 internal state_;
   uint maximalFundSize;
   
-  constructor(uint _minimalFundSize, uint _maximalFundSize, uint _minimalDeposit, address _tokenAddress) public {
-    minimalFundSize = _minimalFundSize;
-    maximalFundSize = _maximalFundSize;
+  constructor(uint _minimalFundSize, uint _minimalDeposit, uint _limits, uint costs) public {
     minimalDeposit = _minimalDeposit;
-    tokenAddress = _tokenAddress;
+    setCosts_(_minimalFundSize, _limits, costs);
   }
   
   
+
   function setRoleTestData(uint8 _role, address _addr) external {
     role_ = _role;
     roleAddress_ = _addr;
