@@ -1,11 +1,13 @@
+// https://github.com/MikeMcl/bignumber.js/
+const BigNumber = require('bignumber.js');
 const RoleModelTest = artifacts.require("./RoleModelTest.sol");
 
 const web3 = global.web3;
 
-const tbn = v => web3.toBigNumber(v);
-const fbn = v => v.toString();
-const tw = v => web3.toBigNumber(v).mul(1e18);
-const fw = v => web3._extend.utils.fromWei(v).toString();
+const tbn = v => new BigNumber(v);
+const fbn = v => v.toNumber();
+const tw = v => BigNumber.isBigNumber(v) ? v.times(1e18) : tbn(v).times(1e18);
+const fw = v => BigNumber.isBigNumber(v) ? v.div(1e18).toNumber() : tbn(v).div(1e18).toNumber();
 
 const RL_DEFAULT = tbn(0x00);
 const RL_ADMIN = tbn(0x04);

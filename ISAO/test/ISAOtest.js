@@ -1,3 +1,5 @@
+// https://github.com/MikeMcl/bignumber.js/
+const BigNumber = require('bignumber.js');
 const ISAO = artifacts.require("./ISAOTest.sol");
 const Token = artifacts.require("./TestToken.sol");
 
@@ -135,11 +137,10 @@ const IERC20_ABI = [
     }
 ];
 
-const tbn = v => web3.toBigNumber(v);
-const fbn = v => v.toString();
-const tw = v => web3.toBigNumber(v).mul(1e18);
-const fw = v => web3._extend.utils.fromWei(v).toString();
-
+const tbn = v => new BigNumber(v);
+const fbn = v => v.toNumber();
+const tw = v => BigNumber.isBigNumber(v) ? v.times(1e18) : tbn(v).times(1e18);
+const fw = v => BigNumber.isBigNumber(v) ? v.div(1e18).toNumber() : tbn(v).div(1e18).toNumber();
 
 const TOKEN_SUPPLY = tw(1000);
 const MINIMAL_DEPOSIT_SIZE = tw(0.05);
@@ -158,9 +159,9 @@ const TM_WAIT_FOR_ICO = tbn(0x02);
 const TM_TOKEN_DISTRIBUTION = tbn(0x08);
 const TM_FUND_DEPRECATED = tbn(0x10);
 
-const RAISING_PERIOD = TI_DAY.mul(10);
-const ICO_PERIOD = TI_DAY.mul(15);
-const DISTRIBUTION_PERIOD = TI_DAY.mul(45);
+const RAISING_PERIOD = TI_DAY.times(10);
+const ICO_PERIOD = TI_DAY.times(15);
+const DISTRIBUTION_PERIOD = TI_DAY.times(45);
 
 const MINIMAL_FUND_SIZE = tw(1);
 const MAXIMAL_FUND_SIZE = tw(100000);
