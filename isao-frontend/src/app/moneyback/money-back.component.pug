@@ -1,2 +1,16 @@
 .money-back
   h4 Return money
+
+  .flex(style="flex-direction:column; align-items: center; justify-content: center; height: 150px")
+    div(*ngIf="!(isInitialized$|async)", style="text-align: center")
+      div Checking your funds
+      span.k-i-loading.k-icon(style="font-size: 24px; color: #ff6358; margin: 10px")
+    .entry(*ngIf="isInitialized$|async")
+      .title You have<span> <b>{{tokens$|async}}</b></span> tokens
+    .entry
+      button(*ngIf="!$isao.process.takingMoneyBack",
+        [disabled]="!(hasTokens$|async)",
+        kendoButton,
+        (click)="$isao.getAllMoneyBack()") Send All my money back
+
+      span.k-i-loading.k-icon(*ngIf="$isao.process.takingMoneyBack", style="font-size: 24px; color: #ff6358")

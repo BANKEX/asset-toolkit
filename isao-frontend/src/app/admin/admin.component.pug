@@ -7,10 +7,11 @@
     span.k-i-loading.k-icon(
       *ngIf="(!$isao.token && $admin.process.connectingToken) || $admin.process.runningFunding",
       style="font-size: 64px; color: #ff6358")
+
   .text-center(*ngIf="($stage|async) === Stage.RAISING")
     p
-      input([(ngModel)]="str", type="text", id="contractAddressInput", size="20", maxlength="20", placeholder="Enter value in hours", style="margin: 10px")
-      button(*ngIf="!$admin.process.runningTimeInc", kendoButton, id="initContractFromAddressBtn", (click)="incTimestamp(str)") Increase timestamp
+      input([(ngModel)]="str", type="text", size="20", maxlength="20", placeholder="Enter value in hours", style="margin: 10px")
+      button(*ngIf="!$admin.process.runningTimeInc", kendoButton, (click)="incTimestamp(str)") Increase timestamp
       span.k-i-loading.k-icon(*ngIf="$admin.process.runningTimeInc", style="font-size: 24px; color: #ff6358")
 
     button.start-distribution(
@@ -30,3 +31,19 @@
       style="font-size: 24px; color: #ff6358")
 
 
+  .text-center(*ngIf="($stage|async) === Stage.MONEY_BACK")
+    p(style="line-height:1.6em") Admin will be able to take unclaimed funds after %TODO: ISAO FINISH TIME% <br/> You cant test that functionality by increasing the time stamp
+    p
+      input([(ngModel)]="str", type="text", size="20", maxlength="20", placeholder="Enter value in hours", style="margin: 10px; text-align: center")
+    p
+      button(*ngIf="!$admin.process.runningTimeInc", kendoButton, (click)="incTimestamp(str)") Increase timestamp
+      span.k-i-loading.k-icon(*ngIf="$admin.process.runningTimeInc", style="font-size: 24px; color: #ff6358")
+
+    // Button doesn't have a sense for now because we close ISAO contact only by time
+    //button(
+    //  kendoButton,
+    //  *ngIf="!$admin.process.runningDistribution && !$admin.process.closingISAO",
+    //  (click)="$admin.closeISAO()") Finalize ISAO contract
+    //span.k-i-loading.k-icon(
+    //  *ngIf="$admin.process.closingISAO",
+    //  style="font-size: 24px; color: #ff6358")
