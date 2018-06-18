@@ -96,7 +96,7 @@ export class IsaoService {
 
   // Be really carefull you can use that method only when the acctual contact on blockchain is in the MONEY-BACK state
   public getAllMoneyBack() {
-    const pEvent = this.payToISAOContact(0);
+    const pEvent = this.payToISAOContact('0');
     pEvent.on('transactionHash', () => this.process.takingMoneyBack = true);
     pEvent.then(() => this.process.takingMoneyBack = false);
   }
