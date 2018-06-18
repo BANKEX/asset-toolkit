@@ -16,8 +16,9 @@ contract ShareStoreTest is ShareStore, TimeMachineT, ERC20Cassette {
   uint8 internal state_;
   uint maximalFundSize;
   
-  constructor(uint _minimalDeposit, address _tokenAddress) public {
-    maximalFundSize = 10000e18;
+  constructor(uint _minimalFundSize, uint _maximalFundSize, uint _minimalDeposit, address _tokenAddress) public {
+    minimalFundSize = _minimalFundSize;
+    maximalFundSize = _maximalFundSize;
     minimalDeposit = _minimalDeposit;
     tokenAddress = _tokenAddress;
   }

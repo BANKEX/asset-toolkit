@@ -27,13 +27,14 @@ contract ISAOTestFactory {
 
   constructor(uint _raisingPeriod, 
               uint _distributionPeriod, 
-              uint _minimalFundSize, 
+              uint _minimalFundSize,
+              uint _maximalFundSize,
               uint[] _limits, 
               uint[] _costs,
               uint _minimalDeposit,
               address _paybotAddress) public {
     isaoAddress = new ISAOTest(_raisingPeriod, _distributionPeriod, 
-      _minimalFundSize, _limits, _costs, _minimalDeposit, _paybotAddress);
+      _minimalFundSize,_maximalFundSize, _limits, _costs, _minimalDeposit, _paybotAddress);
     erc20Address = new ERC20Test(isaoAddress, _limits[_limits.length-1]);
     ISAOTest(isaoAddress).setERC20Token(erc20Address); 
     ISAOTest(isaoAddress).setState(ST_RAISING);

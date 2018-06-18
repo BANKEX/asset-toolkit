@@ -176,12 +176,14 @@ const gasPrice = tw("3e-7");
 
 contract('ShareStore COMMON TEST', (accounts) => {
     beforeEach(async function() {
-        // stateModelTest = await StateModelTest.new(RAISING_PERIOD,DISTRIBUTION_PERIOD);
+        tokenLocal = await Token.new(TOKEN_SUPPLY);
+        share = await ShareStoreTest.new(
+            MINIMAL_FUND_SIZE, MAXIMAL_FUND_SIZE,
+            MINIMAL_DEPOSIT_SIZE, tokenLocal.address
+        );
     });
     it("Token address must be tokenLocal.address", async function () {
-        // let tokenLocal = await Token.new(TOKEN_SUPPLY);
-        // let shareLocal = await ShareStoreTest.new(MINIMAL_DEPOSIT_SIZE, tokenLocal.address);
-        // assert.equal(tokenLocal.address, await shareLocal.tokenAddress());
+        assert.equal(tokenLocal.address, await share.tokenAddress());
     })
 
 });

@@ -216,6 +216,5 @@ contract('ShareStore COMMON TEST', (accounts) => {
         console.log((balToken3).toString());
 
 
-
     });
 });
