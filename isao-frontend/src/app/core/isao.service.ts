@@ -52,17 +52,15 @@ export class IsaoService {
         const methods = $connection.contract.methods;
         this.w3Utils = $connection.web3.utils;
         this.adjustLaunchTime();
-        $stage.subscribe(stage => { if (stage === Stage.RAISING) { this.adjustLaunchTime() }})
+        $stage.subscribe(stage => { if (stage === Stage.RAISING) { this.adjustLaunchTime(); }});
         try {
           methods.raisingPeriod().call().then(rSec => this.rPeriod = rSec);
           methods.distributionPeriod().call().then(dSec => this.dPeriod = dSec);
-          // methods.launchTimestamp().call().then(sec =>
-          //   +sec ? (() => {this.launchTime = new Date(); this.launchTime.setTime(sec * 1000)})() : undefined);
           methods.minimalFundSize().call().then(size => this.minimalFundSize = size / 1e18);
           methods.minimalDeposit().call().then(size => this.minimalDeposit = size / 1e18);
 
-          const [err, events] = await to($connection.contract.getPastEvents('CostStairs', {fromBlock: 0, filter: {}}))
-            if (err) {throw Error(err.message)}
+          const [err, events] = await to($connection.contract.getPastEvents('CostStairs', {fromBlock: 0, filter: {}}));
+            if (err) {throw Error(err.message); }
             if (events.length !== 1) { throw Error('CostStairs array length = ' + events.length); }
             const stairs = {};
             const costs = events[0].returnValues.costs;
@@ -72,7 +70,7 @@ export class IsaoService {
             this.stairs.next(stairs);
           this.getTokenInterval = setInterval(async() => {
             const [error, address] = await to(this.$connection.contract.methods.tokenAddress().call());
-            if (err) { console.error(err)};
+            if (err) { console.error(err); }
             if (!address || address === '0x0000000000000000000000000000000000000000') {
               this.token = undefined;
             } else {
@@ -90,7 +88,7 @@ export class IsaoService {
           }, 2000);
 
         } catch (err) {
-          $error.addError(err.message, 'Error fetching initial contract data. Pls double check the contract address.')
+          $error.addError(err.message, 'Error fetching initial contract data. Pls double check the contract address.');
         }
       }
     });
@@ -103,7 +101,7 @@ export class IsaoService {
     const args =
       [input.rPeriod, input.dPeriod, input.minimalFundSize, input.limits, input.costs, input.minimalDeposit, input.paybotAddress];
     let factory: Contract = new this.$connection.web3.eth.Contract(this.$config.factoryAbi);
-    const transaction: TransactionObject<Contract> = factory.deploy({data: this.$config.factoryCode, arguments: args})
+    const transaction: TransactionObject<Contract> = factory.deploy({data: this.$config.factoryCode, arguments: args});
     const pEvent: PromiEvent<any> = transaction.send({from: this.$connection.account});
     pEvent.on('transactionHash', (hash) => this.process.creatingContract = true);
     pEvent.then(async(_contract: Contract) => {
@@ -112,8 +110,6 @@ export class IsaoService {
       await this.$connection.connect(isaoAddress);
       console.log('Factory Contract Address: ', _contract.options.address);
       console.log('ISAO Contract Address: ', isaoAddress);
-      // this.$connection.contract = new this.$connection.web3.eth.Contract(this.$config.abi, );
-      // window.location.reload();
     });
   }
 

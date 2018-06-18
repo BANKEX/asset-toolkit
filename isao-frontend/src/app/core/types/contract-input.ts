@@ -11,8 +11,6 @@ export class ContractInput {
   public limits;
   public costs;
 
-  private Web3 = Web3;
-
   constructor(rPeriod, dPeriod, minimalFundSize, minimalDeposit, paybotAddress, limits, costs) {
     const web3 = new Web3();
     const tbn = v => web3.utils.toBN(v);
