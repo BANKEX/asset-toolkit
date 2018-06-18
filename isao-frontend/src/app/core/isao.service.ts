@@ -1,18 +1,19 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Inject } from '@angular/core';
 import { ConnectionService } from './connection.service';
 import { Connection, Stage } from './types';
 import { Subject, TimeInterval, BehaviorSubject } from 'rxjs';
 import { ErrorMessageService } from '../shared/services';
-import { EventLog, PromiEvent, TransactionReceipt } from 'web3/types';
 import { to } from 'await-to-js';
 import { StageService } from './stage.service';
-import { Observable } from 'rxjs/Observable';
+import { TransactionReceipt, Contract, PromiEvent, TransactionObject } from 'web3/types';
+import { ContractInput } from './types/contract-input';
 
 type processMap = {
   'takingAllMoneyBack': boolean,
   'buyingTokens': boolean,
   'refundingPartOfTokens': boolean,
-  'receivingTokens': boolean
+  'receivingTokens': boolean,
+  'creatingContract': boolean
 };
 
 @Injectable()
@@ -22,7 +23,8 @@ export class IsaoService {
     buyingTokens: false,
     takingAllMoneyBack: false,
     refundingPartOfTokens: false,
-    receivingTokens: false
+    receivingTokens: false,
+    creatingContract: false
   };
 
   public token: string;
@@ -38,17 +40,15 @@ export class IsaoService {
 
   public w3Utils: any;
 
-  private from: any;
-  private getTokenInterval;
-
-  public constructor (
+  constructor (
+    @Inject('AppConfig') private $config,
     private $connection: ConnectionService,
     private $error: ErrorMessageService,
     private $stage: StageService,
   ) {
     $connection.subscribe(async(status) => {
       this.from = {from: this.$connection.account};
-      if (status === Connection.Estableshed) {
+      if (status === Connection.Estableshed && this.$connection.contract) {
         const methods = $connection.contract.methods;
         this.w3Utils = $connection.web3.utils;
         this.adjustLaunchTime();
@@ -96,6 +96,27 @@ export class IsaoService {
     });
   }
 
+  private from: any;
+  private getTokenInterval;
+
+  public publishNewContract(input: ContractInput) {
+    const args =
+      [input.rPeriod, input.dPeriod, input.minimalFundSize, input.limits, input.costs, input.minimalDeposit, input.paybotAddress];
+    let factory: Contract = new this.$connection.web3.eth.Contract(this.$config.factoryAbi);
+    const transaction: TransactionObject<Contract> = factory.deploy({data: this.$config.factoryCode, arguments: args})
+    const pEvent: PromiEvent<any> = transaction.send({from: this.$connection.account});
+    pEvent.on('transactionHash', (hash) => this.process.creatingContract = true);
+    pEvent.then(async(_contract: Contract) => {
+      factory = _contract;
+      const isaoAddress = await factory.methods.isaoAddress().call();
+      await this.$connection.connect(isaoAddress);
+      console.log('Factory Contract Address: ', _contract.options.address);
+      console.log('ISAO Contract Address: ', isaoAddress);
+      // this.$connection.contract = new this.$connection.web3.eth.Contract(this.$config.abi, );
+      // window.location.reload();
+    });
+  }
+
   public payToISAOContact(amount): PromiEvent<TransactionReceipt> {
     return this.$connection.web3.eth.sendTransaction({
       from: this.$connection.account,
@@ -132,7 +153,7 @@ export class IsaoService {
 
   public refundTokens(amount) {
     if (!amount) { this.$error.addError('Empty amount!'); return; }
-    if (+amount > this.tokensOrderedByUser.value) { this.$error.addError('Too mutch!'); return }
+    if (+amount > this.tokensOrderedByUser.value) { this.$error.addError('Too mutch!'); return; }
     const pEvent = this.$connection.contract.methods.refundShare(amount * 1e18).send(this.from);
     pEvent.on('transactionHash', () => this.process.refundingPartOfTokens = true);
     pEvent.then(() => this.process.refundingPartOfTokens = false);

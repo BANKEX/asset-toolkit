@@ -28,8 +28,10 @@ bnkx-blocking-notification-overlay
           isao-money-back
         .content(*ngIf="($stage|async) === Stage.FUND_DEPRECATED")
           isao-info
+        .content(*ngIf="($stage|async) === undefined")
+          isao-init
         .content
-          isao-admin
+          isao-admin(*ngIf="($stage|async)")
 
   .footer
     .container

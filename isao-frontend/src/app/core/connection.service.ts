@@ -42,7 +42,10 @@ export class ConnectionService extends BehaviorSubject<Connection> {
     try {
       this.decoder = abiDecoder.addABI(this.$config.abi);
       ({account: this.account, networkId: this.networkId} = await this.init(this.web3));
-      this.contract = new this.web3.eth.Contract(this.$config.abi, contractHash || this.$config.contracts[this.networkId]);
+      const contractAddress = contractHash || this.$config.contracts[this.networkId];
+      this.contract = this.web3.utils.isAddress(contractAddress)
+        ? new this.web3.eth.Contract(this.$config.abi, contractHash || this.$config.contracts[this.networkId])
+        : undefined;
       this.next(Connection.Estableshed);
       // this.$blockingNotificationOverlay.hideOverlay();
       this.startLoops();
