@@ -3,5 +3,5 @@ export enum Stage {
   RAISING = 1,
   MONEY_BACK = 4,
   TOKEN_DISTRIBUTION = 8,
-  FUND_DEPRECATED = 10
+  FUND_DEPRECATED = 16
 }

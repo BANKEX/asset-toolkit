@@ -7,13 +7,12 @@ import { Observable } from 'rxjs/Observable';
   templateUrl: './money-back.component.pug',
 })
 export class MoneyBackComponent {
-  tokens$ = this.$isao.tokensOrderedByUser.publishReplay(1).refCount();
-  hasTokens$ = this.tokens$.startWith(false).map( x => x > 0);
-  isInitialized$ = Observable.concat(
-    Observable.of(false),
-    this.tokens$.map(x => true)
-  );
+  public str: string;
+  hasTokens$: Observable<boolean>;
+  isInitialized$: Observable<boolean>;
 
   constructor(public $isao: IsaoService) {
+    this.hasTokens$ = this.$isao.tokensOrderedByUser.map( x => x > 0);
+    this.isInitialized$ = this.$isao.tokensOrderedByUser.map( x => x !== undefined && x !== null);
   }
 }

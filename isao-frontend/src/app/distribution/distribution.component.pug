@@ -1,2 +1,23 @@
 .distribution
-  h4 Distribution of funded tokens
+  .flex
+    .left
+      .entry
+        .title You have
+        .value <b>{{$isao.tokensOrderedByUser|async}}</b> tokens at the ISAO contract
+      .entry
+        input(
+          type="text",
+          [(ngModel)]="str",
+          id="byTokenInput",
+          size="20", maxlength="20",
+          placeholder="Enter amount in tokens")
+        button(
+          *ngIf="!$isao.process.receivingTokens",
+          kendoButton,
+          id="byTokensBtn",
+          (click)="receiveTokens(str)") Receive tokens
+        span.k-i-loading.k-icon(
+          *ngIf="$isao.process.receivingTokens",
+          style="font-size: 24px; color: #ff6358")
+    .right
+      isao-timer

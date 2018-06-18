@@ -1,16 +1,33 @@
 .money-back
-  h4 Return money
 
-  .flex(style="flex-direction:column; align-items: center; justify-content: center; height: 150px")
+  .flex(style="flex-direction:column; align-items: center; justify-content: center; height: 200px")
     div(*ngIf="!(isInitialized$|async)", style="text-align: center")
       div Checking your funds
       span.k-i-loading.k-icon(style="font-size: 24px; color: #ff6358; margin: 10px")
     .entry(*ngIf="isInitialized$|async")
-      .title You have<span> <b>{{tokens$|async}}</b></span> tokens
+      .title You have<span> <b>{{$isao.tokensOrderedByUser|async}}</b></span> tokens at the ISAO contract
     .entry
-      button(*ngIf="!$isao.process.takingMoneyBack",
+      button(*ngIf="!$isao.process.takingAllMoneyBack && !$isao.process.refundingPartOfTokens",
         [disabled]="!(hasTokens$|async)",
         kendoButton,
         (click)="$isao.getAllMoneyBack()") Send All my money back
 
-      span.k-i-loading.k-icon(*ngIf="$isao.process.takingMoneyBack", style="font-size: 24px; color: #ff6358")
+    h4 Or
+    .entry
+
+      input([(ngModel)]="str",
+        [disabled]="!(hasTokens$|async)",
+        type="text",
+        id="byTokenInput",
+        size="20",
+        maxlength="20",
+        placeholder="Enter amount in tokens")
+      button(
+        [disabled]="!(hasTokens$|async)",
+        *ngIf="!$isao.process.refundingPartOfTokens",
+        kendoButton,
+        id="byTokensBtn",
+        (click)="$isao.refundTokens(str)") Refund
+
+      span.k-i-loading.k-icon(*ngIf="$isao.process.takingAllMoneyBack || $isao.process.refundingPartOfTokens",
+        style="font-size: 24px; color: #ff6358")

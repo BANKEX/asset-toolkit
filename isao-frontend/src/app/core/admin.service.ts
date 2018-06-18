@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ConnectionService } from './connection.service';
-import { Account, Contract, Tx, PromiEvent } from 'web3/types';
+import { Contract, PromiEvent } from 'web3/types';
 import { Connection, Stage } from './types';
 import { IsaoService } from './isao.service';
 
