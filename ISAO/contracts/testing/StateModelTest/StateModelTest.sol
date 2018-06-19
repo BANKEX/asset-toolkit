@@ -57,10 +57,6 @@ contract StateModelTest is StateModel, TimeMachineT, ERC20Cassette {
   function getTimeState() external  view returns(uint8) {
     return getTimeState_();
   }
-
-  function getRaisingState() external  view returns(uint8) {
-    return getRaisingState_();
-  }
   
   function setCassetteSize(uint _value) external returns(bool) {
     cassetteSize = _value;
@@ -69,6 +65,10 @@ contract StateModelTest is StateModel, TimeMachineT, ERC20Cassette {
   
   function getCassetteSize_() internal view returns(uint) {
     return cassetteSize;
+  }
+  
+  function getRaisingState() external view returns(uint8) {
+    return getRaisingState_();
   }
 
 

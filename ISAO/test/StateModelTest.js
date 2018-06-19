@@ -17,6 +17,10 @@ const ST_MONEY_BACK = tbn(0x04);
 const ST_TOKEN_DISTRIBUTION = tbn(0x08);
 const ST_FUND_DEPRECATED = tbn(0x10);
 
+const RST_NOT_COLLECTED = tbn(0x01);
+const RST_COLLECTED = tbn(0x02);
+const RST_FULL = tbn(0x04);
+
 const TM_DEFAULT = tbn(0x00);
 const TM_RAISING = tbn(0x01);
 const TM_WAIT_FOR_ICO = tbn(0x02);
@@ -188,11 +192,112 @@ contract('StateModelTest', (accounts) => {
     });
 
     describe('RST amount state tests', () => {
-        it("should not be collected if share store < minimal_fund_size", async () => {});
+        it("should not be collected if total share < minimal_fund_size", async () => {
+            await stateModelTest.setRole(RL_ADMIN);
+            assert((RL_ADMIN).eq(await stateModelTest.getRole()));
+            await stateModelTest.setTotalShare(tw(1));
+            assert(RST_NOT_COLLECTED.eq(await stateModelTest.getRaisingState()));
+        });
+        it("should be collected if total share > minimal_fund_size", async () => {
+            await stateModelTest.setRole(RL_ADMIN);
+            assert((RL_ADMIN).eq(await stateModelTest.getRole()));
+            await stateModelTest.setTotalShare(tw(101));
+            assert(RST_COLLECTED.eq(await stateModelTest.getRaisingState()));
+        });
+        it("should be full if total share = maximal_fund_size", async () => {
+            await stateModelTest.setRole(RL_ADMIN);
+            assert((RL_ADMIN).eq(await stateModelTest.getRole()));
+            await stateModelTest.setTotalShare(tw(100000));
+            assert(RST_FULL.eq(await stateModelTest.getRaisingState()));
+        });
     });
 
+    describe('ST negative state tests', () => {
+        it("should not allow to set any state except RAISING if current state DEFAULT", async () => {
+            await stateModelTest.setRole(RL_ADMIN);
+            assert((RL_ADMIN).eq(await stateModelTest.getRole()));
+            await stateModelTest.setCassetteSize(tw(100001));
+            let stateObj = {
+                STATE1: ST_DEFAULT,
+                STATE2: ST_MONEY_BACK,
+                STATE3: ST_FUND_DEPRECATED,
+                STATE4: ST_TOKEN_DISTRIBUTION
+            };
+            try {
+                for (let i in stateObj) {
+                    await stateModelTest.setState(STATE[i]);
+                }
+            }
+            catch (e) {
 
+            }
+            assert(ST_DEFAULT.eq(await stateModelTest.getState()));
+            await stateModelTest.setState(ST_RAISING);
+            assert(ST_RAISING.eq(await stateModelTest.getState()));
+        });
 
+        it("should not allow to set any state EXCEPT MONEYBACK or DISTRIBUTION after RAISING", async () => {
+            await stateModelTest.setRole(RL_ADMIN);
+            await stateModelTest.setCassetteSize(tw(100001));
+            await stateModelTest.setState(ST_RAISING);
+            await stateModelTest.setTotalShare(tw(101));
+            let stateObj = {
+                STATE1: ST_DEFAULT,
+                STATE2: ST_FUND_DEPRECATED,
+                STATE3: ST_RAISING,
+            };
+            try {
+                for (let i in stateObj) {
+                    await stateModelTest.setState(STATE[i]);
+                }
+            }
+            catch (e) {
+
+            }
+            assert(ST_RAISING.eq(await stateModelTest.getState()));
+            await stateModelTest.setState(ST_TOKEN_DISTRIBUTION);
+            assert(ST_TOKEN_DISTRIBUTION.eq(await stateModelTest.getState()));
+        });
+
+        it("should not allow to set any state EXCEPT MONEYBACK or DISTRIBUTION after RAISING x2", async () => {
+            await stateModelTest.setRole(RL_ADMIN);
+            await stateModelTest.setCassetteSize(tw(100001));
+            await stateModelTest.setState(ST_RAISING);
+            await stateModelTest.setTotalShare(tw(101));
+            let stateObj = {
+                STATE1: ST_DEFAULT,
+                STATE2: ST_FUND_DEPRECATED,
+                STATE3: ST_RAISING,
+            };
+            try {
+                for (let i in stateObj) {
+                    await stateModelTest.setState(STATE[i]);
+                }
+            }
+            catch (e) {
+
+            }
+            assert(ST_RAISING.eq(await stateModelTest.getState()));
+            await stateModelTest.setState(ST_MONEY_BACK);
+            assert(ST_MONEY_BACK.eq(await stateModelTest.getState()));
+        });
+
+        it("should not allow to set  state DISTRIBUTION after RAISING if fund is not collected", async () => {
+            await stateModelTest.setRole(RL_ADMIN);
+            await stateModelTest.setCassetteSize(tw(100001));
+            await stateModelTest.setState(ST_RAISING);
+            await stateModelTest.setTotalShare(tw(10));
+
+            try {
+                  await stateModelTest.setState(ST_TOKEN_DISTRIBUTION);
+            }
+            catch (e) {
+
+            }
+            assert(ST_RAISING.eq(await stateModelTest.getState()));
+        });
+
+    });
 
 });
 //
@@ -412,54 +517,6 @@ contract('StateModelTest', (accounts) => {
 //         await stateModelTestLocal.setTotalShare(tw(1));
 //         await stateModelTestLocal.incTimestamp(RAISING_PERIOD);
 //         assert(ST_MONEY_BACK.eq(await stateModelTestLocal.getState()));
-//     })
-// });
-//
-// contract('StateModelTest TimeState TEST', (accounts) => {
-//
-//     it("must be default", async function() {
-//         let stateModelTestLocal = await StateModelTest.new(RAISING_PERIOD, ICO_PERIOD, DISTRIBUTION_PERIOD, MINIMAL_FUND_SIZE, MAXIMAL_FUND_SIZE);
-//         assert(TM_DEFAULT.eq(await stateModelTestLocal.getTimeState()));
-//     })
-//
-//     it("must be default", async function() {
-//         let stateModelTestLocal = await StateModelTest.new(RAISING_PERIOD, ICO_PERIOD, DISTRIBUTION_PERIOD, MINIMAL_FUND_SIZE, MAXIMAL_FUND_SIZE);
-//         await stateModelTestLocal.incTimestamp(RAISING_PERIOD);
-//         assert(TM_DEFAULT.eq(await stateModelTestLocal.getTimeState()));
-//     })
-//
-//     it("must be rasing", async function() {
-//         let stateModelTestLocal = await StateModelTest.new(RAISING_PERIOD, ICO_PERIOD, DISTRIBUTION_PERIOD, MINIMAL_FUND_SIZE, MAXIMAL_FUND_SIZE);
-//         await stateModelTestLocal.setRole(RL_POOL_MANAGER);
-//         await stateModelTestLocal.setState(ST_RAISING);
-//         assert(TM_RAISING.eq(await stateModelTestLocal.getTimeState()));
-//     })
-//
-//     it("must be TM_WAIT_FOR_ICO", async function() {
-//         let stateModelTestLocal = await StateModelTest.new(RAISING_PERIOD, ICO_PERIOD, DISTRIBUTION_PERIOD, MINIMAL_FUND_SIZE, MAXIMAL_FUND_SIZE);
-//         await stateModelTestLocal.setRole(RL_POOL_MANAGER);
-//         await stateModelTestLocal.setState(ST_RAISING);
-//         await stateModelTestLocal.incTimestamp(RAISING_PERIOD);
-//         assert(TM_WAIT_FOR_ICO.eq(await stateModelTestLocal.getTimeState()));
-//     })
-//
-//     it("must be TM_TOKEN_DISTRIBUTION", async function() {
-//         let stateModelTestLocal = await StateModelTest.new(RAISING_PERIOD, ICO_PERIOD, DISTRIBUTION_PERIOD, MINIMAL_FUND_SIZE, MAXIMAL_FUND_SIZE);
-//         await stateModelTestLocal.setRole(RL_POOL_MANAGER);
-//         await stateModelTestLocal.setState(ST_RAISING);
-//         await stateModelTestLocal.incTimestamp(RAISING_PERIOD);
-//         await stateModelTestLocal.incTimestamp(ICO_PERIOD);
-//         assert(TM_TOKEN_DISTRIBUTION.eq(await stateModelTestLocal.getTimeState()));
-//     })
-//
-//     it("must be TM_FUND_DEPRECATED", async function() {
-//         let stateModelTestLocal = await StateModelTest.new(RAISING_PERIOD, ICO_PERIOD, DISTRIBUTION_PERIOD, MINIMAL_FUND_SIZE, MAXIMAL_FUND_SIZE);
-//         await stateModelTestLocal.setRole(RL_POOL_MANAGER);
-//         await stateModelTestLocal.setState(ST_RAISING);
-//         await stateModelTestLocal.incTimestamp(RAISING_PERIOD);
-//         await stateModelTestLocal.incTimestamp(ICO_PERIOD);
-//         await stateModelTestLocal.incTimestamp(DISTRIBUTION_PERIOD);
-//         assert(TM_FUND_DEPRECATED.eq(await stateModelTestLocal.getTimeState()));
 //     })
 // });
 //
