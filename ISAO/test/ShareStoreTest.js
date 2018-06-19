@@ -162,9 +162,9 @@ const gasPrice = tw("3e-7");
 /**
  * Calculates totalShare and investors balances (in tokens)
  * @param {Object} investors contains accounts of investors
- * @param {Object} investorsSums contains sums in ETH which investors would send
+ * @param {Object} investorsSendSums contains sums in ETH which investors would send
  */
-function calculateTokenBalances(investors, investorsSums) {
+function calculateTokenBalances(investors, investorsSendSums) {
     let goodInvestorTokenBalance = {
         account3: tbn('0'),
         account4: tbn('0'),
@@ -176,7 +176,7 @@ function calculateTokenBalances(investors, investorsSums) {
     let goodTotalShare = tbn(0);
     let currentStage = 0;
     for (let i in investors) {
-        let remainETHValue = investorsSums[i];
+        let remainETHValue = investorsSendSums[i];
         while (tbn(remainETHValue).gt(0) && goodTotalShare.lte(LIMITS[LIMITS.length - 1])) {
             if (goodTotalShare.plus(remainETHValue.mul(1e18).div(COSTS[currentStage])).lte(LIMITS[currentStage])) {
                 goodTotalShare = goodTotalShare.plus(remainETHValue.mul(1e18).div(COSTS[currentStage]));
@@ -242,9 +242,9 @@ contract('ShareStore COMMON TEST', (accounts) => {
         assert(ISAOTokenBalance.eq(APPROVE_VALUE));
     })
 
-    it("should send invest ETH during RAISING period via transaction send", async function () {
+    it("should invest ETH during ST_RAISING period via transaction send", async function () {
         let countOfInvestors = Object.keys(investors).length;
-        let investorsSums = {
+        let investorsSendSums = {
             account3: INVESTOR_SUM_PAY,
             account4: INVESTOR_SUM_PAY,
             account5: INVESTOR_SUM_PAY,
@@ -252,7 +252,7 @@ contract('ShareStore COMMON TEST', (accounts) => {
             account7: INVESTOR_SUM_PAY,
             account8: INVESTOR_SUM_PAY
         }
-        let goodValues = calculateTokenBalances(investors, investorsSums);
+        let goodValues = calculateTokenBalances(investors, investorsSendSums);
         let goodTotalShare = goodValues.goodTotalShare;
         let goodInvestorTokenBalance = goodValues.goodInvestorTokenBalance;
         await tokenLocal.approve(share.address, APPROVE_VALUE, {from: ERC20_CREATOR});
@@ -260,12 +260,57 @@ contract('ShareStore COMMON TEST', (accounts) => {
         await share.acceptAbstractToken(TOKEN_SUPPLY, {from: ADMIN});
         await share.setState(ST_RAISING, {from: ADMIN});
         for (let i in investors) 
-            await share.sendTransaction({value: INVESTOR_SUM_PAY, from: investors[i]});
+            await share.sendTransaction({value: investorsSendSums[i], from: investors[i]});
         for (let i in investors) {
             let goodTokenBalance = goodInvestorTokenBalance[i];
             let tokenBalance = await share.getBalanceTokenOf(investors[i]);
             assert(tokenBalance.eq(goodTokenBalance));
         }
+        let totalShare = await share.totalShare();
+        assert(totalShare.eq(goodTotalShare));
+    })
+
+    it("should invest ETH during ST_RAISING period via buyShare func", async function () {
+        let investorsSendSums = {
+            account3: INVESTOR_SUM_PAY,
+            account4: INVESTOR_SUM_PAY,
+            account5: INVESTOR_SUM_PAY,
+            account6: INVESTOR_SUM_PAY,
+            account7: INVESTOR_SUM_PAY,
+            account8: INVESTOR_SUM_PAY
+        }
+        let goodValues = calculateTokenBalances(investors, investorsSendSums);
+        let goodTotalShare = goodValues.goodTotalShare;
+        let goodInvestorTokenBalance = goodValues.goodInvestorTokenBalance;
+        await tokenLocal.approve(share.address, APPROVE_VALUE, {from: ERC20_CREATOR});
+        await share.setERC20Token(tokenLocal.address, {from: ADMIN});
+        await share.acceptAbstractToken(TOKEN_SUPPLY, {from: ADMIN});
+        await share.setState(ST_RAISING, {from: ADMIN});
+        for (let i in investors) 
+            await share.buyShare({value: investorsSendSums[i], from: investors[i]});
+        for (let i in investors) {
+            let goodTokenBalance = goodInvestorTokenBalance[i];
+            let tokenBalance = await share.getBalanceTokenOf(investors[i]);
+            assert(tokenBalance.eq(goodTokenBalance));
+        }
+        let totalShare = await share.totalShare();
+        assert(totalShare.eq(goodTotalShare));
+    })
+
+    it("should get all sent ETH by investors to ADMIN during ST_TOKEN_DISTRIBUTION period", async function () {
+        let totalSendETH = INVESTOR_SUM_PAY.mul(Object.keys(investors).length);
+        await tokenLocal.approve(share.address, APPROVE_VALUE, {from: ERC20_CREATOR});
+        await share.setERC20Token(tokenLocal.address, {from: ADMIN});
+        await share.acceptAbstractToken(TOKEN_SUPPLY, {from: ADMIN});
+        await share.setState(ST_RAISING, {from: ADMIN});
+        for (let i in investors) 
+            await share.buyShare({value: INVESTOR_SUM_PAY, from: investors[i]});
+        await share.setState(ST_TOKEN_DISTRIBUTION, {from: ADMIN});
+        let adminBalanceBefore = await web3.eth.getBalance(ADMIN);
+        let tx = await share.releaseEtherToStakeholderForce(RL_ADMIN, totalSendETH, {from: ADMIN, gasPrice: gasPrice});
+        let gasCost = gasPrice.mul(tx.receipt.gasUsed);
+        let adminBalanceAfter = await web3.eth.getBalance(ADMIN);
+        assert(adminBalanceAfter.eq(adminBalanceBefore.plus(totalSendETH).minus(gasCost)));
     })
 
 });
