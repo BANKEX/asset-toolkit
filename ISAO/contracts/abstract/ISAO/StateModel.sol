@@ -32,10 +32,10 @@ contract StateModel is ICassette, IRoleModel, IShareStore, IStateModel, ITimeMac
   }
 
   function getRaisingState_() internal view returns(uint8) {
-    uint _totalEther = getTotalShare_();
-    if (_totalEther < getMinimalFundSize_()) 
+    uint _totalShare = getTotalShare_();
+    if (_totalShare < getMinimalFundSize_()) 
       return RST_NOT_COLLECTED;
-    if (_totalEther < getMaximalFundSize_())
+    if (_totalShare < getMaximalFundSize_())
       return RST_COLLECTED;
     return RST_FULL;
   }
