@@ -21,7 +21,7 @@ contract StateModel is ICassette, IRoleModel, IShareStore, IStateModel, ITimeMac
  
   function getTimeState_() internal view returns (uint8) {
     uint _launchTimestamp = launchTimestamp;
-    uint _relativeTimestamp = getTimestamp_() - _launchTimestamp;
+    uint _relativeTimestamp = getTimestamp_().sub(_launchTimestamp);
     if (_launchTimestamp == 0)
       return TST_DEFAULT;
     if (_relativeTimestamp < raisingPeriod)
@@ -32,10 +32,10 @@ contract StateModel is ICassette, IRoleModel, IShareStore, IStateModel, ITimeMac
   }
 
   function getRaisingState_() internal view returns(uint8) {
-    uint _totalEther = getTotalShare_();
-    if (_totalEther < getMinimalFundSize_()) 
+    uint _totalShare = getTotalShare_();
+    if (_totalShare < getMinimalFundSize_()) 
       return RST_NOT_COLLECTED;
-    if (_totalEther < getMaximalFundSize_())
+    if (_totalShare < getMaximalFundSize_())
       return RST_COLLECTED;
     return RST_FULL;
   }
@@ -59,11 +59,11 @@ contract StateModel is ICassette, IRoleModel, IShareStore, IStateModel, ITimeMac
         }
         return ST_RAISING;
       }
-      if (_raisingState == RST_NOT_COLLECTED) {
-        return ST_MONEY_BACK;
-      }
 
       if (_timeState == TST_TOKEN_DISTRIBUTION) {
+        if (_raisingState == RST_NOT_COLLECTED) {
+          return ST_MONEY_BACK;
+        }
         return ST_TOKEN_DISTRIBUTION;
       }
       return ST_FUND_DEPRECATED;
@@ -98,7 +98,7 @@ contract StateModel is ICassette, IRoleModel, IShareStore, IStateModel, ITimeMac
 
     if (_stateNew == ST_RAISING) {
       if ((_role == RL_ADMIN || _role == RL_PAYBOT) && (_state == ST_DEFAULT)) 
-        if(getCassetteSize_() >= getMinimalFundSize_()) {
+        if(getCassetteSize_() >= getMaximalFundSize_()) {
           launchTimestamp = getTimestamp_();
           initialState_ = ST_RAISING;
           return true;
