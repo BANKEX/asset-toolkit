@@ -9,6 +9,7 @@ contract StateModelTest is StateModel, TimeMachineT, ERC20Cassette {
   uint8 role_;
   uint public minimalFundSize;
   uint public maximalFundSize;
+  uint internal cassetteSize;
   
   function getMinimalFundSize_() internal view returns(uint) {
     return minimalFundSize;
@@ -61,16 +62,21 @@ contract StateModelTest is StateModel, TimeMachineT, ERC20Cassette {
     return getRaisingState_();
   }
   
+  function setCassetteSize(uint _value) external returns(bool) {
+    cassetteSize = _value;
+    return true;
+  }
+  
   function getCassetteSize_() internal view returns(uint) {
-    return totalShare_;
+    return cassetteSize;
   }
 
 
-  constructor(uint _raisingPeriod, uint _distributionPeriod, uint _maximalFundSize) public {
+  constructor(uint _raisingPeriod, uint _distributionPeriod, uint _minimalFundSize, uint _maximalFundSize) public {
     raisingPeriod = _raisingPeriod;
     distributionPeriod = _distributionPeriod;
 
-//    minimalFundSize = _minimalFundSize;
+    minimalFundSize = _minimalFundSize;
     maximalFundSize = _maximalFundSize;
   }
 }
