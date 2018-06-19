@@ -55,13 +55,17 @@ contract StateModelTest is StateModel, TimeMachineT, ERC20Cassette {
   function getRaisingState() external  view returns(uint8) {
     return getRaisingState_();
   }
+  
+  function getCassetteSize_() internal view returns(uint) {
+    return totalShare_;
+  }
 
 
-  constructor(uint _raisingPeriod, uint _distributionPeriod) public {
+  constructor(uint _raisingPeriod, uint _distributionPeriod, uint _maximalFundSize) public {
     raisingPeriod = _raisingPeriod;
     distributionPeriod = _distributionPeriod;
 
 //    minimalFundSize = _minimalFundSize;
-//    maximalFundSize = _maximalFundSize;
+    maximalFundSize = _maximalFundSize;
   }
 }
