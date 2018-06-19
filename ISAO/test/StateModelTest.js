@@ -71,6 +71,34 @@ contract('StateModelTest COMMON TEST', (accounts) => {
         assert(ST_MONEY_BACK.eq(await stateModelTest.getState()), `error ${await stateModelTest.getState()}`);
     });
 
+    it("should be depricated after distribution be period", async () => {
+        await stateModelTest.setRole(RL_ADMIN);
+        assert((RL_ADMIN).eq(await stateModelTest.getRole()));
+        await stateModelTest.setCassetteSize(tw(100001));
+        await stateModelTest.setState(ST_RAISING);
+        assert(ST_RAISING.eq(await stateModelTest.getState()), `error ${await stateModelTest.getState()}`);
+        await stateModelTest.setTotalShare(MAXIMAL_FUND_SIZE);
+        await stateModelTest.incTimestamp(RAISING_PERIOD);
+        assert(ST_TOKEN_DISTRIBUTION.eq(await stateModelTest.getState()), `error ${await stateModelTest.getState()}`);
+        await stateModelTest.incTimestamp(DISTRIBUTION_PERIOD);
+        assert(ST_FUND_DEPRECATED.eq(await stateModelTest.getState()), `error ${await stateModelTest.getState()}`);
+    })
+
+    it("_", async () => {
+        await stateModelTest.setRole(RL_ADMIN);
+        assert((RL_ADMIN).eq(await stateModelTest.getRole()));
+        await stateModelTest.setCassetteSize(tw(100001));
+        await stateModelTest.setState(ST_RAISING);
+        assert(ST_RAISING.eq(await stateModelTest.getState()), `error ${await stateModelTest.getState()}`);
+        await stateModelTest.setTotalShare(tw(0));
+        await stateModelTest.incTimestamp(RAISING_PERIOD);
+        assert(ST_MONEY_BACK.eq(await stateModelTest.getState()), `error ${await stateModelTest.getState()}`);
+        await stateModelTest.incTimestamp(DISTRIBUTION_PERIOD);
+        // await stateModelTest.incTimestamp(DISTRIBUTION_PERIOD);
+        // await stateModelTest.incTimestamp(DISTRIBUTION_PERIOD);
+        assert(ST_FUND_DEPRECATED.eq(await stateModelTest.getState()), `error ${await stateModelTest.getState()}`);
+    })
+
 
 
 //     it("should be setted to ST_WAIT_FOR_ICO when time ends if pool > minimal", async function() {

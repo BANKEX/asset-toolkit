@@ -21,7 +21,7 @@ contract StateModel is ICassette, IRoleModel, IShareStore, IStateModel, ITimeMac
  
   function getTimeState_() internal view returns (uint8) {
     uint _launchTimestamp = launchTimestamp;
-    uint _relativeTimestamp = getTimestamp_() - _launchTimestamp;
+    uint _relativeTimestamp = getTimestamp_().sub(_launchTimestamp);
     if (_launchTimestamp == 0)
       return TST_DEFAULT;
     if (_relativeTimestamp < raisingPeriod)
