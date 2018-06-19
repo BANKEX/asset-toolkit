@@ -178,14 +178,45 @@ const COSTS = [tw(0.1), tw(0.2), tw(0.5)];
 const gasPrice = tw("3e-7");
 
 contract('ShareStore COMMON TEST', (accounts) => {
+    const ADMIN = accounts[0];
+    const PAYBOT = accounts[1];
+    const ERC20_CREATOR = accounts[0];
+    
+    const investors = {
+        account3: accounts[3],
+        account4: accounts[4],
+        account5: accounts[5],
+        account6: accounts[6],
+        account7: accounts[7],
+        account8: accounts[8]
+    };
+
     beforeEach(async function() {
-        tokenLocal = await Token.new(TOKEN_SUPPLY);
+        tokenLocal = await Token.new(TOKEN_SUPPLY, {from: ERC20_CREATOR});
         share = await ShareStoreTest.new(
             MINIMAL_FUND_SIZE,
-            MINIMAL_DEPOSIT_SIZE, LIMITS, COSTS
+            MINIMAL_DEPOSIT_SIZE, 
+            LIMITS,
+            COSTS,
+            {from: ADMIN}
         );
     });
 
+    it("should set token to ISAO", async function () {
+        await tokenLocal.approve(share.address, TOKEN_SUPPLY, {from: ERC20_CREATOR});
+        await share.setERC20Token(tokenLocal.address, {from: ADMIN});
+        let tokenAddress = await share.tokenAddress();
+        assert(tbn(tokenAddress).eq(tokenLocal.address));
+    })
+    
+    it("should send ERC20 tokens to ISAO", async function () {
+        let approveValue = TOKEN_SUPPLY;
+        await tokenLocal.approve(share.address, approveValue, {from: ERC20_CREATOR});
+        await share.setERC20Token(tokenLocal.address, {from: ADMIN});
+        await share.acceptAbstractToken(TOKEN_SUPPLY, {from: ADMIN});
+        let ISAOTokenBalance = await tokenLocal.balanceOf(share.address);
+        assert(approveValue.eq(ISAOTokenBalance));
+    })
 
 });
 
