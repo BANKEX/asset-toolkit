@@ -59,11 +59,11 @@ contract StateModel is ICassette, IRoleModel, IShareStore, IStateModel, ITimeMac
         }
         return ST_RAISING;
       }
-      if (_raisingState == RST_NOT_COLLECTED) {
-        return ST_MONEY_BACK;
-      }
 
       if (_timeState == TST_TOKEN_DISTRIBUTION) {
+        if (_raisingState == RST_NOT_COLLECTED) {
+          return ST_MONEY_BACK;
+        }
         return ST_TOKEN_DISTRIBUTION;
       }
       return ST_FUND_DEPRECATED;
