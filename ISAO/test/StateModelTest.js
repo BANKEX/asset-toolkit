@@ -134,6 +134,66 @@ contract('StateModelTest', (accounts) => {
         });
     });
 
+    describe('TM time state tests', () => {
+        it("after creation must be default", async () => {
+            assert(TM_DEFAULT.eq(await stateModelTest.getTimeState()));
+        });
+        it("after creation must be default anyway", async () => {
+            await stateModelTest.incTimestamp(RAISING_PERIOD);
+            await stateModelTest.incTimestamp(DISTRIBUTION_PERIOD);
+            assert(TM_DEFAULT.eq(await stateModelTest.getTimeState()));
+        });
+        it("when ST become raising must be raising", async () => {
+            await stateModelTest.setRole(RL_ADMIN);
+            await stateModelTest.setCassetteSize(tw(100001));
+            await stateModelTest.setState(ST_RAISING);
+            assert(TM_RAISING.eq(await stateModelTest.getTimeState()));
+        });
+        it("after raising goes to distribution if fund collected", async () => {
+            await stateModelTest.setRole(RL_ADMIN);
+            await stateModelTest.setCassetteSize(tw(100001));
+            await stateModelTest.setState(ST_RAISING);
+            assert(TM_RAISING.eq(await stateModelTest.getTimeState()));
+            await stateModelTest.setTotalShare(tw(1000));
+            await stateModelTest.incTimestamp(RAISING_PERIOD);
+            assert(ST_TOKEN_DISTRIBUTION.eq(await stateModelTest.getState()), `error ${await stateModelTest.getState()}`);
+            assert(TM_TOKEN_DISTRIBUTION.eq(await stateModelTest.getTimeState()));
+        });
+        it("should be depricated after distribution period ", async () => {
+            await stateModelTest.setRole(RL_ADMIN);
+            await stateModelTest.setCassetteSize(tw(100001));
+            await stateModelTest.setState(ST_RAISING);
+            assert(TM_RAISING.eq(await stateModelTest.getTimeState()));
+            await stateModelTest.setTotalShare(tw(1000));
+            await stateModelTest.incTimestamp(RAISING_PERIOD);
+            assert(ST_TOKEN_DISTRIBUTION.eq(await stateModelTest.getState()), `error ${await stateModelTest.getState()}`);
+            assert(TM_TOKEN_DISTRIBUTION.eq(await stateModelTest.getTimeState()));
+            await stateModelTest.incTimestamp(DISTRIBUTION_PERIOD);
+            assert(ST_FUND_DEPRECATED.eq(await stateModelTest.getState()), `error ${await stateModelTest.getState()}`);
+            assert(TM_FUND_DEPRECATED.eq(await stateModelTest.getTimeState()));
+        });
+        it("also must be depricated if st is mone back", async () => {
+            await stateModelTest.setRole(RL_ADMIN);
+            assert((RL_ADMIN).eq(await stateModelTest.getRole()));
+            await stateModelTest.setCassetteSize(tw(100001));
+            await stateModelTest.setState(ST_RAISING);
+            assert(ST_RAISING.eq(await stateModelTest.getState()), `error ${await stateModelTest.getState()}`);
+            await stateModelTest.setTotalShare(tw(1000));
+            await stateModelTest.setState(ST_MONEY_BACK);
+            assert(ST_MONEY_BACK.eq(await stateModelTest.getState()), `error ${await stateModelTest.getState()}`);
+            await stateModelTest.incTimestamp(DISTRIBUTION_PERIOD);
+            assert(ST_FUND_DEPRECATED.eq(await stateModelTest.getState()), `error ${await stateModelTest.getState()}`);
+            assert(TM_FUND_DEPRECATED.eq(await stateModelTest.getTimeState()));
+        });
+    });
+
+    describe('RST amount state tests', () => {
+        it("should not be collected if share store < minimal_fund_size", async () => {});
+    });
+
+
+
+
 });
 //
 // contract('StateModelTest ROLE TEST POSITIVE', (accounts) => {
