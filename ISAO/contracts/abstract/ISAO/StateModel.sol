@@ -98,7 +98,7 @@ contract StateModel is ICassette, IRoleModel, IShareStore, IStateModel, ITimeMac
 
     if (_stateNew == ST_RAISING) {
       if ((_role == RL_ADMIN || _role == RL_PAYBOT) && (_state == ST_DEFAULT)) 
-        if(getCassetteSize_() >= getMinimalFundSize_()) {
+        if(getCassetteSize_() >= getMaximalFundSize_()) {
           launchTimestamp = getTimestamp_();
           initialState_ = ST_RAISING;
           return true;
