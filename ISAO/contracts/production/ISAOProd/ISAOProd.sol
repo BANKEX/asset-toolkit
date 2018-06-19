@@ -28,10 +28,8 @@ contract ISAOProd is ISAO, TimeMachineP, ERC20Cassette {
               address _paybotAddress) public {
     raisingPeriod = _raisingPeriod;
     distributionPeriod = _distributionPeriod;
-
     minimalDeposit = _minimalDeposit;
     setCosts_(_minimalFundSize, _limits, _costs);
-
     setRole_(RL_ADMIN, _adminAddress);
     setRole_(RL_PAYBOT, _paybotAddress);
     emit CostStairs(_limits, _costs);
