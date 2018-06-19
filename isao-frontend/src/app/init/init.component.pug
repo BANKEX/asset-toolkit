@@ -25,4 +25,4 @@
         input.value(type="text",[(ngModel)]="costs", size="40")
       .text-center
         button.big(*ngIf="!$isao.process.creatingContract", kendoButton, id="initContractBtn", (click)="initContract()") Create new contract
-        span.k-i-loading.k-icon(*ngIf="$isao.process.creatingContract", style="font-size: 64px; color: #ff6358; margin 25px")
+        span.k-i-loading.k-icon(*ngIf="$isao.process.creatingContract", style="font-size: 64px; color: #ff6358; margin: 25px")

@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { IsaoService } from '../core/isao.service';
 import 'hammerjs';
 import { ErrorMessageService } from '../shared/services/error-message.service';
 import { ContractInput } from '../core/types/contract-input';
+import { ConnectionService, IsaoService } from '../core';
 
 @Component({
   selector: 'isao-init',
@@ -17,9 +17,10 @@ export class InitComponent implements OnInit {
   public minimalDeposit = 0.1;
   public paybotAddress = 0;
   public limits = '100, 200';
-  public costs = '0.1, 0.2'
+  public costs = '0.1, 0.2';
 
   public constructor(
+    private $connection: ConnectionService,
     private $error: ErrorMessageService,
     public $isao: IsaoService,
   ) { }
@@ -33,6 +34,7 @@ export class InitComponent implements OnInit {
         this.dPeriod,
         this.minimalFundSize,
         this.minimalDeposit,
+        this.$connection.account,
         this.paybotAddress,
         this.limits,
         this.costs

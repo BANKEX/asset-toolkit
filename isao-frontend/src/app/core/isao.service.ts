@@ -97,9 +97,9 @@ export class IsaoService {
   private from: any;
   private getTokenInterval;
 
-  public publishNewContract(input: ContractInput) {
+  public publishNewContract(i: ContractInput) {
     const args =
-      [input.rPeriod, input.dPeriod, input.minimalFundSize, input.limits, input.costs, input.minimalDeposit, input.paybotAddress];
+      [i.rPeriod, i.dPeriod, i.minimalFundSize, i.limits, i.costs, i.minimalDeposit, i.adminAddress, i.paybotAddress];
     let factory: Contract = new this.$connection.web3.eth.Contract(this.$config.factoryAbi);
     const transaction: TransactionObject<Contract> = factory.deploy({data: this.$config.factoryCode, arguments: args});
     const pEvent: PromiEvent<any> = transaction.send({from: this.$connection.account});
@@ -141,7 +141,7 @@ export class IsaoService {
 
   public receiveTokens(amount) {
     if (!amount) { this.$error.addError('Empty amount!'); return; }
-    if (+amount > this.tokensOrderedByUser.value) { this.$error.addError('Too mutch!'); return; }
+    if (+amount > this.tokensOrderedByUser.value) { this.$error.addError('Too much!'); return; }
     const pEvent = this.$connection.contract.methods.releaseToken(amount * 1e18).send(this.from);
     pEvent.on('transactionHash', () => this.process.receivingTokens = true);
     pEvent.then(() => this.process.receivingTokens = false);
@@ -149,7 +149,7 @@ export class IsaoService {
 
   public refundTokens(amount) {
     if (!amount) { this.$error.addError('Empty amount!'); return; }
-    if (+amount > this.tokensOrderedByUser.value) { this.$error.addError('Too mutch!'); return; }
+    if (+amount > this.tokensOrderedByUser.value) { this.$error.addError('Too much!'); return; }
     const pEvent = this.$connection.contract.methods.refundShare(amount * 1e18).send(this.from);
     pEvent.on('transactionHash', () => this.process.refundingPartOfTokens = true);
     pEvent.then(() => this.process.refundingPartOfTokens = false);

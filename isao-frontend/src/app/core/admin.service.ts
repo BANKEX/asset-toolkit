@@ -3,6 +3,7 @@ import { ConnectionService } from './connection.service';
 import { Contract, PromiEvent } from 'web3/types';
 import { Connection, Stage } from './types';
 import { IsaoService } from './isao.service';
+import { ErrorMessageService } from '../shared/services/error-message.service';
 
 type processMap = {
   'runningFunding': boolean,
@@ -26,10 +27,9 @@ export class AdminService {
     'runningTimeInc': false,
   };
 
-  private contract: Contract;
-
   public constructor (
     private $connection: ConnectionService,
+    private $error: ErrorMessageService,
     private $isao: IsaoService,
   ) {
     $connection.subscribe(status => {
@@ -39,7 +39,10 @@ export class AdminService {
     });
   }
 
+  private contract: Contract;
+
   public incTimestamp(hours) {
+    if (!hours || isNaN(Number(hours)) || +hours < 0) { this.$error.addError('Wrong value!'); return; }
     const pEvent: PromiEvent<boolean> =
       this.contract.methods.incTimestamp(hours * 3600).send({from: this.$connection.account});
 

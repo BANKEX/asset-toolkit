@@ -1,6 +1,5 @@
-.money-back
-
-  .flex(style="flex-direction:column; align-items: center; justify-content: center; height: 200px")
+.money-back(style="display:flex")
+  .flex(style="flex-direction:column; align-items: center; justify-content: center; margin: auto")
     div(*ngIf="!(isInitialized$|async)", style="text-align: center")
       div Checking your funds
       span.k-i-loading.k-icon(style="font-size: 24px; color: #ff6358; margin: 10px")
@@ -14,7 +13,6 @@
 
     h4 Or
     .entry
-
       input([(ngModel)]="str",
         [disabled]="!(hasTokens$|async)",
         type="text",
@@ -28,6 +26,5 @@
         kendoButton,
         id="byTokensBtn",
         (click)="$isao.refundTokens(str)") Refund
-
       span.k-i-loading.k-icon(*ngIf="$isao.process.takingAllMoneyBack || $isao.process.refundingPartOfTokens",
         style="font-size: 24px; color: #ff6358")
