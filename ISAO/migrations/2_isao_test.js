@@ -41,6 +41,7 @@ module.exports = function(deployer, network, accounts) {
   const MINIMAL_FUND_SIZE = tw(110);
   const LIMITS = [tw(100), tw(500), tw(1000)];
   const COSTS = [tw(0.1), tw(0.2), tw(0.5)];
+  const ADMIN_ADDRESS = operator;
   const PAYBOT_ADDRESS = accounts[9];
   
   const MINIMAL_DEPOSIT = tw(0.1);
@@ -73,7 +74,7 @@ module.exports = function(deployer, network, accounts) {
           let isao = await ISAOTest.new(
                       RAISING_PERIOD, DISTRIBUTION_PERIOD,
                       MINIMAL_FUND_SIZE, LIMITS, COSTS, MINIMAL_DEPOSIT,
-                      PAYBOT_ADDRESS,
+                      ADMIN_ADDRESS, PAYBOT_ADDRESS,
                       {from:operator});
 
           await token.approve(isao.address, TOKEN_SUPPLY, {from: operator});

@@ -17,13 +17,14 @@ contract ISAOProd is ISAO, TimeMachineP, ERC20Cassette {
   * @param _costs stages prices
   * @param _minimalDeposit minimal amount of ETH in wei which is allowed to become investor
   * @param _paybotAddress address of pay bot
-  */
+  */  
   constructor(uint _raisingPeriod, 
               uint _distributionPeriod, 
               uint _minimalFundSize, 
               uint[] _limits, 
               uint[] _costs,
               uint _minimalDeposit,
+              address _adminAddress,
               address _paybotAddress) public {
     raisingPeriod = _raisingPeriod;
     distributionPeriod = _distributionPeriod;
@@ -31,7 +32,7 @@ contract ISAOProd is ISAO, TimeMachineP, ERC20Cassette {
     minimalDeposit = _minimalDeposit;
     setCosts_(_minimalFundSize, _limits, _costs);
 
-    setRole_(RL_ADMIN, msg.sender);
+    setRole_(RL_ADMIN, _adminAddress);
     setRole_(RL_PAYBOT, _paybotAddress);
     emit CostStairs(_limits, _costs);
   }
