@@ -1,0 +1,28 @@
+.init
+  h4 Init new contract
+  .flex
+    .left(style="padding:0")
+      .entry
+        .title Raising period in days:
+        input.value(type="text",[(ngModel)]="rPeriod", size="40")
+      .entry
+        .title Distribution period:
+        input.value(type="text",[(ngModel)]="dPeriod", size="40")
+      .entry
+        .title Minimal funds in tokens:
+        input.value(type="text",[(ngModel)]="minimalFundSize", size="40")
+      .entry
+        .title Minimal deposit in ETH:
+        input.value(type="text",[(ngModel)]="minimalDeposit", size="40")
+      .entry
+        .title Paybot address (you can skip it):
+        input.value(type="text",[(ngModel)]="paybotAddress", size="40")
+      .entry
+        .title Limits in tokens(ex.: 100, 500, 1000):
+        input.value(type="text",[(ngModel)]="limits", size="40")
+      .entry
+        .title Costs in ETH (ex.: 0.5, 2, 3):
+        input.value(type="text",[(ngModel)]="costs", size="40")
+      .text-center
+        button.big(*ngIf="!$isao.process.creatingContract", kendoButton, id="initContractBtn", (click)="initContract()") Create new contract
+        span.k-i-loading.k-icon(*ngIf="$isao.process.creatingContract", style="font-size: 64px; color: #ff6358; margin 25px")

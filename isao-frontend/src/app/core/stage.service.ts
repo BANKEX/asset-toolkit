@@ -27,6 +27,7 @@ export class StageService extends BehaviorSubject<Stage> {
   }
 
   private async getStateValue() {
+    if (!this.$connection.contract) { return }
     const [err, stage] = await to(this.$connection.contract.methods.getState().call());
     return +stage;
   }

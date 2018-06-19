@@ -18,6 +18,10 @@ h4 {
   min-height: 400px
 }
 
+.init {
+  min-height: 500px
+}
+
 .admin {
   min-height: 200px;
 }
@@ -92,6 +96,10 @@ h4 {
 
 button {
   position: relative;
+  &.big {
+    padding: 15px;
+    margin: 25px;
+  }
 }
 
 select {

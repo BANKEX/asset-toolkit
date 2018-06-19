@@ -38,7 +38,7 @@ export class AppComponent extends NeatComponent implements AfterViewInit {
       if (state === Connection.Estableshed) {
         $overlay.hideOverlay();
         this.clientAddress = $connection.account.toLowerCase();
-        this.contractAddress = $connection.contract.options.address.toLowerCase();
+        this.contractAddress = $connection.contract ? $connection.contract.options.address.toLowerCase() : 'not set';
         this.$toasty.success('Connected to blockchain.');
         this.listenForEvents();
         this.$router.navigate(['../'], { queryParams: {contract: this.contractAddress}});

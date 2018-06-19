@@ -39,7 +39,6 @@ export class TimerComponent extends NeatComponent implements OnInit {
       this.passed = this.currentTime.getTime() - this.launchTime.getTime();
       this.left = this.launchTime.getTime() + this.range - this.currentTime.getTime();
       this.value = Math.floor(100 * this.passed / this.range);
-      console.log(this.value);
       this.ready = true;
     });
   }

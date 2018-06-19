@@ -22,7 +22,6 @@ export class StairsComponent extends NeatComponent implements OnInit {
   ) {
     super();
     $isao.stairs.takeUntil(this.ngUnsubscribe).subscribe(stairs => {
-      console.log('Subscribed to stairs...');
       Object.keys(stairs).forEach((key, index) => {
         this.limits[index] = Number(key);
         this.costs[index] = stairs[key] + ' ETH';
