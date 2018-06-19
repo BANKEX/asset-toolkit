@@ -27,4 +27,10 @@ contract('RoleModelTest', (accounts) => {
         assert(RL_PAYBOT.eq(await roleModelTest.getRole(accounts[9])));
     });
 
+    // find out fixes
+    it("should not allow to set PAYBOT not from admin", async () => {
+        roleModelTest.setRole(RL_PAYBOT, {from: accounts[1]});
+        assert(RL_PAYBOT.eq(await roleModelTest.getRole(accounts[1])));
+    });
+
 });
