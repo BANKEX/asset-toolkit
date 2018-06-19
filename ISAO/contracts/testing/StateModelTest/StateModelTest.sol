@@ -25,6 +25,11 @@ contract StateModelTest is StateModel, TimeMachineT, ERC20Cassette {
   function getRole_() internal view returns(uint8) {
     return role_;
   }
+  
+  function getRole() external view returns(uint8) {
+    return getRole_();
+  }
+  
 
   function getRole_(address _for) internal view returns(uint8) {
     return role_;
