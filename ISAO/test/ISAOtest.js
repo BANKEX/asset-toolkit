@@ -1,6 +1,6 @@
 // https://github.com/MikeMcl/bignumber.js/
 const BigNumber = require('bignumber.js');
-const ShareStoreTest = artifacts.require("./ShareStoreTest.sol");
+const ISAO = artifacts.require("./ISAOTest.sol");
 const Token = artifacts.require("./TestToken.sol");
 
 const web3 = global.web3;
@@ -137,23 +137,12 @@ const IERC20_ABI = [
     }
 ];
 
-// const tbn = v => web3.toBigNumber(v);
-// const fbn = v => v.toString();
-// const tw = v => web3.toBigNumber(v).mul(1e18);
-// const fw = v => web3._extend.utils.fromWei(v).toString();
-// const DECIMAL_MULTIPLIER = new BN(0xDE0B6B3A7640000, 16);
-// console.log(DECIMAL_MULTIPLIER.toNumber())
-// const tbn = v => new BN(v, 10);
-// const fbn = v => v.toNumber();
-// const tw = v => BN.isBN(v) ? v.mul(DECIMAL_MULTIPLIER) : tbn(v).mul(DECIMAL_MULTIPLIER);
-// const fw = v => BN.isBN(v) ? v.div(DECIMAL_MULTIPLIER).toNumber() : tbn(v).div(DECIMAL_MULTIPLIER).toNumber();
-
 const tbn = v => new BigNumber(v);
 const fbn = v => v.toNumber();
 const tw = v => BigNumber.isBigNumber(v) ? v.times(1e18) : tbn(v).times(1e18);
 const fw = v => BigNumber.isBigNumber(v) ? v.div(1e18).toNumber() : tbn(v).div(1e18).toNumber();
 
-const TOKEN_SUPPLY = tw(10);
+const TOKEN_SUPPLY = tw(1000);
 const MINIMAL_DEPOSIT_SIZE = tw(0.05);
 const TI_DAY = tbn(86400);
 
@@ -176,8 +165,6 @@ const DISTRIBUTION_PERIOD = TI_DAY.times(45);
 
 const MINIMAL_FUND_SIZE = tw(1);
 const MAXIMAL_FUND_SIZE = tw(100000);
-const LIMITS = [tw(1), tw(5), tw(15)];
-const COSTS = [tw(0.1), tw(0.2), tw(0.5)];
 
 const INVESTOR_SUM_PAY = tw(0.5);
 const INVESTOR_SUM_TO_TRIGGER = tw(0.00001);
@@ -185,60 +172,50 @@ const INVESTOR_SUM_TO_TRIGGER = tw(0.00001);
 const RL_DEFAULT = tbn(0x00);
 const RL_ADMIN = tbn(0x04);
 const RL_PAYBOT = tbn(0x08);
+const LIMITS = [tw(100), tw(500), tw(1000)];
+const COSTS = [tw(0.1), tw(0.2), tw(0.5)];
 
 const gasPrice = tw("3e-7");
 
 contract('ShareStore COMMON TEST', (accounts) => {
-    const ADMIN = accounts[0];
-    const PAYBOT = accounts[1];
-    const ERC20_CREATOR = accounts[2];
-    
-    const investors = {
-        account3: accounts[3],
-        account4: accounts[4],
-        account5: accounts[5],
-        account6: accounts[6],
-        account7: accounts[7],
-        account8: accounts[8]
-    };
 
-    beforeEach(async function() {
-        tokenLocal = await Token.new(TOKEN_SUPPLY, {from: ERC20_CREATOR});
-        share = await ShareStoreTest.new(
-            MINIMAL_FUND_SIZE,
-            MINIMAL_DEPOSIT_SIZE, 
-            LIMITS,
-            COSTS,
-            {from: ADMIN}
+    beforeEach(async function () {
+        isao = await ISAO.new(
+            RAISING_PERIOD, DISTRIBUTION_PERIOD,
+            MINIMAL_FUND_SIZE, MAXIMAL_FUND_SIZE,LIMITS, COSTS, MINIMAL_DEPOSIT_SIZE,
+            accounts[1], {from: accounts[0]}
         );
+        token = await Token.new(TOKEN_SUPPLY, {from: accounts[0]});
     });
 
-    it("should set token to ISAO", async function () {
-        await tokenLocal.approve(share.address, TOKEN_SUPPLY, {from: ERC20_CREATOR});
-        await share.setERC20Token(tokenLocal.address, {from: ADMIN});
-        let tokenAddress = await share.tokenAddress();
-        assert(tokenAddress.eq(tokenLocal.address));
-    })
-    
-    it("should send ERC20 tokens to ISAO", async function () {
-        let approveValue = TOKEN_SUPPLY;
-        await tokenLocal.approve(share.address, approveValue, {from: ERC20_CREATOR});
-        await share.setERC20Token(tokenLocal.address, {from: ADMIN});
-        await share.acceptAbstractToken(TOKEN_SUPPLY, {from: ADMIN});
-        let ISAOTokenBalance = await tokenLocal.balanceOf(share.address);
-        assert(approveValue.eq(ISAOTokenBalance));
-    })
+    it("should allow to take all tokens when distribution", async function () {
+        await token.approve(isao.address, TOKEN_SUPPLY, {from: accounts[0]});
+        await isao.setERC20Token(token.address, {from: accounts[0]});
+        await isao.acceptAbstractToken(TOKEN_SUPPLY, {from: accounts[0]});
+        await isao.setState(ST_RAISING);
+        assert((await isao.getState()).eq(ST_RAISING));
 
-});
+        await isao.sendTransaction({from: accounts[2], value: 10e18});
+        await isao.setState(ST_TOKEN_DISTRIBUTION, {from: accounts[0]});
+        assert((await isao.getState()).eq(ST_TOKEN_DISTRIBUTION));
 
-contract('ShareStore NEGATIVE TEST', (accounts) => {
+        let balToken = await isao.getBalanceTokenOf(accounts[2]);
 
-});
+        console.log((balToken).toString());
 
-contract('ShareStore CALC TEST', (accounts) => {
-
-});
+        await isao.releaseToken(90000000000000000000, {from: accounts[2]});
 
 
-contract('ShareStore OVERDRAFT TEST', (accounts) => {
+        let balToken2 = await isao.getBalanceTokenOf(accounts[2]);
+
+        console.log((balToken2).toString());
+
+        await isao.releaseToken(9999999999999998800, {from: accounts[2]});
+
+        let balToken3 = await isao.getBalanceTokenOf(accounts[2]);
+
+        console.log((balToken3).toString());
+
+
+    });
 });

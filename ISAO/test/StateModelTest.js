@@ -1,12 +1,13 @@
+// https://github.com/MikeMcl/bignumber.js/
+const BigNumber = require('bignumber.js');
 const StateModelTest = artifacts.require("./StateModelTest.sol");
 
 const web3 = global.web3;
 
-const tbn = v => web3.toBigNumber(v);
-const fbn = v => v.toString();
-const tw = v => web3.toBigNumber(v).mul(1e18);
-const fw = v => web3._extend.utils.fromWei(v).toString();
-
+const tbn = v => new BigNumber(v);
+const fbn = v => v.toNumber();
+const tw = v => BigNumber.isBigNumber(v) ? v.times(1e18) : tbn(v).times(1e18);
+const fw = v => BigNumber.isBigNumber(v) ? v.div(1e18).toNumber() : tbn(v).div(1e18).toNumber();
 
 const TI_DAY = tbn(86400);
 
@@ -23,8 +24,8 @@ const TM_WAIT_FOR_ICO = tbn(0x02);
 const TM_TOKEN_DISTRIBUTION = tbn(0x08);
 const TM_FUND_DEPRECATED = tbn(0x10);
 
-const RAISING_PERIOD = TI_DAY.mul(10);
-const DISTRIBUTION_PERIOD = TI_DAY.mul(45);
+const RAISING_PERIOD = TI_DAY.times(10);
+const DISTRIBUTION_PERIOD = TI_DAY.times(45);
 const MINIMAL_FUND_SIZE = tw(100);
 const MAXIMAL_FUND_SIZE = tw(100000);
 
@@ -36,7 +37,7 @@ const RL_PAYBOT = tbn(0x08);
 
 contract('StateModelTest COMMON TEST', (accounts) => {
     beforeEach(async function() {
-        stateModelTest = await StateModelTest.new(0,0);
+        stateModelTest = await StateModelTest.new(RAISING_PERIOD,DISTRIBUTION_PERIOD);
     });
 
     it("default state should be ST_DEFAULT", async function() {

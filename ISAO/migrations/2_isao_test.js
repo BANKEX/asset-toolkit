@@ -39,6 +39,7 @@ module.exports = function(deployer, network, accounts) {
   const DISTRIBUTION_PERIOD = TI_DAY.mul(36524);
   // const MINIMAL_FUND_SIZE = tw(110);
   const MINIMAL_FUND_SIZE = tw(110);
+  const MAXIMAL_FUND_SIZE = tw(100000);
   const LIMITS = [tw(100), tw(500), tw(1000)];
   const COSTS = [tw(0.1), tw(0.2), tw(0.5)];
   const ADMIN_ADDRESS = operator;
@@ -73,7 +74,7 @@ module.exports = function(deployer, network, accounts) {
           let token = await TestToken.new(TOKEN_SUPPLY);
           let isao = await ISAOTest.new(
                       RAISING_PERIOD, DISTRIBUTION_PERIOD,
-                      MINIMAL_FUND_SIZE, LIMITS, COSTS, MINIMAL_DEPOSIT,
+                      MINIMAL_FUND_SIZE, MAXIMAL_FUND_SIZE, LIMITS, COSTS, MINIMAL_DEPOSIT,
                       ADMIN_ADDRESS, PAYBOT_ADDRESS,
                       {from:operator});
 
