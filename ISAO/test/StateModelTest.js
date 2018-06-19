@@ -34,7 +34,7 @@ const RL_PAYBOT = tbn(0x08);
 
 contract('StateModelTest COMMON TEST', (accounts) => {
     beforeEach(async function() {
-        stateModelTest = await StateModelTest.new(RAISING_PERIOD,DISTRIBUTION_PERIOD, MAXIMAL_FUND_SIZE);
+        stateModelTest = await StateModelTest.new(RAISING_PERIOD,DISTRIBUTION_PERIOD,MINIMAL_FUND_SIZE, MAXIMAL_FUND_SIZE);
     });
 
     it("default state should be ST_DEFAULT", async function() {
@@ -43,7 +43,7 @@ contract('StateModelTest COMMON TEST', (accounts) => {
 
     it("should allow to set state RAISING if there are enough tokens", async () => {
         await stateModelTest.setRole(RL_ADMIN);
-        await stateModelTest.setTotalShare(MINIMAL_FUND_SIZE);
+        await stateModelTest.setCassetteSize(tw(100000));
         await stateModelTest.setState(ST_RAISING);
         assert(ST_RAISING.eq(await stateModelTest.getState()), `error ${await stateModelTest.getState()}`);
 
@@ -52,12 +52,23 @@ contract('StateModelTest COMMON TEST', (accounts) => {
     it("should be changed to distribution from raising if fund is collected", async () => {
         await stateModelTest.setRole(RL_ADMIN);
         assert((RL_ADMIN).eq(await stateModelTest.getRole()));
-        await stateModelTest.setTotalShare(MINIMAL_FUND_SIZE);
+        await stateModelTest.setCassetteSize(tw(100001));
         await stateModelTest.setState(ST_RAISING);
         assert(ST_RAISING.eq(await stateModelTest.getState()), `error ${await stateModelTest.getState()}`);
         await stateModelTest.setTotalShare(MAXIMAL_FUND_SIZE);
         await stateModelTest.incTimestamp(RAISING_PERIOD);
         assert(ST_TOKEN_DISTRIBUTION.eq(await stateModelTest.getState()), `error ${await stateModelTest.getState()}`);
+    });
+
+    it("should go to MONEY BACK from Raising if RST is not collected", async () => {
+        await stateModelTest.setRole(RL_ADMIN);
+        assert((RL_ADMIN).eq(await stateModelTest.getRole()));
+        await stateModelTest.setCassetteSize(tw(100001));
+        await stateModelTest.setState(ST_RAISING);
+        assert(ST_RAISING.eq(await stateModelTest.getState()), `error ${await stateModelTest.getState()}`);
+        await stateModelTest.setTotalShare(tw(0));
+        await stateModelTest.incTimestamp(RAISING_PERIOD);
+        assert(ST_MONEY_BACK.eq(await stateModelTest.getState()), `error ${await stateModelTest.getState()}`);
     });
 
 
