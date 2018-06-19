@@ -1,5 +1,3 @@
-// https://github.com/MikeMcl/bignumber.js/
-const BigNumber = require('bignumber.js');
 const ShareStoreTest = artifacts.require("./ShareStoreTest.sol");
 const Token = artifacts.require("./TestToken.sol");
 
@@ -137,21 +135,11 @@ const IERC20_ABI = [
     }
 ];
 
-// const tbn = v => web3.toBigNumber(v);
-// const fbn = v => v.toString();
-// const tw = v => web3.toBigNumber(v).mul(1e18);
-// const fw = v => web3._extend.utils.fromWei(v).toString();
-// const DECIMAL_MULTIPLIER = new BN(0xDE0B6B3A7640000, 16);
-// console.log(DECIMAL_MULTIPLIER.toNumber())
-// const tbn = v => new BN(v, 10);
-// const fbn = v => v.toNumber();
-// const tw = v => BN.isBN(v) ? v.mul(DECIMAL_MULTIPLIER) : tbn(v).mul(DECIMAL_MULTIPLIER);
-// const fw = v => BN.isBN(v) ? v.div(DECIMAL_MULTIPLIER).toNumber() : tbn(v).div(DECIMAL_MULTIPLIER).toNumber();
+const tbn = v => web3.toBigNumber(v);
+const fbn = v => v.toString();
+const tw = v => web3.toBigNumber(v).mul(1e18);
+const fw = v => web3._extend.utils.fromWei(v).toString();
 
-const tbn = v => new BigNumber(v);
-const fbn = v => v.toNumber();
-const tw = v => BigNumber.isBigNumber(v) ? v.times(1e18) : tbn(v).times(1e18);
-const fw = v => BigNumber.isBigNumber(v) ? v.div(1e18).toNumber() : tbn(v).div(1e18).toNumber();
 
 const TOKEN_SUPPLY = tw(10);
 const MINIMAL_DEPOSIT_SIZE = tw(0.05);
@@ -170,14 +158,12 @@ const TM_WAIT_FOR_ICO = tbn(0x02);
 const TM_TOKEN_DISTRIBUTION = tbn(0x08);
 const TM_FUND_DEPRECATED = tbn(0x10);
 
-const RAISING_PERIOD = TI_DAY.times(10);
-const ICO_PERIOD = TI_DAY.times(15);
-const DISTRIBUTION_PERIOD = TI_DAY.times(45);
+const RAISING_PERIOD = TI_DAY.mul(10);
+const ICO_PERIOD = TI_DAY.mul(15);
+const DISTRIBUTION_PERIOD = TI_DAY.mul(45);
 
 const MINIMAL_FUND_SIZE = tw(1);
 const MAXIMAL_FUND_SIZE = tw(100000);
-const LIMITS = [tw(1), tw(5), tw(15)];
-const COSTS = [tw(0.1), tw(0.2), tw(0.5)];
 
 const INVESTOR_SUM_PAY = tw(0.5);
 const INVESTOR_SUM_TO_TRIGGER = tw(0.00001);
@@ -186,12 +172,15 @@ const RL_DEFAULT = tbn(0x00);
 const RL_ADMIN = tbn(0x04);
 const RL_PAYBOT = tbn(0x08);
 
+const LIMITS = [tw(100), tw(500), tw(1000)];
+const COSTS = [tw(0.1), tw(0.2), tw(0.5)];
+
 const gasPrice = tw("3e-7");
 
 contract('ShareStore COMMON TEST', (accounts) => {
     const ADMIN = accounts[0];
     const PAYBOT = accounts[1];
-    const ERC20_CREATOR = accounts[2];
+    const ERC20_CREATOR = accounts[0];
     
     const investors = {
         account3: accounts[3],
@@ -217,7 +206,7 @@ contract('ShareStore COMMON TEST', (accounts) => {
         await tokenLocal.approve(share.address, TOKEN_SUPPLY, {from: ERC20_CREATOR});
         await share.setERC20Token(tokenLocal.address, {from: ADMIN});
         let tokenAddress = await share.tokenAddress();
-        assert(tokenAddress.eq(tokenLocal.address));
+        assert(tbn(tokenAddress).eq(tokenLocal.address));
     })
     
     it("should send ERC20 tokens to ISAO", async function () {
