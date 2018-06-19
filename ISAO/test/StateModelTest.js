@@ -296,7 +296,29 @@ contract('StateModelTest', (accounts) => {
             }
             assert(ST_RAISING.eq(await stateModelTest.getState()));
         });
+        it("should not allow to set any state after DISTRIBUTION", async () => {
+            await stateModelTest.setRole(RL_ADMIN);
+            await stateModelTest.setCassetteSize(tw(100001));
+            await stateModelTest.setState(ST_RAISING);
+            await stateModelTest.setTotalShare(tw(101));
+            await stateModelTest.setState(ST_TOKEN_DISTRIBUTION);
+            let stateObj = {
+                STATE1: ST_DEFAULT,
+                STATE2: ST_FUND_DEPRECATED,
+                STATE3: ST_RAISING,
+                STATE4: ST_MONEY_BACK,
+                STATE5: ST_TOKEN_DISTRIBUTION
+            };
+            try {
+                for (let i in stateObj) {
+                    await stateModelTest.setState(STATE[i]);
+                }
+            }
+            catch (e) {
 
+            }
+            assert(ST_TOKEN_DISTRIBUTION.eq(await stateModelTest.getState()));
+        });
     });
 
 });
