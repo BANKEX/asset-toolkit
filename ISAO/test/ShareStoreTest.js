@@ -231,7 +231,7 @@ contract('ShareStore COMMON TEST', (accounts) => {
         await share.setERC20Token(tokenLocal.address, {from: ADMIN});
         let tokenAddress = await share.tokenAddress();
         assert(tbn(tokenAddress).eq(tokenLocal.address));
-    })
+    });
 
     it("should send ERC20 tokens to ISAO", async function () {
         await tokenLocal.approve(share.address, APPROVE_VALUE, {from: ERC20_CREATOR});
@@ -239,7 +239,7 @@ contract('ShareStore COMMON TEST', (accounts) => {
         await share.acceptAbstractToken(TOKEN_SUPPLY, {from: ADMIN});
         let ISAOTokenBalance = await tokenLocal.balanceOf(share.address);
         assert(ISAOTokenBalance.eq(APPROVE_VALUE));
-    })
+    });
 
     it("should invest ETH during ST_RAISING period via transaction send", async function () {
         let countOfInvestors = Object.keys(investors).length;
@@ -250,7 +250,7 @@ contract('ShareStore COMMON TEST', (accounts) => {
             account6: INVESTOR_SUM_PAY,
             account7: INVESTOR_SUM_PAY,
             account8: INVESTOR_SUM_PAY
-        }
+        };
         let goodValues = calculateTokenBalances(investors, investorsSendSums);
         let goodTotalShare = goodValues.goodTotalShare;
         let goodInvestorTokenBalance = goodValues.goodInvestorTokenBalance;
@@ -263,10 +263,10 @@ contract('ShareStore COMMON TEST', (accounts) => {
             let goodTokenBalance = goodInvestorTokenBalance[i];
             let tokenBalance = await share.getBalanceTokenOf(investors[i]);
             assert(tokenBalance.eq(goodTokenBalance));
-        }
+        };
         let totalShare = await share.totalShare();
         assert(totalShare.eq(goodTotalShare));
-    })
+    });
 
     it("should invest ETH during ST_RAISING period via buyShare func call", async function () {
         let investorsSendSums = {
@@ -276,7 +276,7 @@ contract('ShareStore COMMON TEST', (accounts) => {
             account6: INVESTOR_SUM_PAY,
             account7: INVESTOR_SUM_PAY,
             account8: INVESTOR_SUM_PAY
-        }
+        };
         let goodValues = calculateTokenBalances(investors, investorsSendSums);
         let goodTotalShare = goodValues.goodTotalShare;
         let goodInvestorTokenBalance = goodValues.goodInvestorTokenBalance;
@@ -292,7 +292,7 @@ contract('ShareStore COMMON TEST', (accounts) => {
         }
         let totalShare = await share.totalShare();
         assert(totalShare.eq(goodTotalShare));
-    })
+    });
 
     it("should get all sent ETH by investors to ADMIN during ST_TOKEN_DISTRIBUTION period", async function () {
         let totalSendETH = INVESTOR_SUM_PAY.mul(Object.keys(investors).length);
@@ -308,7 +308,7 @@ contract('ShareStore COMMON TEST', (accounts) => {
         let gasCost = gasPrice.mul(tx.receipt.gasUsed);
         let adminBalanceAfter = await web3.eth.getBalance(ADMIN);
         assert(adminBalanceAfter.eq(adminBalanceBefore.plus(totalSendETH).minus(gasCost)));
-    })
+    });
 
     it("should get all share in tokens by investors during ST_TOKEN_DISTRIBUTION period by transaction send", async function () {
         let investorsSendSums = {
@@ -318,7 +318,7 @@ contract('ShareStore COMMON TEST', (accounts) => {
             account6: INVESTOR_SUM_PAY,
             account7: INVESTOR_SUM_PAY,
             account8: INVESTOR_SUM_PAY
-        }
+        };
         let goodValues = calculateTokenBalances(investors, investorsSendSums);
         let goodTotalShare = goodValues.goodTotalShare;
         let goodInvestorTokenBalance = goodValues.goodInvestorTokenBalance;
@@ -334,11 +334,11 @@ contract('ShareStore COMMON TEST', (accounts) => {
             let goodTokenBalance = goodInvestorTokenBalance[i];
             let tokenBalance = await tokenLocal.balanceOf(investors[i]);
             assert(tokenBalance.eq(goodTokenBalance));
-        }
+        };
         let totalSupply = await tokenLocal.totalSupply();
         let remainTokens = await tokenLocal.balanceOf(share.address);
         assert(remainTokens.eq(totalSupply.minus(goodTotalShare)));
-    })
+    });
 
     it("should get all share in tokens by investors during ST_TOKEN_DISTRIBUTION period by releaseToken func call", async function () {
         let investorsSendSums = {
@@ -348,7 +348,7 @@ contract('ShareStore COMMON TEST', (accounts) => {
             account6: INVESTOR_SUM_PAY,
             account7: INVESTOR_SUM_PAY,
             account8: INVESTOR_SUM_PAY
-        }
+        };
         let goodValues = calculateTokenBalances(investors, investorsSendSums);
         let goodTotalShare = goodValues.goodTotalShare;
         let goodInvestorTokenBalance = goodValues.goodInvestorTokenBalance;
@@ -365,11 +365,11 @@ contract('ShareStore COMMON TEST', (accounts) => {
             let goodTokenBalance = goodInvestorTokenBalance[i];
             let tokenBalance = await tokenLocal.balanceOf(investors[i]);
             assert(tokenBalance.eq(goodTokenBalance));
-        }
+        };
         let totalSupply = await tokenLocal.totalSupply();
         let remainTokens = await tokenLocal.balanceOf(share.address);
         assert(remainTokens.eq(totalSupply.minus(goodTotalShare)));
-    })
+    });
 
     it("should get all share in tokens by investors during ST_TOKEN_DISTRIBUTION period by releaseTokenForce func call", async function () {
         let investorsSendSums = {
@@ -379,7 +379,7 @@ contract('ShareStore COMMON TEST', (accounts) => {
             account6: INVESTOR_SUM_PAY,
             account7: INVESTOR_SUM_PAY,
             account8: INVESTOR_SUM_PAY
-        }
+        };
         let goodValues = calculateTokenBalances(investors, investorsSendSums);
         let goodTotalShare = goodValues.goodTotalShare;
         let goodInvestorTokenBalance = goodValues.goodInvestorTokenBalance;
@@ -400,7 +400,7 @@ contract('ShareStore COMMON TEST', (accounts) => {
         let totalSupply = await tokenLocal.totalSupply();
         let remainTokens = await tokenLocal.balanceOf(share.address);
         assert(remainTokens.eq(totalSupply.minus(goodTotalShare)));
-    })
+    });
 
     it("should get sent ETH back to investors during ST_MONEY_BACK period by transaction send", async function () {
         await tokenLocal.approve(share.address, APPROVE_VALUE, {from: ERC20_CREATOR});
@@ -417,7 +417,7 @@ contract('ShareStore COMMON TEST', (accounts) => {
             let balanceAfter = await web3.eth.getBalance(investors[i]);
             assert(balanceAfter.eq(balanceBefore.plus(INVESTOR_SUM_PAY).minus(gasCost)));
         }
-    })
+    });
 
     it("should get sent ETH back to investors during ST_MONEY_BACK period by refundShare func call", async function () {
         await tokenLocal.approve(share.address, APPROVE_VALUE, {from: ERC20_CREATOR});
@@ -435,7 +435,7 @@ contract('ShareStore COMMON TEST', (accounts) => {
             let balanceAfter = await web3.eth.getBalance(investors[i]);
             assert(balanceAfter.eq(balanceBefore.plus(INVESTOR_SUM_PAY).minus(gasCost)));
         }
-    })
+    });
 
     it("should get sent ETH back to investors during ST_MONEY_BACK period by refundShareForce func call", async function () {
         await tokenLocal.approve(share.address, APPROVE_VALUE, {from: ERC20_CREATOR});
@@ -491,11 +491,9 @@ contract('ShareStore COMMON TEST', (accounts) => {
 });
 
 contract('ShareStore NEGATIVE TEST', (accounts) => {
-
 });
 
 contract('ShareStore CALC TEST', (accounts) => {
-
 });
 
 contract('ShareStore OVERDRAFT TEST', (accounts) => {});
