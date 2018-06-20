@@ -47,6 +47,7 @@ h4 {
     height: 300px !important;
   }
   .entry {
+    position: relative;
     margin: 10px 0;
     .title {
       display: inline;
@@ -54,6 +55,13 @@ h4 {
     }
     .value {
       display: inline;
+    }
+    .spinner {
+      color: #ff6358;
+      font-size: 24px;
+      position: absolute;
+      right: -35px;
+      top: 20%;
     }
   }
 }
@@ -94,11 +102,19 @@ h4 {
   margin: 0 !important;
 }
 
+
 button {
   position: relative;
+  padding: 7px 14px !important;
+  margin: 0 10px;
   &.big {
-    padding: 15px;
+    padding: 15px !important;
     margin: 25px;
+  }
+}
+kendo-buttongroup {
+  button {
+    margin: 0;
   }
 }
 

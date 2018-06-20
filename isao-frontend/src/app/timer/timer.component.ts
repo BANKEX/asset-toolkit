@@ -11,7 +11,7 @@ import { StageService } from '../core';
 })
 export class TimerComponent extends NeatComponent implements OnInit {
 
-  public ready = false;
+  public ready = true;
   public series: any[];
   public currentTime: Date;
   public launchTime: Date;
@@ -32,14 +32,14 @@ export class TimerComponent extends NeatComponent implements OnInit {
     // TODO: cleanup no need NeatComponent here
     $isao.currentTime.takeUntil(this.ngUnsubscribe).subscribe(time => {
       if (!this.stage) { console.error('No stage info yet!'); return; }
-      this.ready = false;
-      this.launchTime = this.$isao.launchTime;
+      // Костыль (см. todo в $isao)
+      if (this.currentTime && this.currentTime.getTime() === time.getTime()) { this.$isao.getCurrentTime(); return; }
       this.currentTime = time;
+      this.launchTime = this.$isao.launchTime;
       this.range = this.stage === Stage.RAISING ? $isao.rPeriod * 1000 : $isao.dPeriod * 1000;
       this.passed = this.currentTime.getTime() - this.launchTime.getTime();
       this.left = this.launchTime.getTime() + this.range - this.currentTime.getTime();
       this.value = Math.floor(100 * this.passed / this.range);
-      this.ready = true;
     });
   }
 

@@ -45,11 +45,10 @@ export class AdminService {
     if (!hours || isNaN(Number(hours)) || +hours < 0) { this.$error.addError('Wrong value!'); return; }
     const pEvent: PromiEvent<boolean> =
       this.contract.methods.incTimestamp(hours * 3600).send({from: this.$connection.account});
-
     pEvent.on('transactionHash', () => this.process.runningTimeInc = true);
-    pEvent.then(() => {
-      this.process.runningTimeInc = false;
-      this.$isao.getCurrentTime();
+    pEvent.then(async() => {
+      const ok = await this.$isao.getCurrentTime();
+      this.process.runningTimeInc = ok ? false : true;
     });
   }
 

@@ -1,5 +1,5 @@
 span.k-i-loading.k-icon(*ngIf="!ready", style="font-size: 24px; color: #ff6358")
-div(*ngIf="ready")
+div
 
   kendo-arcgauge([value]="value", [scale]="{ max: 100 }", style="height:150px")
     ng-template(kendoArcGaugeCenterTemplate, let-value="value") {{ value }}%
