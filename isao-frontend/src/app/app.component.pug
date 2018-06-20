@@ -31,7 +31,7 @@ bnkx-blocking-notification-overlay
         .content(*ngIf="($stage|async) === undefined")
           isao-init
         .content
-          isao-admin(*ngIf="($stage|async)")
+          isao-admin(*ngIf="($stage|async) !== undefined")
 
   .footer
     .container

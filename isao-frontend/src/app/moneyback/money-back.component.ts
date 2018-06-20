@@ -13,6 +13,6 @@ export class MoneyBackComponent {
 
   constructor(public $isao: IsaoService) {
     this.hasTokens$ = this.$isao.tokensOrderedByUser.map( x => x > 0);
-    this.isInitialized$ = this.$isao.tokensOrderedByUser.map( x => x !== undefined && x !== null);
+    this.isInitialized$ = this.$isao.tokensOrderedByUser.map( x => x !== undefined);
   }
 }

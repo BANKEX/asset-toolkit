@@ -36,7 +36,7 @@ export class IsaoService {
   public minimalDeposit: number;
   public stairs: BehaviorSubject<any> = new BehaviorSubject({});
   public tokensOrdered: Subject<any> = new Subject();
-  public tokensOrderedByUser: BehaviorSubject<number> = new BehaviorSubject(null);
+  public tokensOrderedByUser: BehaviorSubject<number> = new BehaviorSubject(undefined);
 
   public w3Utils: any;
 
@@ -97,9 +97,9 @@ export class IsaoService {
   private from: any;
   private getTokenInterval;
 
-  public publishNewContract(input: ContractInput) {
+  public publishNewContract(i: ContractInput) {
     const args =
-      [input.rPeriod, input.dPeriod, input.minimalFundSize, input.limits, input.costs, input.minimalDeposit, input.paybotAddress];
+      [i.rPeriod, i.dPeriod, i.minimalFundSize, i.limits, i.costs, i.minimalDeposit, i.adminAddress, i.paybotAddress];
     let factory: Contract = new this.$connection.web3.eth.Contract(this.$config.factoryAbi);
     const transaction: TransactionObject<Contract> = factory.deploy({data: this.$config.factoryCode, arguments: args});
     const pEvent: PromiEvent<any> = transaction.send({from: this.$connection.account});
@@ -129,39 +129,46 @@ export class IsaoService {
   }
 
   public buyTokens(amount) {
-    if (!amount) {
-      this.$error.addError('Empty amount!');
+    if (!amount || isNaN(Number(amount)) || +amount < 0) {
+      this.$error.addError('Wrong amount!');
       return;
     }
 
     const pEvent = this.payToISAOContact(amount);
     pEvent.on('transactionHash', () => this.process.buyingTokens = true);
-    pEvent.then(() => this.process.buyingTokens = false);
+    pEvent.then(() => {
+      this.process.buyingTokens = false;
+      this.tokensOrderedByUser.next(undefined);
+    });
   }
 
   public receiveTokens(amount) {
     if (!amount) { this.$error.addError('Empty amount!'); return; }
-    if (+amount > this.tokensOrderedByUser.value) { this.$error.addError('Too mutch!'); return; }
+    if (+amount > this.tokensOrderedByUser.value) { this.$error.addError('Too much!'); return; }
     const pEvent = this.$connection.contract.methods.releaseToken(amount * 1e18).send(this.from);
     pEvent.on('transactionHash', () => this.process.receivingTokens = true);
-    pEvent.then(() => this.process.receivingTokens = false);
+    pEvent.then(() => { this.process.receivingTokens = false; this.tokensOrderedByUser.next(undefined); });
   }
 
   public refundTokens(amount) {
     if (!amount) { this.$error.addError('Empty amount!'); return; }
-    if (+amount > this.tokensOrderedByUser.value) { this.$error.addError('Too mutch!'); return; }
+    if (+amount > this.tokensOrderedByUser.value) { this.$error.addError('Too much!'); return; }
     const pEvent = this.$connection.contract.methods.refundShare(amount * 1e18).send(this.from);
     pEvent.on('transactionHash', () => this.process.refundingPartOfTokens = true);
     pEvent.then(() => this.process.refundingPartOfTokens = false);
   }
 
-  public async getCurrentTime() {
+  public async getCurrentTime(): Promise<boolean> {
     const [err, isTestContract] = await to(this.hasMethod('getTimestamp()'));
-    if (err) { console.error(err.message); return Date.now(); }
+    if (err) { console.error(err.message); return false; }
     let time = new Date;
     const timestamp = isTestContract ? 1000 * await this.$connection.contract.methods.getTimestamp().call() : Date.now();
+    // TODO:
+    // Баг, с которым я так и не смог разобраться - при первом добавлении времени
+    // getTimestamp() через раз возвращает старый таймштамп, добавление задержки не помогло
     time.setTime(timestamp);
     this.currentTime.next(time);
+    return true;
   }
 
   public adjustLaunchTime() {

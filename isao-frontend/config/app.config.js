@@ -1,6 +1,6 @@
 module.exports = {
   // Set contract ABI here:
-  abi: require('./ISAOTest.json').abi,
+  abi: require('./ISAOTest2.json').abi,
   // Test factory settings:
   factoryAbi: require('./ISAOTestFactory.json').abi,
   factoryCode: require('./ISAOTestFactoryCode.json').bytecode,

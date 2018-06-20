@@ -41,8 +41,8 @@ doctype html
 
 
   ng-template(#time_control)
-    p
-      input([(ngModel)]="str", type="text", size="20", maxlength="20", placeholder="Enter value in hours", style="margin: 10px")
-      button(*ngIf="!$admin.process.runningTimeInc", kendoButton, (click)="incTimestamp(str)") Increase timestamp
-      span.k-i-loading.k-icon(*ngIf="$admin.process.runningTimeInc", style="font-size: 24px; color: #ff6358")
+    .entry
+      input([(ngModel)]="str", type="text", size="21", maxlength="20", placeholder="Enter value in hours", style="margin: 10px")
+      button([attr.disabled]="$admin.process.runningTimeInc?true:null", kendoButton, (click)="incTimestamp(str)") Increase timestamp
+      span.spinner.k-i-loading.k-icon(*ngIf="$admin.process.runningTimeInc", style="font-size: 24px; color: #ff6358")
         input([(ngModel)]="str", type="text", size="20", maxlength="20", placeholder="Enter value in hours", style="margin: 10px; text-align: center")
