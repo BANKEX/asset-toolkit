@@ -454,6 +454,40 @@ contract('ShareStore COMMON TEST', (accounts) => {
             assert(balanceAfter.eq(balanceBefore.plus(INVESTOR_SUM_PAY)));
         }
     })
+
+    it("should allow refundShareForce during RAISING period", async function () {
+        await tokenLocal.approve(share.address, APPROVE_VALUE, {from: ERC20_CREATOR});
+        await share.setERC20Token(tokenLocal.address, {from: ADMIN});
+        await share.acceptAbstractToken(TOKEN_SUPPLY, {from: ADMIN});
+        await share.setState(ST_RAISING, {from: ADMIN});
+        for (let i in investors) 
+            await share.buyShare({value: INVESTOR_SUM_PAY, from: investors[i]});;
+        for (let i in investors) {
+            let investorTokenBalance = await share.getBalanceTokenOf(investors[i]);
+            let balanceBefore = await web3.eth.getBalance(investors[i]);
+            let tx = await share.refundShareForce(investors[i], investorTokenBalance, {from: ADMIN});
+            let gasCost = gasPrice.mul(tx.receipt.gasUsed);
+            let balanceAfter = await web3.eth.getBalance(investors[i]);
+            assert(balanceAfter.eq(balanceBefore.plus(INVESTOR_SUM_PAY)));
+        }
+    })
+
+    it("should allow refundShareForce during RAISING period", async function () {
+        await tokenLocal.approve(share.address, APPROVE_VALUE, {from: ERC20_CREATOR});
+        await share.setERC20Token(tokenLocal.address, {from: ADMIN});
+        await share.acceptAbstractToken(TOKEN_SUPPLY, {from: ADMIN});
+        await share.setState(ST_RAISING, {from: ADMIN});
+        for (let i in investors) 
+            await share.buyShare({value: INVESTOR_SUM_PAY, from: investors[i]});;
+        for (let i in investors) {
+            let investorTokenBalance = await share.getBalanceTokenOf(investors[i]);
+            let balanceBefore = await web3.eth.getBalance(investors[i]);
+            let tx = await share.refundShareForce(investors[i], investorTokenBalance, {from: ADMIN});
+            let gasCost = gasPrice.mul(tx.receipt.gasUsed);
+            let balanceAfter = await web3.eth.getBalance(investors[i]);
+            assert(balanceAfter.eq(balanceBefore.plus(INVESTOR_SUM_PAY)));
+        }
+    })
 });
 
 contract('ShareStore NEGATIVE TEST', (accounts) => {
@@ -463,6 +497,5 @@ contract('ShareStore NEGATIVE TEST', (accounts) => {
 contract('ShareStore CALC TEST', (accounts) => {
 
 });
-
 
 contract('ShareStore OVERDRAFT TEST', (accounts) => {});
