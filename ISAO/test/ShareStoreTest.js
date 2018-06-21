@@ -582,17 +582,17 @@ contract('ShareStore', (accounts) => {
             assert(totalShare.eq(goodTotalShare));
         });
 
-        it("should admin sends tokens to ISAO => invest => first investor gets their share => refund some investors shares => admin gets back 50% his share in ETH => admin sends tokens to ISAO => remaining investors gets their remain share", async function () {
+        it("should admin sends tokens to ISAO => invest => first investor gets 50% their share => refund some investors shares => admin gets back 50% his share in ETH => admin sends tokens to ISAO => all investors gets their remain share", async function () {
             let approveValue1 = TOKEN_SUPPLY.divToInt(2e6);
             let approveValue2 = TOKEN_SUPPLY.minus(approveValue1);
             let investorsSendSums = {
                 // Sending this value we get current max amount of tokens
                 account3: approveValue1.mul(COSTS[0]).divToInt(1e18),
-                account4: tw('1.2211221'),
-                account5: tw('0.123242423432423'),
-                account6: tw('9.999999999999999'),
-                account7: tw('1.213123131'),
-                account8: tw('20.555555555555554')
+                account4: tw('1.2231221'),
+                account5: tw('0.123242423452423'),
+                account6: tw('9.999919999999999'),
+                account7: tw('1.2131203131'),
+                account8: tw('20.555155555555554')
             };
 
             let adminShare = tbn(0);
@@ -602,92 +602,51 @@ contract('ShareStore', (accounts) => {
             let goodTotalShare = goodValues.goodTotalShare;
             let goodInvestorTokenBalance = goodValues.goodInvestorTokenBalance;
             let firstInvestorMoneyBack = (goodInvestorTokenBalance.account3).divToInt('2');
+            let firstInvestorMoneyBackInETH = firstInvestorMoneyBack.mul(COSTS[0]).div('1e18');
             await tokenLocal.approve(share.address, approveValue1, {from: ERC20_CREATOR});
+            let allowance = await tokenLocal.allowance(ERC20_CREATOR, share.address);
+            assert(allowance.eq(approveValue1));
             await share.setERC20Token(tokenLocal.address, {from: ADMIN});
+            let tokenAddress = await share.tokenAddress();
+            assert(tbn(tokenAddress).eq(tokenLocal.address));
             await share.acceptAbstractToken(approveValue1, {from: ADMIN});
+            let ISAOTokenBalance = await tokenLocal.balanceOf(share.address);
+            assert(ISAOTokenBalance.eq(approveValue1));
             await share.setState(ST_RAISING, {from: ADMIN});
             for (let i in investors) {
                 await share.sendTransaction({value: investorsSendSums[i], from: investors[i]});
+                let investorTokenBalance = await share.getBalanceTokenOf(investors[i]);
+                assert(investorTokenBalance.eq(goodInvestorTokenBalance[i]));
             }
+            let investorBalanceBefore = web3.eth.getBalance(investors.account3);
             await share.refundShareForce(investors.account3, firstInvestorMoneyBack, {from: ADMIN});
+            let investorBalanceAfter = web3.eth.getBalance(investors.account3);
+            assert(investorBalanceAfter.eq(investorBalanceBefore.plus(firstInvestorMoneyBackInETH)));
             goodInvestorTokenBalance.account3 = (goodInvestorTokenBalance.account3).minus(firstInvestorMoneyBack);
             goodTotalShare = goodTotalShare.minus(firstInvestorMoneyBack);
             await share.setState(ST_TOKEN_DISTRIBUTION, {from: ADMIN});
-            await share.releaseEtherToStakeholderForce(RL_ADMIN, adminShare.divToInt(2), {from: ADMIN});
-            await share.sendTransaction({value: tw(0.0001), from: investors.account3});
+            let adminBalanceBefore = await web3.eth.getBalance(ADMIN);
+            let tx = await share.releaseEtherToStakeholderForce(RL_ADMIN, adminShare.divToInt(2), {from: ADMIN, gasPrice: gasPrice});
+            let gasCost1 = gasPrice.mul(tx.receipt.gasUsed);
+            let adminBalanceAfter = await web3.eth.getBalance(ADMIN);
+            assert(adminBalanceAfter.eq(adminBalanceBefore.plus(adminShare.divToInt(2)).minus(gasCost1)));
+            let firstInvestorReleaseAmount = goodInvestorTokenBalance.account3.divToInt(2);
+            await share.releaseToken(firstInvestorReleaseAmount, {from: investors.account3});
+            let investorTokenBalance = await tokenLocal.balanceOf(investors.account3);
+            assert(investorTokenBalance.eq(firstInvestorReleaseAmount));
             await tokenLocal.approve(share.address, approveValue2, {from: ERC20_CREATOR});
+            let allowance1 = await tokenLocal.allowance(ERC20_CREATOR, share.address);
+            assert(allowance1.eq(approveValue2));
             await share.acceptAbstractToken(approveValue2, {from: ADMIN});
+            let ISAOTokenBalance1 = await tokenLocal.balanceOf(share.address);
+            assert(ISAOTokenBalance1.eq(approveValue1.plus(approveValue2).minus(firstInvestorReleaseAmount)));
             for (let i in investors) {
-                if (i != 'account3') {
-                    await share.sendTransaction({value: investorsSendSums[i], from: investors[i]});
+                    await share.sendTransaction({value: tw('0.0001'), from: investors[i]});
                     let goodTokenBalance = goodInvestorTokenBalance[i];
                     let tokenBalance = await tokenLocal.balanceOf(investors[i]);
                     assert(tokenBalance.eq(goodTokenBalance));
-                }
-            }
+            }   
         });
-
-        // it("should get all share in tokens by investors during ST_TOKEN_DISTRIBUTION period by releaseToken func call", async function () {
-        //     let investorsSendSums = {
-        //         account3: INVESTOR_SUM_PAY,
-        //         account4: INVESTOR_SUM_PAY,
-        //         account5: INVESTOR_SUM_PAY,
-        //         account6: INVESTOR_SUM_PAY,
-        //         account7: INVESTOR_SUM_PAY,
-        //         account8: INVESTOR_SUM_PAY
-        //     };
-        //     let goodValues = calculateTokenBalances(investors, investorsSendSums);
-        //     let goodTotalShare = goodValues.goodTotalShare;
-        //     let goodInvestorTokenBalance = goodValues.goodInvestorTokenBalance;
-        //     await tokenLocal.approve(share.address, APPROVE_VALUE, {from: ERC20_CREATOR});
-        //     await share.setERC20Token(tokenLocal.address, {from: ADMIN});
-        //     await share.acceptAbstractToken(APPROVE_VALUE, {from: ADMIN});
-        //     await share.setState(ST_RAISING, {from: ADMIN});
-        //     for (let i in investors) 
-        //         await share.buyShare({value: investorsSendSums[i], from: investors[i]});
-        //     await share.setState(ST_TOKEN_DISTRIBUTION, {from: ADMIN});
-        //     for (let i in investors) {
-        //         let investorTokenBalance = await share.getBalanceTokenOf(investors[i]);
-        //         await share.releaseToken(investorTokenBalance, {from: investors[i]});
-        //         let goodTokenBalance = goodInvestorTokenBalance[i];
-        //         let tokenBalance = await tokenLocal.balanceOf(investors[i]);
-        //         assert(tokenBalance.eq(goodTokenBalance));
-        //     };
-        //     let totalSupply = await tokenLocal.totalSupply();
-        //     let remainTokens = await tokenLocal.balanceOf(share.address);
-        //     assert(remainTokens.eq(totalSupply.minus(goodTotalShare)));
-        // });
-
-        // it("should get all share in tokens by investors during ST_TOKEN_DISTRIBUTION period by releaseTokenForce func call", async function () {
-        //     let investorsSendSums = {
-        //         account3: INVESTOR_SUM_PAY,
-        //         account4: INVESTOR_SUM_PAY,
-        //         account5: INVESTOR_SUM_PAY,
-        //         account6: INVESTOR_SUM_PAY,
-        //         account7: INVESTOR_SUM_PAY,
-        //         account8: INVESTOR_SUM_PAY
-        //     };
-        //     let goodValues = calculateTokenBalances(investors, investorsSendSums);
-        //     let goodTotalShare = goodValues.goodTotalShare;
-        //     let goodInvestorTokenBalance = goodValues.goodInvestorTokenBalance;
-        //     await tokenLocal.approve(share.address, APPROVE_VALUE, {from: ERC20_CREATOR});
-        //     await share.setERC20Token(tokenLocal.address, {from: ADMIN});
-        //     await share.acceptAbstractToken(APPROVE_VALUE, {from: ADMIN});
-        //     await share.setState(ST_RAISING, {from: ADMIN});
-        //     for (let i in investors) 
-        //         await share.buyShare({value: investorsSendSums[i], from: investors[i]});
-        //     await share.setState(ST_TOKEN_DISTRIBUTION, {from: ADMIN});
-        //     for (let i in investors) {
-        //         let investorTokenBalance = await share.getBalanceTokenOf(investors[i]);
-        //         await share.releaseTokenForce(investors[i], investorTokenBalance, {from: ADMIN});
-        //         let goodTokenBalance = goodInvestorTokenBalance[i];
-        //         let tokenBalance = await tokenLocal.balanceOf(investors[i]);
-        //         assert(tokenBalance.eq(goodTokenBalance));
-        //     }
-        //     let totalSupply = await tokenLocal.totalSupply();
-        //     let remainTokens = await tokenLocal.balanceOf(share.address);
-        //     assert(remainTokens.eq(totalSupply.minus(goodTotalShare)));
-        // });
 
         // it("should get sent ETH back to investors during ST_MONEY_BACK period by transaction send", async function () {
         //     await tokenLocal.approve(share.address, APPROVE_VALUE, {from: ERC20_CREATOR});
