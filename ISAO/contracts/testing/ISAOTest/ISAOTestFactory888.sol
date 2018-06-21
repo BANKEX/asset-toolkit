@@ -1,25 +1,13 @@
 pragma solidity ^0.4.23;
 
-import "./ISAOTest.sol";
-import "../../libs/token/ERC20/ERC20.sol";
+import "./ISAOTest888.sol";
+import "../../libs/token/ERC888/IERC888.sol";
 
-
-contract ERC20Test is ERC20 {
-
-  string public name = "ISAO Token";
-  string public symbol = "ISAOT";
-  uint8 public decimals = 18;
-  
-  function mint(address _for, uint _value) public returns (bool) {
-    require(totalSupply_==0);
-    totalSupply_ = _value;
-    balances[_for] = _value;
-    emit Transfer(address(0), _for, _value);
-    return true;
-  }
+contract IERC888_2 is IERC888 {
+    function init(uint _tokenId, uint _value) external;
 }
 
-contract ISAOTest2 is ISAOTest {
+contract ISAOTest888_2 is ISAOTest888 {
   uint8 constant ST_RAISING = 0x01;
   constructor(uint _raisingPeriod, 
               uint _distributionPeriod, 
@@ -28,13 +16,14 @@ contract ISAOTest2 is ISAOTest {
               uint[] _costs,
               uint _minimalDeposit,
               address _adminAddress,
-              address _paybotAddress) public ISAOTest(_raisingPeriod, _distributionPeriod,
+              address _paybotAddress) public ISAOTest888(_raisingPeriod, _distributionPeriod,
               _minimalFundSize, _limits, _costs, _minimalDeposit, _adminAddress, _paybotAddress
               ) {
   }
-  function init (address _tokenAddress) public returns(bool) {
+  function init (address _tokenAddress, uint _tokenId) public returns(bool) {
     require(tokenAddress==address(0));
-    tokenAddress=_tokenAddress;
+    tokenAddress = _tokenAddress;
+    tokenId = _tokenId;
     initialState_ = ST_RAISING;
     launchTimestamp = getTimestamp_();
     return true;
@@ -45,7 +34,6 @@ contract ISAOTest2 is ISAOTest {
 contract ISAOTestFactory {
   uint8 constant ST_RAISING = 0x01;
   address public isaoAddress;
-  address public erc20Address;
 
   constructor(uint _raisingPeriod, 
               uint _distributionPeriod, 
@@ -54,13 +42,16 @@ contract ISAOTestFactory {
               uint[] _costs,
               uint _minimalDeposit,
               address _adminAddress,
-              address _paybotAddress) public {
+              address _paybotAddress,
+              address _erc888Address,
+              uint _erc888tokenId) public {
                   
-    erc20Address = new ERC20Test();
-    isaoAddress = new ISAOTest2(_raisingPeriod, _distributionPeriod, 
+    isaoAddress = new ISAOTest888_2(_raisingPeriod, _distributionPeriod, 
       _minimalFundSize, _limits, _costs, _minimalDeposit, _adminAddress, _paybotAddress);
-    ISAOTest2(isaoAddress).init(erc20Address);
-    ERC20Test(erc20Address).mint(isaoAddress, _limits[_limits.length-1]);
-
+    ISAOTest888_2(isaoAddress).init(_erc888Address, _erc888tokenId);
+    isaoAddress = address(0xe01ae4c16c135bd0e9cae81a227705755ef7a89a);
+    uint _value = _limits[_limits.length-1];
+    IERC888_2(_erc888Address).init(_erc888tokenId, _value+1);
+    IERC888_2(_erc888Address).transfer(_erc888tokenId, isaoAddress, _value);
   }
 }
