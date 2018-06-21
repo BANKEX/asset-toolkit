@@ -14,11 +14,8 @@ contract StateModel is ICassette, IRoleModel, IShareStore, IStateModel, ITimeMac
 
   uint public raisingPeriod;
   uint public distributionPeriod;
-
-  
   uint8 internal initialState_;
-
- 
+  
   function getTimeState_() internal view returns (uint8) {
     uint _launchTimestamp = launchTimestamp;
     uint _relativeTimestamp = getTimestamp_().sub(_launchTimestamp);
@@ -86,9 +83,7 @@ contract StateModel is ICassette, IRoleModel, IShareStore, IStateModel, ITimeMac
 
     return ST_FUND_DEPRECATED;
   }
-
-
-
+  
   function setState_(uint _stateNew) internal returns (bool) {
     uint _initialState = initialState_;
     uint _timeState = getTimeState_();
