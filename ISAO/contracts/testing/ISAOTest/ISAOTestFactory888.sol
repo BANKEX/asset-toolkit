@@ -49,7 +49,6 @@ contract ISAOTestFactory {
     isaoAddress = new ISAOTest888_2(_raisingPeriod, _distributionPeriod, 
       _minimalFundSize, _limits, _costs, _minimalDeposit, _adminAddress, _paybotAddress);
     ISAOTest888_2(isaoAddress).init(_erc888Address, _erc888tokenId);
-    isaoAddress = address(0xe01ae4c16c135bd0e9cae81a227705755ef7a89a);
     uint _value = _limits[_limits.length-1];
     IERC888_2(_erc888Address).init(_erc888tokenId, _value+1);
     IERC888_2(_erc888Address).transfer(_erc888tokenId, isaoAddress, _value);
