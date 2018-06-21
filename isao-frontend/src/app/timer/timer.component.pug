@@ -4,6 +4,6 @@ div
   kendo-arcgauge([value]="value", [scale]="{ max: 100 }", style="height:150px")
     ng-template(kendoArcGaugeCenterTemplate, let-value="value") {{ value }}%
 
-  div Now: {{currentTime|date:'medium'}}
+  //- div Now: {{currentTime|date:'medium'}}
   div Launched: {{launchTime|date:'medium'}}
   div Passed: {{Math.floor(passed/3600000)}} hours, Left: {{Math.floor(left/3600000)}} hours
