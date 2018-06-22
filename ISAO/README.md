@@ -4,7 +4,7 @@
 
 ## About
 
-This repo contains well tested Ethereum smart contract that is used in the services of BANKEX and also useful for all the people who want to perform their own procedure of asset tokenization. It is available under <span style="color:red">SOME<span> license.
+This repo contains well tested Ethereum smart contract that is used in the services of BANKEX and also useful for all the people who want to perform their own procedure of asset tokenization.
 
 #### What is ISAO?
 
@@ -21,6 +21,8 @@ ISAO Smart contact allows to raise funding on any ERC20 token in several steps, 
 - Distribution stage
 - Deprecated stage
 - Testing contract
+
+Smart asset offering occurs in two stages: raising and token distrubution. At first stage investors send ether to contract and buy rights to get tokens. If the contract does not reach the minimal value of collected ether during raising time, investors can refund their ether back. If it reaches, we wait until raising time will be over (or admin switch contract to token distribution mode manually, or it reaches hard cap), after that investors can use their rights and get their tokens. You can find detailed description below
 
 Features to be implemented:
 
@@ -50,7 +52,7 @@ INFURA_TOKEN=TOKEN  # Infura API key
 
 5) Find ISAO contract address in the console output:
 
-```Address of ERC20 token: 0xf23a25c06d8b30134e82755910945ecd4d4a709d
+```
 Address of ERC20 token: --- You'll find address here ---
 Address of ISAO: --- You'll address here ---
 ```
@@ -187,3 +189,5 @@ When distribution period ends, contract automatically changes its state DEPRECAT
 In that state administrator can take unclaimed funds of the ISAO contract, such as ETH and related ERC20 token as well as any token that belongs to contract.
 
 See documentation at https://bankex.github.io/isao-contract/
+
+This is smart contract for initial smart asset offering (isao). See contract source at /contracts/production/ISAOProd/ISAOProd.sol .
