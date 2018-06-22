@@ -7,6 +7,7 @@ import { to } from 'await-to-js';
 import { StageService } from './stage.service';
 import { TransactionReceipt, Contract, PromiEvent, TransactionObject } from 'web3/types';
 import { ContractInput } from './types/contract-input';
+import { TokenType } from './types/contract-type.enum';
 
 type processMap = {
   'takingAllMoneyBack': boolean,
@@ -97,11 +98,25 @@ export class IsaoService {
   private from: any;
   private getTokenInterval;
 
-  public publishNewContract(i: ContractInput) {
-    const args =
+  public async publishNewContract(i: ContractInput, type: TokenType = TokenType.ERC20, params: any[] = []) {
+    let factory: Contract, transaction: TransactionObject<Contract>;
+    let args =
       [i.rPeriod, i.dPeriod, i.minimalFundSize, i.limits, i.costs, i.minimalDeposit, i.adminAddress, i.paybotAddress];
-    let factory: Contract = new this.$connection.web3.eth.Contract(this.$config.factoryAbi);
-    const transaction: TransactionObject<Contract> = factory.deploy({data: this.$config.factoryCode, arguments: args});
+    if (type === TokenType.ERC20) {
+      factory = new this.$connection.web3.eth.Contract(this.$config.factory20Abi);
+      transaction = factory.deploy({data: this.$config.factory20Code, arguments: args});
+    } else if (type === TokenType.Multitoken) {
+      const token = +params[0];
+      if (!token || isNaN(Number(token)) || token <= 0) { this.$error.addError('Wrong subtoken value!'); return; }
+      args = args.concat([this.$config.multitokenAddress, token]);
+      const multitoken = new this.$connection.web3.eth.Contract(this.$config.multitokenAbi, this.$config.multitokenAddress);
+      const [err, tokenExist] = await to(multitoken.methods.totalSupply(token).call());
+      if (err || +tokenExist) { this.$error.addError('Try another subtoken id!', err); return; }
+      factory = new this.$connection.web3.eth.Contract(this.$config.factory888Abi);
+      transaction = factory.deploy({data: this.$config.factory888Code, arguments: args});
+      console.log('Deploying factory contract with params:');
+      console.log(args);
+    } else { this.$error.addError('Unknown token type!'); return; }
     const pEvent: PromiEvent<any> = transaction.send({from: this.$connection.account});
     pEvent.on('transactionHash', (hash) => this.process.creatingContract = true);
     pEvent.then(async(_contract: Contract) => {

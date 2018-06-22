@@ -9,6 +9,6 @@ export class DecoderService {
   public constructor(
     @Inject('AppConfig') private $config
   ) {
-    abiDecoder.addABI(this.$config.abi);
+    abiDecoder.addABI(this.$config.isaoAbi);
   }
 }
