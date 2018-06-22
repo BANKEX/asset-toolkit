@@ -535,6 +535,35 @@ contract('ShareStore', (accounts) => {
                 assert(e);
             }
         });
+
+        it("should try to destribute more tokens than investor has", async function () {
+            let goodValues = calculateTokenBalances(investors, INVESTOR_SUM_PAY);
+            let goodTotalShare = goodValues.goodTotalShare;
+            let goodInvestorTokenBalance = goodValues.goodInvestorTokenBalance;
+            await tokenLocal.approve(share.address, APPROVE_VALUE, {from: ERC20_CREATOR});
+            await share.setERC20Token(tokenLocal.address, {from: ADMIN});
+            await share.acceptAbstractToken(APPROVE_VALUE, {from: ADMIN});
+            await share.setState(ST_RAISING, {from: ADMIN});
+            for (let i in investors) 
+                await share.buyShare({value: INVESTOR_SUM_PAY, from: investors[i]});
+            await share.setState(ST_TOKEN_DISTRIBUTION, {from: ADMIN});
+            for (let i in investors) {
+                await share.sendTransaction({value: tw(0.0001), from: investors[i]});
+            };
+            await share.setState(ST_FUND_DEPRECATED);
+            for (let i in investors) {
+                try {
+                    await share.releaseToken(goodInvestorTokenBalance.plus(tw('0.1')), {from: investors[i]});
+                    console.log('ERROR');
+                } catch (e) {
+                    assert(e);
+                }
+            }
+            for (let i in investors) {
+                let tokenBalance = await share.getBalanceTokenOf(investors[i]);
+                assert(tokenBalance.eq(0));
+            }
+        });
     });
 
     describe('CALC TEST', () => {
@@ -560,7 +589,7 @@ contract('ShareStore', (accounts) => {
             let lastInvestorBalanceAfter = await web3.eth.getBalance(investors.account8);
             assert(lastInvestorBalanceAfter.eq(lastInvestorBalanceBefore.minus(investorsSendSums.account8).plus(investorsSendSums.account8.minus(tw('35.625'))).minus(gasCost)));
         });
-        
+
         it("should send: 20 ERC20 tokens => 40 ERC20 tokens => 120 ERC20 tokens => 1e23 ERC20 tokens to ISAO", async function () {
             let approveSums = [tbn(20), tbn(40), tbn(120), tbn(1e23)];
             let goodTokenBalance = tbn(0);
