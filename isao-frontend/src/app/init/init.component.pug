@@ -3,6 +3,8 @@
   .flex(style="justify-content: center")
     .left.nomargin.nopadding.flex.flex-column
       .entry
+        .title Select type of tokens:
+      .entry
         .title Raising period in days:
       .entry
         .title Distribution period:
@@ -18,6 +20,15 @@
         .title Costs in ETH (ex.: 0.5, 2, 3):
 
     .right.nomargin.nopadding.flex.flex-column
+      .entry
+        kendo-dropdownlist.w-100(
+          [data]="tokenTypes",
+          [textField]="'name'",
+          [valueField]="'value'",
+          [valuePrimitive]="false",
+          [(ngModel)]="selectedTokenType",
+          (selectionChange)="selectionChange($event)",
+          #kendoDropDownListInstance="kendoDropDownList")
       .entry
         input.value(type="text",[(ngModel)]="rPeriod", size="40")
       .entry

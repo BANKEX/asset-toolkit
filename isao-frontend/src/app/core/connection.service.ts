@@ -24,7 +24,7 @@ export class ConnectionService extends BehaviorSubject<Connection> {
   public Web3: any = Web3;
   public web3: any;         // setted up instance of Web3
 
-  private balances: any;
+  public balances: any;
 
   public constructor(
     @Inject('AppConfig') private $config,
@@ -40,11 +40,11 @@ export class ConnectionService extends BehaviorSubject<Connection> {
   public async connect(contractHash?: string) {
     this.next(Connection.InProcess);
     try {
-      this.decoder = abiDecoder.addABI(this.$config.abi);
+      this.decoder = abiDecoder.addABI(this.$config.isaoAbi);
       ({account: this.account, networkId: this.networkId} = await this.init(this.web3));
       const contractAddress = contractHash || this.$config.contracts[this.networkId];
       this.contract = this.web3.utils.isAddress(contractAddress)
-        ? new this.web3.eth.Contract(this.$config.abi, contractHash || this.$config.contracts[this.networkId])
+        ? new this.web3.eth.Contract(this.$config.isaoAbi, contractHash || this.$config.contracts[this.networkId])
         : undefined;
       this.next(Connection.Estableshed);
       // this.$blockingNotificationOverlay.hideOverlay();

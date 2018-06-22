@@ -1,15 +1,17 @@
-import { Component, OnInit } from '@angular/core';
 import 'hammerjs';
+import { Component, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+// import DropDownList = kendo.ui.DropDownList;
 import { ErrorMessageService } from '../shared/services/error-message.service';
 import { ContractInput } from '../core/types/contract-input';
 import { ConnectionService, IsaoService } from '../core';
+import { TokenType } from '../core/types/contract-type.enum';
 
 @Component({
   selector: 'isao-init',
   templateUrl: './init.component.pug',
 })
-export class InitComponent implements OnInit {
-
+export class InitComponent implements OnInit, AfterViewInit {
+  @ViewChild('kendoDropDownListInstance') dropdown;
   public creating = false;
   public rPeriod = 7;
   public dPeriod = 30;
@@ -18,6 +20,11 @@ export class InitComponent implements OnInit {
   public paybotAddress = 0;
   public limits = '100, 200';
   public costs = '0.1, 0.2';
+  public tokenTypes = [
+    {name: 'Standard ERC20 token', value: TokenType.ERC20},
+    {name: 'Bankex Multitoken', value: TokenType.Multitiken}
+  ];
+  public selectedTokenType = this.tokenTypes[0];
 
   public constructor(
     private $connection: ConnectionService,
@@ -26,6 +33,7 @@ export class InitComponent implements OnInit {
   ) { }
 
   public ngOnInit(): void { }
+  public ngAfterViewInit(): void { }
 
   public initContract() {
     try {
@@ -40,7 +48,11 @@ export class InitComponent implements OnInit {
         this.costs
       );
       this.creating = true;
-      this.$isao.publishNewContract(data);
-    } catch (err) { console.error(err); this.$error.addError(err.message) };
+      this.$isao.publishNewContract(data, this.selectedTokenType.value);
+    } catch (err) { console.error(err); this.$error.addError(err.message); }
+  }
+
+  public selectionChange(value: any): void {
+    // console.log('selectionChange', value);
   }
 }
