@@ -3,7 +3,7 @@ import { Component, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angula
 // import DropDownList = kendo.ui.DropDownList;
 import { ErrorMessageService } from '../shared/services/error-message.service';
 import { ContractInput } from '../core/types/contract-input';
-import { ConnectionService, IsaoService } from '../core';
+import { ConnectionService, IsaoService, HelperService } from '../core';
 import { TokenType } from '../core/types/contract-type.enum';
 
 @Component({
@@ -26,12 +26,13 @@ export class InitComponent implements OnInit, AfterViewInit {
   ];
   public selectedTokenType = this.tokenTypes[0];
   public TokenType = TokenType;
-  public subtokenId = 1;
+  public subtokenId = this.$helper.rnd(5);
 
   public constructor(
     private $connection: ConnectionService,
     private $error: ErrorMessageService,
     public $isao: IsaoService,
+    public $helper: HelperService,
   ) { }
 
   public ngOnInit(): void { }
