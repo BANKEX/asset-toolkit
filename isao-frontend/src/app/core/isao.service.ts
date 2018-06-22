@@ -98,33 +98,31 @@ export class IsaoService {
   private from: any;
   private getTokenInterval;
 
-  public publishNewContract(i: ContractInput, type: TokenType = TokenType.ERC20) {
-    const args =
+  public publishNewContract(i: ContractInput, type: TokenType = TokenType.ERC20, params: any[] = []) {
+    let factory: Contract, transaction: TransactionObject<Contract>;
+    let args =
       [i.rPeriod, i.dPeriod, i.minimalFundSize, i.limits, i.costs, i.minimalDeposit, i.adminAddress, i.paybotAddress];
     if (type === TokenType.ERC20) {
-      let factory: Contract = new this.$connection.web3.eth.Contract(this.$config.factoryAbi);
-      const transaction: TransactionObject<Contract> = factory.deploy({data: this.$config.factoryCode, arguments: args});
-      const pEvent: PromiEvent<any> = transaction.send({from: this.$connection.account});
-      pEvent.on('transactionHash', (hash) => this.process.creatingContract = true);
-      pEvent.then(async(_contract: Contract) => {
-        factory = _contract;
-        const isaoAddress = await factory.methods.isaoAddress().call();
-        await this.$connection.connect(isaoAddress);
-        console.log('Factory Contract Address: ', _contract.options.address);
-        console.log('ISAO Contract Address: ', isaoAddress);
-      });
-    } else if (type === TokenType.Multitiken) {
-      let isao: Contract = new this.$connection.web3.eth.Contract(this.$config.isaoAbi);
-      // let multitokenAddress = this.$config.multitokenAddress;
-      const transaction: TransactionObject<Contract> = isao.deploy({data: this.$config.isaoCode, arguments: args});
-      const pEvent: PromiEvent<any> = transaction.send({from: this.$connection.account});
-      pEvent.on('transactionHash', (hash) => this.process.creatingContract = true);
-      pEvent.then(async(_contract: Contract) => {
-        isao = _contract;
-        await isao.methods.setERC20Token(this.$config.multitokenAddress).send(this.from);
-        await this.$connection.connect(isao.options.address);
-      });
-    } else { throw Error('Unknown token type!'); }
+      factory = new this.$connection.web3.eth.Contract(this.$config.factory20Abi);
+      transaction = factory.deploy({data: this.$config.factory20Code, arguments: args});
+    } else if (type === TokenType.Multitoken) {
+      const token = params[0];
+      if (!token || isNaN(Number(token)) || token <= 0) { this.$error.addError('Wrong subtoken value!'); return; }
+      args = args.concat([this.$config.multitokenAddress, token]);
+      factory = new this.$connection.web3.eth.Contract(this.$config.factory888Abi);
+      transaction = factory.deploy({data: this.$config.factory888Code, arguments: args});
+      console.log('Deploying factory contract with params:');
+      console.log(args);
+    } else { this.$error.addError('Unknown token type!'); return; }
+    const pEvent: PromiEvent<any> = transaction.send({from: this.$connection.account});
+    pEvent.on('transactionHash', (hash) => this.process.creatingContract = true);
+    pEvent.then(async(_contract: Contract) => {
+      factory = _contract;
+      const isaoAddress = await factory.methods.isaoAddress().call();
+      await this.$connection.connect(isaoAddress);
+      console.log('Factory Contract Address: ', _contract.options.address);
+      console.log('ISAO Contract Address: ', isaoAddress);
+    });
   }
 
   public payToISAOContact(amount): PromiEvent<TransactionReceipt> {

@@ -1,10 +1,12 @@
 module.exports = {
   // ISAO Settings:
-  isaoAbi: require('./ISAOTest2.json').abi,
-  isaoCode: require('./ISAOTestCode.json').bytecode,
+  isaoAbi: require('./ISAOTest.json').abi,
+  //isaoCode: require('./ISAOTest.json').bytecode,
   // Test factory settings:
-  factoryAbi: require('./ISAOTestFactory.json').abi,
-  factoryCode: require('./ISAOTestFactoryCode.json').bytecode,
+  factory20Abi: require('./ISAOTestFactory.json').abi,
+  factory20Code: require('./ISAOTestFactory.json').bytecode,
+  factory888Abi: require('./ISAOTest888Factory.json').abi,
+  factory888Code: require('./ISAOTest888Factory.json').bytecode,
   multitokenAddress: '0x02a2f8482658a3da0bbe078f3c0316e94d00a148',
   // List contracts for different networks here:
   contracts: {

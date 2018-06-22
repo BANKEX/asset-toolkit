@@ -22,9 +22,11 @@ export class InitComponent implements OnInit, AfterViewInit {
   public costs = '0.1, 0.2';
   public tokenTypes = [
     {name: 'Standard ERC20 token', value: TokenType.ERC20},
-    {name: 'Bankex Multitoken', value: TokenType.Multitiken}
+    {name: 'Bankex Multitoken', value: TokenType.Multitoken}
   ];
   public selectedTokenType = this.tokenTypes[0];
+  public TokenType = TokenType;
+  public subtokenId = 1;
 
   public constructor(
     private $connection: ConnectionService,
@@ -48,7 +50,7 @@ export class InitComponent implements OnInit, AfterViewInit {
         this.costs
       );
       this.creating = true;
-      this.$isao.publishNewContract(data, this.selectedTokenType.value);
+      this.$isao.publishNewContract(data, this.selectedTokenType.value, [this.subtokenId]);
     } catch (err) { console.error(err); this.$error.addError(err.message); }
   }
 

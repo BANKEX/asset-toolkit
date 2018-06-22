@@ -4,6 +4,8 @@
     .left.nomargin.nopadding.flex.flex-column
       .entry
         .title Select type of tokens:
+      .entry(*ngIf="selectedTokenType.value === TokenType.Multitoken")
+        .title Subtoken Id:
       .entry
         .title Raising period in days:
       .entry
@@ -29,6 +31,8 @@
           [(ngModel)]="selectedTokenType",
           (selectionChange)="selectionChange($event)",
           #kendoDropDownListInstance="kendoDropDownList")
+      .entry(*ngIf="selectedTokenType.value === TokenType.Multitoken")
+        input.value(type="text",[(ngModel)]="subtokenId", size="40")
       .entry
         input.value(type="text",[(ngModel)]="rPeriod", size="40")
       .entry
@@ -45,4 +49,4 @@
         input.value(type="text",[(ngModel)]="costs", size="40")
   .text-center
     button.big(*ngIf="!$isao.process.creatingContract", kendoButton, id="initContractBtn", (click)="initContract()") Create new contract
-    span.k-i-loading.k-icon(*ngIf="$isao.process.creatingContract", style="font-size: 64px; color: #ff6358; margin: 25px")
+    span.k-i-loading.k-icon(*ngIf="$isao.process.creatingContract", style="font-size: 40px; color: #ff6358; margin: 25px")
