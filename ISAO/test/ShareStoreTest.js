@@ -538,6 +538,29 @@ contract('ShareStore', (accounts) => {
     });
 
     describe('CALC TEST', () => {
+        it("should try to buy share > maxShare (remain ETH back to investor)", async function () {
+            let investorsSendSums = {
+                account3: tw('0.5'),
+                account4: tw('2'),
+                account5: tw('35.625'),
+                account6: tw('35.625'),
+                account7: tw('35.625'),
+                account8: tw('40'),
+            };
+            await tokenLocal.approve(share.address, APPROVE_VALUE, {from: ERC20_CREATOR});
+            await share.setERC20Token(tokenLocal.address, {from: ADMIN});
+            await share.acceptAbstractToken(APPROVE_VALUE, {from: ADMIN});
+            await share.setState(ST_RAISING, {from: ADMIN});
+            let lastInvestorBalanceBefore = await web3.eth.getBalance(investors.account8);
+            let gasCost;
+            for (let i in investors) {
+                let tx = await share.buyShare({value: investorsSendSums[i], from: investors[i], gasPrice: gasPrice});
+                gasCost = gasPrice.mul(tx.receipt.gasUsed);
+            }
+            let lastInvestorBalanceAfter = await web3.eth.getBalance(investors.account8);
+            assert(lastInvestorBalanceAfter.eq(lastInvestorBalanceBefore.minus(investorsSendSums.account8).plus(investorsSendSums.account8.minus(tw('35.625'))).minus(gasCost)));
+        });
+        
         it("should send: 20 ERC20 tokens => 40 ERC20 tokens => 120 ERC20 tokens => 1e23 ERC20 tokens to ISAO", async function () {
             let approveSums = [tbn(20), tbn(40), tbn(120), tbn(1e23)];
             let goodTokenBalance = tbn(0);
