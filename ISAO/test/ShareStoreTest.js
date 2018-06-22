@@ -516,7 +516,7 @@ contract('ShareStore', (accounts) => {
 
 
     describe('NEGATIVE TEST', () => {
-
+      
     });
 
     describe('CALC TEST', () => {
@@ -594,7 +594,6 @@ contract('ShareStore', (accounts) => {
                 account7: tw('1.2131203131'),
                 account8: tw('20.555155555555554')
             };
-
             let adminShare = tbn(0);
             for (let i in investors)
                 adminShare = adminShare.plus(investorsSendSums[i]);
@@ -698,101 +697,6 @@ contract('ShareStore', (accounts) => {
             let ISAOTokenBalance = await tokenLocal.balanceOf(share.address);
             assert(ISAOTokenBalance.eq(APPROVE_VALUE.minus(goodTotalShare)));
         });
-
-        // it("should get sent ETH back to investors during ST_MONEY_BACK period by refundShare func call", async function () {
-        //     await tokenLocal.approve(share.address, APPROVE_VALUE, {from: ERC20_CREATOR});
-        //     await share.setERC20Token(tokenLocal.address, {from: ADMIN});
-        //     await share.acceptAbstractToken(APPROVE_VALUE, {from: ADMIN});
-        //     await share.setState(ST_RAISING, {from: ADMIN});
-        //     for (let i in investors) 
-        //         await share.buyShare({value: INVESTOR_SUM_PAY, from: investors[i]});
-        //     await share.setState(ST_MONEY_BACK, {from: ADMIN});
-        //     for (let i in investors) {
-        //         let investorTokenBalance = await share.getBalanceTokenOf(investors[i]);
-        //         let balanceBefore = await web3.eth.getBalance(investors[i]);
-        //         let tx = await share.refundShare(investorTokenBalance, {from: investors[i], gasPrice: gasPrice});
-        //         let gasCost = gasPrice.mul(tx.receipt.gasUsed);
-        //         let balanceAfter = await web3.eth.getBalance(investors[i]);
-        //         assert(balanceAfter.eq(balanceBefore.plus(INVESTOR_SUM_PAY).minus(gasCost)));
-        //     }
-        // });
-
-        // it("should get sent ETH back to investors during ST_MONEY_BACK period by refundShareForce func call", async function () {
-        //     await tokenLocal.approve(share.address, APPROVE_VALUE, {from: ERC20_CREATOR});
-        //     await share.setERC20Token(tokenLocal.address, {from: ADMIN});
-        //     await share.acceptAbstractToken(APPROVE_VALUE, {from: ADMIN});
-        //     await share.setState(ST_RAISING, {from: ADMIN});
-        //     for (let i in investors) 
-        //         await share.buyShare({value: INVESTOR_SUM_PAY, from: investors[i]});
-        //     await share.setState(ST_MONEY_BACK, {from: ADMIN});
-        //     for (let i in investors) {
-        //         let investorTokenBalance = await share.getBalanceTokenOf(investors[i]);
-        //         let balanceBefore = await web3.eth.getBalance(investors[i]);
-        //         let tx = await share.refundShareForce(investors[i], investorTokenBalance, {from: ADMIN});
-        //         let gasCost = gasPrice.mul(tx.receipt.gasUsed);
-        //         let balanceAfter = await web3.eth.getBalance(investors[i]);
-        //         assert(balanceAfter.eq(balanceBefore.plus(INVESTOR_SUM_PAY)));
-        //     }
-        // })
-
-        // it("should allow refundShareForce during RAISING period", async function () {
-        //     await tokenLocal.approve(share.address, APPROVE_VALUE, {from: ERC20_CREATOR});
-        //     await share.setERC20Token(tokenLocal.address, {from: ADMIN});
-        //     await share.acceptAbstractToken(APPROVE_VALUE, {from: ADMIN});
-        //     await share.setState(ST_RAISING, {from: ADMIN});
-        //     for (let i in investors) 
-        //         await share.buyShare({value: INVESTOR_SUM_PAY, from: investors[i]});;
-        //     for (let i in investors) {
-        //         let investorTokenBalance = await share.getBalanceTokenOf(investors[i]);
-        //         let balanceBefore = await web3.eth.getBalance(investors[i]);
-        //         let tx = await share.refundShareForce(investors[i], investorTokenBalance, {from: ADMIN});
-        //         let gasCost = gasPrice.mul(tx.receipt.gasUsed);
-        //         let balanceAfter = await web3.eth.getBalance(investors[i]);
-        //         assert(balanceAfter.eq(balanceBefore.plus(INVESTOR_SUM_PAY)));
-        //     }
-        // })
-
-        // it("should get all remain share in tokens by ADMIN during ST_FUND_DEPRECATED period", async function () {
-        //     await tokenLocal.approve(share.address, APPROVE_VALUE, {from: ERC20_CREATOR});
-        //     await share.setERC20Token(tokenLocal.address, {from: ADMIN});
-        //     await share.acceptAbstractToken(APPROVE_VALUE, {from: ADMIN});
-        //     await share.setState(ST_RAISING, {from: ADMIN});
-        //     for (let i in investors) 
-        //         await share.buyShare({value: INVESTOR_SUM_PAY, from: investors[i]});
-        //     await share.setState(ST_TOKEN_DISTRIBUTION, {from: ADMIN});
-        //     for (let i in investors) {
-        //         await share.sendTransaction({value: tw(0.0001), from: investors[i]});
-        //         break;
-        //     };
-        //     await share.setState(ST_FUND_DEPRECATED);
-        //     let remainTokens = await tokenLocal.balanceOf(share.address);
-        //     let adminTokenBalanceBefore = await tokenLocal.balanceOf(ADMIN);
-        //     let data = web3.eth.contract(IERC20_ABI).at(tokenLocal.address).transfer.getData(ADMIN, remainTokens);
-        //     await share.execute(tokenLocal.address, 0, data, {from: ADMIN, gasPrice: gasPrice});
-        //     let adminTokenBalanceAfter = await tokenLocal.balanceOf(ADMIN);
-        //     assert(adminTokenBalanceAfter.eq(adminTokenBalanceBefore.plus(remainTokens)));
-        // });
-
-        // it("should get all remain share in ETH by ADMIN during ST_FUND_DEPRECATED period", async function () {
-        //     await tokenLocal.approve(share.address, APPROVE_VALUE, {from: ERC20_CREATOR});
-        //     await share.setERC20Token(tokenLocal.address, {from: ADMIN});
-        //     await share.acceptAbstractToken(APPROVE_VALUE, {from: ADMIN});
-        //     await share.setState(ST_RAISING, {from: ADMIN});
-        //     for (let i in investors) 
-        //         await share.buyShare({value: INVESTOR_SUM_PAY, from: investors[i]});
-        //     await share.setState(ST_TOKEN_DISTRIBUTION, {from: ADMIN});
-        //     for (let i in investors) {
-        //         await share.sendTransaction({value: tw(0.0001), from: investors[i]});
-        //         break;
-        //     };
-        //     await share.setState(ST_FUND_DEPRECATED);
-        //     let remainETH = await web3.eth.getBalance(share.address);
-        //     let adminBalanceBefore = await web3.eth.getBalance(ADMIN);
-        //     let tx = await share.execute(ADMIN, remainETH, 0, {from: ADMIN, gasPrice: gasPrice});
-        //     let gasCost = gasPrice.mul(tx.receipt.gasUsed);
-        //     let adminBalanceAfter = await web3.eth.getBalance(ADMIN);
-        //     assert(adminBalanceAfter.eq(adminBalanceBefore.plus(remainETH).minus(gasCost)));
-        // });
     });
 
     describe('OVERDRAFT TEST', () => {
