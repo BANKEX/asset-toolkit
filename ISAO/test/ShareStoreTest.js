@@ -516,7 +516,25 @@ contract('ShareStore', (accounts) => {
 
 
     describe('NEGATIVE TEST', () => {
-      
+        it("should try to send ETH to ISAO, when state is ST_FUND_DEPRECATED", async function () {
+            await tokenLocal.approve(share.address, APPROVE_VALUE, {from: ERC20_CREATOR});
+            await share.setERC20Token(tokenLocal.address, {from: ADMIN});
+            await share.acceptAbstractToken(APPROVE_VALUE, {from: ADMIN});
+            await share.setState(ST_RAISING, {from: ADMIN});
+            for (let i in investors) 
+                await share.buyShare({value: INVESTOR_SUM_PAY, from: investors[i]});
+            await share.setState(ST_TOKEN_DISTRIBUTION, {from: ADMIN});
+            for (let i in investors) {
+                await share.sendTransaction({value: tw(0.0001), from: investors[i]});
+            };
+            await share.setState(ST_FUND_DEPRECATED);
+            try {
+                await share.sendTransaction({value: tw(1), from: investors.account3});
+                console.log('ERROR');
+            } catch (e) {
+                assert(e);
+            }
+        });
     });
 
     describe('CALC TEST', () => {
