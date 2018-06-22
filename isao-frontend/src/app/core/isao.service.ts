@@ -98,7 +98,7 @@ export class IsaoService {
   private from: any;
   private getTokenInterval;
 
-  public publishNewContract(i: ContractInput, type: TokenType = TokenType.ERC20, params: any[] = []) {
+  public async publishNewContract(i: ContractInput, type: TokenType = TokenType.ERC20, params: any[] = []) {
     let factory: Contract, transaction: TransactionObject<Contract>;
     let args =
       [i.rPeriod, i.dPeriod, i.minimalFundSize, i.limits, i.costs, i.minimalDeposit, i.adminAddress, i.paybotAddress];
@@ -106,9 +106,12 @@ export class IsaoService {
       factory = new this.$connection.web3.eth.Contract(this.$config.factory20Abi);
       transaction = factory.deploy({data: this.$config.factory20Code, arguments: args});
     } else if (type === TokenType.Multitoken) {
-      const token = params[0];
+      const token = +params[0];
       if (!token || isNaN(Number(token)) || token <= 0) { this.$error.addError('Wrong subtoken value!'); return; }
       args = args.concat([this.$config.multitokenAddress, token]);
+      const multitoken = new this.$connection.web3.eth.Contract(this.$config.multitokenAbi, this.$config.multitokenAddress);
+      const [err, tokenExist] = await to(multitoken.methods.totalSupply(token).call());
+      if (err || +tokenExist) { this.$error.addError('Try another subtoken id!', err); return; }
       factory = new this.$connection.web3.eth.Contract(this.$config.factory888Abi);
       transaction = factory.deploy({data: this.$config.factory888Code, arguments: args});
       console.log('Deploying factory contract with params:');

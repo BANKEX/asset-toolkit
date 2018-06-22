@@ -7,6 +7,7 @@ module.exports = {
   factory20Code: require('./ISAOTestFactory.json').bytecode,
   factory888Abi: require('./ISAOTest888Factory.json').abi,
   factory888Code: require('./ISAOTest888Factory.json').bytecode,
+  multitokenAbi: require('./MultiToken.json').abi,
   multitokenAddress: '0x02a2f8482658a3da0bbe078f3c0316e94d00a148',
   // List contracts for different networks here:
   contracts: {
