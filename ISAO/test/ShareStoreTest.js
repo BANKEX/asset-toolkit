@@ -528,6 +528,42 @@ contract('ShareStore', (accounts) => {
             assert(ISAOtokenBalance.eq(0));            
         });
 
+        it("should not allow to take back tokens from ISAO, when state is ST_RAISING", async function () {
+            await tokenLocal.approve(share.address, APPROVE_VALUE, {from: ERC20_CREATOR});
+            await share.setERC20Token(tokenLocal.address, {from: ADMIN});
+            await share.acceptAbstractToken(APPROVE_VALUE, {from: ADMIN});
+            await share.setState(ST_RAISING, {from: ADMIN});
+            for (let i in investors) {
+                await share.buyShare({value: INVESTOR_SUM_PAY, from: investors[i]});
+                try {
+                    await share.releaseToken(tw('0.0001'), {from: investors[i]});
+                } catch (e) {
+                    assert(e);
+                }
+                let tokenBalance = await tokenLocal.balanceOf(investors[i]);
+                assert(tokenBalance.eq(0)); 
+            }
+        });
+
+        it("should not allow to take back ETH from ISAO, when state is ST_RAISING", async function () {
+            await tokenLocal.approve(share.address, APPROVE_VALUE, {from: ERC20_CREATOR});
+            await share.setERC20Token(tokenLocal.address, {from: ADMIN});
+            await share.acceptAbstractToken(APPROVE_VALUE, {from: ADMIN});
+            await share.setState(ST_RAISING, {from: ADMIN});
+            for (let i in investors) {
+                await share.buyShare({value: INVESTOR_SUM_PAY, from: investors[i]});
+                let ETHBalanceBefore = await web3.eth.getBalance(investors[i]);
+                try {
+                    await share.refundShare(tw('0.0011'), {from: investors[i], gasPrice: gasPrice});
+                    console.log('ERROR');
+                } catch (e) {
+                    assert(e);
+                }
+                let ETHBalanceAfter = await web3.eth.getBalance(investors[i]);
+                assert(ETHBalanceAfter.lt(ETHBalanceBefore)); 
+            }
+        });
+        
         it("should try to send ETH to ISAO, when state is ST_FUND_DEPRECATED", async function () {
             await tokenLocal.approve(share.address, APPROVE_VALUE, {from: ERC20_CREATOR});
             await share.setERC20Token(tokenLocal.address, {from: ADMIN});
@@ -536,9 +572,8 @@ contract('ShareStore', (accounts) => {
             for (let i in investors) 
                 await share.buyShare({value: INVESTOR_SUM_PAY, from: investors[i]});
             await share.setState(ST_TOKEN_DISTRIBUTION, {from: ADMIN});
-            for (let i in investors) {
+            for (let i in investors)
                 await share.sendTransaction({value: tw(0.0001), from: investors[i]});
-            };
             await share.setState(ST_FUND_DEPRECATED);
             try {
                 await share.sendTransaction({value: tw(1), from: investors.account3});
@@ -617,6 +652,8 @@ contract('ShareStore', (accounts) => {
                 goodInvestorTokenBalance[i] = goodInvestorTokenBalance[i].minus(0);
                 goodTotalShare = goodTotalShare.minus(0);
                 let balanceAfter = await web3.eth.getBalance(investors[i]);
+                let tokenBalance = await share.getBalanceTokenOf(investors[i]);
+                assert(tokenBalance.eq(goodInvestorTokenBalance[i]));
                 assert(balanceAfter.eq(balanceBefore));
             }
         });
