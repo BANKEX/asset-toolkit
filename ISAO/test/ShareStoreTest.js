@@ -590,16 +590,13 @@ contract('ShareStore', (accounts) => {
             let goodTotalShare = goodValues.goodTotalShare;
             let goodInvestorTokenBalance = goodValues.goodInvestorTokenBalance;
             let investorsMoneyBackSumsInTokens = {
-                account3: (goodInvestorTokenBalance.account3).divToInt('2'),
-                account4: (goodInvestorTokenBalance.account4).divToInt('3'),
-                account5: (goodInvestorTokenBalance.account5).divToInt('4'),
-                account6: (goodInvestorTokenBalance.account6).divToInt('5'),
-                account7: (goodInvestorTokenBalance.account7).divToInt('6'),
-                account8: (goodInvestorTokenBalance.account8).divToInt('7'),
+                account3: (goodInvestorTokenBalance.account3).plus(tw('0.04242201')),
+                account4: (goodInvestorTokenBalance.account4).plus(tw('0.919191901')),
+                account5: (goodInvestorTokenBalance.account5).plus(tw('0.9999901')),
+                account6: (goodInvestorTokenBalance.account6).plus(tw('0.2123121201')),
+                account7: (goodInvestorTokenBalance.account7).plus(tw('0.201')),
+                account8: (goodInvestorTokenBalance.account8).plus(tw('0.101')),
             };
-            let investorsMoneyBackSumsETH = {};
-            for (let i in investors) 
-                investorsMoneyBackSumsETH[i] = (investorsSendSums[i]).mul(investorsMoneyBackSumsInTokens[i]).divToInt(goodInvestorTokenBalance[i]);
             await tokenLocal.approve(share.address, APPROVE_VALUE, {from: ERC20_CREATOR});
             await share.setERC20Token(tokenLocal.address, {from: ADMIN});
             await share.acceptAbstractToken(APPROVE_VALUE, {from: ADMIN});
@@ -612,17 +609,15 @@ contract('ShareStore', (accounts) => {
             };
             for (let i in investors) {
                 let balanceBefore = await web3.eth.getBalance(investors[i]);
-                let tx;
                 try {
-                    tx = await share.refundShareForce(investors[i], investorsMoneyBackSumsInTokens[i].plus(tw('0.001')), {from: ADMIN, gasPrice: gasPrice});
+                    await share.refundShareForce(investors[i], investorsMoneyBackSumsInTokens[i].plus(tw('0.001')), {from: ADMIN, gasPrice: gasPrice});
                 } catch (e) {
                     assert(e);
                 }
-                let gasCost = tx.receipt.gasUsed;
                 goodInvestorTokenBalance[i] = goodInvestorTokenBalance[i].minus(0);
                 goodTotalShare = goodTotalShare.minus(0);
                 let balanceAfter = await web3.eth.getBalance(investors[i]);
-                assert(balanceAfter.eq(balanceBefore.minus(gasCost)));
+                assert(balanceAfter.eq(balanceBefore));
             }
         });
     });
