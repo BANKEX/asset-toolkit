@@ -657,6 +657,42 @@ contract('ShareStore', (accounts) => {
                 assert(balanceAfter.eq(balanceBefore));
             }
         });
+
+        it("should not allow to ETH and tokens back to admin during ST_RAISING", async function () {
+            let investorsSendSums = {
+                account3: tw('0.354'),
+                account4: tw('5'),
+                account5: tw('1.121241223'),
+                account6: tw('5.555555555551'),
+                account7: tw('1.22314232124324'),
+                account8: tw('0.89999999999999')
+            };
+            let goodValues = calculateTokenBalances(investors, investorsSendSums);
+            let goodTotalShare = goodValues.goodTotalShare;
+            await tokenLocal.approve(share.address, APPROVE_VALUE, {from: ERC20_CREATOR});
+            await share.setERC20Token(tokenLocal.address, {from: ADMIN});
+            await share.acceptAbstractToken(APPROVE_VALUE, {from: ADMIN});
+            await share.setState(ST_RAISING, {from: ADMIN});
+            for (let i in investors)
+                await share.sendTransaction({value: investorsSendSums[i], from: investors[i]});
+            let ISAOETHBalanceBefore = await web3.eth.getBalance(share.address); 
+            let ISAOTokenBalanceBefore = await tokenLocal.balanceOf(share.address);
+            let data = web3.eth.contract(IERC20_ABI).at(tokenLocal.address).transfer.getData(ADMIN, goodTotalShare);
+            try {
+                await share.execute(tokenLocal.address, 0, data, {from: ADMIN, gasPrice: gasPrice});
+            } catch (e) {
+                assert(e);
+            }
+            try {
+                await share.execute(tokenLocal.address, tw('1'), 0, {from: ADMIN, gasPrice: gasPrice});
+            } catch (e) {
+                assert(e);
+            }
+            let ISAOETHBalanceAfter = await web3.eth.getBalance(share.address); 
+            let ISAOTokenBalanceAfter = await tokenLocal.balanceOf(share.address);
+            assert(ISAOETHBalanceAfter.eq(ISAOETHBalanceBefore));
+            assert(ISAOTokenBalanceAfter.eq(ISAOTokenBalanceBefore));
+        });
     });
 
     describe('CALC TEST', () => {
