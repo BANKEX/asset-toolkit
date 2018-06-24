@@ -516,6 +516,18 @@ contract('ShareStore', (accounts) => {
 
 
     describe('NEGATIVE TEST', () => {
+        it("should try to accept more tokens than approve", async function () {
+            await tokenLocal.approve(share.address, APPROVE_VALUE, {from: ERC20_CREATOR});
+            await share.setERC20Token(tokenLocal.address, {from: ADMIN});
+            try {
+                await share.acceptAbstractToken(APPROVE_VALUE.plus(tw(0.1)), {from: ADMIN});
+            } catch (e) {
+                assert(e);
+            }
+            let ISAOtokenBalance = await tokenLocal.balanceOf(share.address);
+            assert(ISAOtokenBalance.eq(0));            
+        });
+
         it("should try to send ETH to ISAO, when state is ST_FUND_DEPRECATED", async function () {
             await tokenLocal.approve(share.address, APPROVE_VALUE, {from: ERC20_CREATOR});
             await share.setERC20Token(tokenLocal.address, {from: ADMIN});
@@ -562,6 +574,55 @@ contract('ShareStore', (accounts) => {
             for (let i in investors) {
                 let tokenBalance = await share.getBalanceTokenOf(investors[i]);
                 assert(tokenBalance.eq(0));
+            }
+        });
+
+        it("should refundShareForce more than investor has", async function () {
+            let investorsSendSums = {
+                account3: tw('0.354'),
+                account4: tw('5'),
+                account5: tw('1.121241223'),
+                account6: tw('5.555555555551'),
+                account7: tw('1.22314232124324'),
+                account8: tw('0.89999999999999')
+            };
+            let goodValues = calculateTokenBalances(investors, investorsSendSums);
+            let goodTotalShare = goodValues.goodTotalShare;
+            let goodInvestorTokenBalance = goodValues.goodInvestorTokenBalance;
+            let investorsMoneyBackSumsInTokens = {
+                account3: (goodInvestorTokenBalance.account3).divToInt('2'),
+                account4: (goodInvestorTokenBalance.account4).divToInt('3'),
+                account5: (goodInvestorTokenBalance.account5).divToInt('4'),
+                account6: (goodInvestorTokenBalance.account6).divToInt('5'),
+                account7: (goodInvestorTokenBalance.account7).divToInt('6'),
+                account8: (goodInvestorTokenBalance.account8).divToInt('7'),
+            };
+            let investorsMoneyBackSumsETH = {};
+            for (let i in investors) 
+                investorsMoneyBackSumsETH[i] = (investorsSendSums[i]).mul(investorsMoneyBackSumsInTokens[i]).divToInt(goodInvestorTokenBalance[i]);
+            await tokenLocal.approve(share.address, APPROVE_VALUE, {from: ERC20_CREATOR});
+            await share.setERC20Token(tokenLocal.address, {from: ADMIN});
+            await share.acceptAbstractToken(APPROVE_VALUE, {from: ADMIN});
+            await share.setState(ST_RAISING, {from: ADMIN});
+            for (let i in investors) {
+                await share.sendTransaction({value: investorsSendSums[i], from: investors[i]});
+                let goodTokenBalance = goodInvestorTokenBalance[i];
+                let tokenBalance = await share.getBalanceTokenOf(investors[i]);
+                assert(tokenBalance.eq(goodTokenBalance));
+            };
+            for (let i in investors) {
+                let balanceBefore = await web3.eth.getBalance(investors[i]);
+                let tx;
+                try {
+                    tx = await share.refundShareForce(investors[i], investorsMoneyBackSumsInTokens[i].plus(tw('0.001')), {from: ADMIN, gasPrice: gasPrice});
+                } catch (e) {
+                    assert(e);
+                }
+                let gasCost = tx.receipt.gasUsed;
+                goodInvestorTokenBalance[i] = goodInvestorTokenBalance[i].minus(0);
+                goodTotalShare = goodTotalShare.minus(0);
+                let balanceAfter = await web3.eth.getBalance(investors[i]);
+                assert(balanceAfter.eq(balanceBefore.minus(gasCost)));
             }
         });
     });
@@ -770,7 +831,7 @@ contract('ShareStore', (accounts) => {
     });
 
     describe('OVERDRAFT TEST', () => {
-
+        
     });
 });
 
