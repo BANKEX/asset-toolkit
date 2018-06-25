@@ -973,7 +973,232 @@ contract('ShareStore', (accounts) => {
     });
 
     describe('OVERDRAFT TEST', () => {
+        it("should not work with overdraft sum when releaseToken", async function () {
+            await tokenLocal.approve(share.address, APPROVE_VALUE, {from: ERC20_CREATOR});
+            await share.setERC20Token(tokenLocal.address, {from: ADMIN});
+            await share.acceptAbstractToken(APPROVE_VALUE, {from: ADMIN});
+            await share.setState(ST_RAISING, {from: ADMIN});
+            for (let i in investors) 
+                await share.buyShare({value: INVESTOR_SUM_PAY, from: investors[i]});
+            await share.setState(ST_TOKEN_DISTRIBUTION, {from: ADMIN});
+            const OWERDRAFT_SUM = await share.max_value_test();
+            for (let i in investors) {
+                let investorTokenBalanceBefore = await share.getBalanceTokenOf(investors[i]);
+                try {
+                    await share.releaseToken(OWERDRAFT_SUM, {from: investors[i]});
+                } catch (e) {
+                    assert(e);
+                }
+                let tokenBalance = await tokenLocal.balanceOf(investors[i]);
+                let investorTokenBalanceAfter = await share.getBalanceTokenOf(investors[i]);
+                assert(investorTokenBalanceAfter.eq(investorTokenBalanceBefore));
+                assert(tokenBalance.eq(0));
+            }
+        });
         
+        it("should not work with overdraft sum when releaseTokenForce", async function () {
+            await tokenLocal.approve(share.address, APPROVE_VALUE, {from: ERC20_CREATOR});
+            await share.setERC20Token(tokenLocal.address, {from: ADMIN});
+            await share.acceptAbstractToken(APPROVE_VALUE, {from: ADMIN});
+            await share.setState(ST_RAISING, {from: ADMIN});
+            for (let i in investors) 
+                await share.buyShare({value: INVESTOR_SUM_PAY, from: investors[i]});
+            await share.setState(ST_TOKEN_DISTRIBUTION, {from: ADMIN});
+            const OWERDRAFT_SUM = await share.max_value_test();
+            for (let i in investors) {
+                let investorTokenBalanceBefore = await share.getBalanceTokenOf(investors[i]);
+                try {
+                    await share.releaseTokenForce(investors[i], OWERDRAFT_SUM, {from: ADMIN});
+                } catch (e) {
+                    assert(e);
+                }
+                let tokenBalance = await tokenLocal.balanceOf(investors[i]);
+                let investorTokenBalanceAfter = await share.getBalanceTokenOf(investors[i]);
+                assert(investorTokenBalanceAfter.eq(investorTokenBalanceBefore));
+                assert(tokenBalance.eq(0));
+            }
+        });
+
+        it("should not work with overdraft sum when releaseEtherToStakeholderForce", async function () {
+            await tokenLocal.approve(share.address, APPROVE_VALUE, {from: ERC20_CREATOR});
+            await share.setERC20Token(tokenLocal.address, {from: ADMIN});
+            await share.acceptAbstractToken(APPROVE_VALUE, {from: ADMIN});
+            await share.setState(ST_RAISING, {from: ADMIN});
+            for (let i in investors) 
+                await share.buyShare({value: INVESTOR_SUM_PAY, from: investors[i]});
+            await share.setState(ST_TOKEN_DISTRIBUTION, {from: ADMIN});
+            const OWERDRAFT_SUM = await share.max_value_test();
+            let balanceBefore = web3.eth.getBalance(ADMIN);
+            try {
+                await share.releaseEtherToStakeholderForce(ADMIN, OWERDRAFT_SUM, {from: ADMIN});
+            } catch (e) {
+                assert(e);
+            }
+            let balanceAfter = web3.eth.getBalance(ADMIN);
+            assert(balanceAfter.eq(balanceAfter));
+        });
+
+       it("should not work with overdraft sum when refundShare", async function () {
+            await tokenLocal.approve(share.address, APPROVE_VALUE, {from: ERC20_CREATOR});
+            await share.setERC20Token(tokenLocal.address, {from: ADMIN});
+            await share.acceptAbstractToken(APPROVE_VALUE, {from: ADMIN});
+            await share.setState(ST_RAISING, {from: ADMIN});
+            for (let i in investors) 
+                await share.buyShare({value: INVESTOR_SUM_PAY, from: investors[i]});
+            await share.setState(ST_MONEY_BACK, {from: ADMIN});
+            const OWERDRAFT_SUM = await share.max_value_test();
+            for (let i in investors) {
+                let investorTokenBalanceBefore = await share.getBalanceTokenOf(investors[i]);
+                let tokenBalanceBefore = await tokenLocal.balanceOf(investors[i]);
+                try {
+                    await share.refundShare(OWERDRAFT_SUM, {from: investors[i]});
+                } catch (e) {
+                    assert(e);
+                }
+                let tokenBalanceAfter = await tokenLocal.balanceOf(investors[i]);
+                let investorTokenBalanceAfter = await share.getBalanceTokenOf(investors[i]);
+            }
+        });
+
+        it("should not work with overdraft sum when refundShareForce", async function () {
+            await tokenLocal.approve(share.address, APPROVE_VALUE, {from: ERC20_CREATOR});
+            await share.setERC20Token(tokenLocal.address, {from: ADMIN});
+            await share.acceptAbstractToken(APPROVE_VALUE, {from: ADMIN});
+            await share.setState(ST_RAISING, {from: ADMIN});
+            for (let i in investors) 
+                await share.buyShare({value: INVESTOR_SUM_PAY, from: investors[i]});
+            await share.setState(ST_MONEY_BACK, {from: ADMIN});
+            const OWERDRAFT_SUM = await share.max_value_test();
+            for (let i in investors) {
+                let investorTokenBalanceBefore = await share.getBalanceTokenOf(investors[i]);
+                let tokenBalanceBefore = await tokenLocal.balanceOf(investors[i]);
+                try {
+                    await share.refundShareForce(investors[i], OWERDRAFT_SUM, {from: ADMIN});
+                } catch (e) {
+                    assert(e);
+                }
+                let tokenBalanceAfter = await tokenLocal.balanceOf(investors[i]);
+                let investorTokenBalanceAfter = await share.getBalanceTokenOf(investors[i]);
+            }
+        }); 
+
+        it("should not work with incorrect sum when releaseToken", async function () {
+            await tokenLocal.approve(share.address, APPROVE_VALUE, {from: ERC20_CREATOR});
+            await share.setERC20Token(tokenLocal.address, {from: ADMIN});
+            await share.acceptAbstractToken(APPROVE_VALUE, {from: ADMIN});
+            await share.setState(ST_RAISING, {from: ADMIN});
+            for (let i in investors) 
+                await share.buyShare({value: INVESTOR_SUM_PAY, from: investors[i]});
+            await share.setState(ST_TOKEN_DISTRIBUTION, {from: ADMIN});
+            let incorrenct = {
+                account3: tw('123213213'),
+                account4: tw('0.0000000000000000000000000000000000000000000000001'),
+                account5: 'we33w!w0',
+                account6: investors.account6,
+                account7: '22e',
+                account8: '00000000000000000000000000000000.111'
+            };
+            for (let i in investors) {
+                let investorTokenBalanceBefore = await share.getBalanceTokenOf(investors[i]);
+                try {
+                    await share.releaseToken(incorrenct[i], {from: investors[i]});
+                } catch (e) {
+                    assert(e);
+                }
+                let tokenBalance = await tokenLocal.balanceOf(investors[i]);
+                let investorTokenBalanceAfter = await share.getBalanceTokenOf(investors[i]);
+                assert(investorTokenBalanceAfter.eq(investorTokenBalanceBefore));
+                assert(tokenBalance.eq(0));
+            }
+        });
+
+        it("should not work with incorrect sum when releaseTokenForce", async function () {
+            await tokenLocal.approve(share.address, APPROVE_VALUE, {from: ERC20_CREATOR});
+            await share.setERC20Token(tokenLocal.address, {from: ADMIN});
+            await share.acceptAbstractToken(APPROVE_VALUE, {from: ADMIN});
+            await share.setState(ST_RAISING, {from: ADMIN});
+            for (let i in investors) 
+                await share.buyShare({value: INVESTOR_SUM_PAY, from: investors[i]});
+            await share.setState(ST_TOKEN_DISTRIBUTION, {from: ADMIN});
+            let incorrenct = {
+                account3: tw('123213213'),
+                account4: tw('0.0000000000000000000000000000000000000000000000001'),
+                account5: 'we33ww0',
+                account6: investors.account6,
+                account7: '22e',
+                account8: '00000000000000000000000000000000.111'
+            };
+            for (let i in investors) {
+                let investorTokenBalanceBefore = await share.getBalanceTokenOf(investors[i]);
+                try {
+                    await share.releaseTokenForce(investors[i], incorrenct[i], {from: ADMIN});
+                } catch (e) {
+                    assert(e);
+                }
+                let tokenBalance = await tokenLocal.balanceOf(investors[i]);
+                let investorTokenBalanceAfter = await share.getBalanceTokenOf(investors[i]);
+                assert(investorTokenBalanceAfter.eq(investorTokenBalanceBefore));
+                assert(tokenBalance.eq(0));
+            }
+        });
+
+        it("should not work with incorrect sum when refundShare", async function () {
+            await tokenLocal.approve(share.address, APPROVE_VALUE, {from: ERC20_CREATOR});
+            await share.setERC20Token(tokenLocal.address, {from: ADMIN});
+            await share.acceptAbstractToken(APPROVE_VALUE, {from: ADMIN});
+            await share.setState(ST_RAISING, {from: ADMIN});
+            for (let i in investors) 
+                await share.buyShare({value: INVESTOR_SUM_PAY, from: investors[i]});
+            await share.setState(ST_MONEY_BACK, {from: ADMIN});
+            let incorrenct = {
+                account3: tw('123213213'),
+                account4: tw('0.0000000000000000000000000000000000000000000000001'),
+                account5: 'we33w!w0',
+                account6: investors.account6,
+                account7: '22e',
+                account8: '00000000000000000000000000000000.111'
+            };
+            for (let i in investors) {
+                let investorTokenBalanceBefore = await share.getBalanceTokenOf(investors[i]);
+                let tokenBalanceBefore = await tokenLocal.balanceOf(investors[i]);
+                try {
+                    await share.refundShare(incorrenct[i], {from: investors[i]});
+                } catch (e) {
+                    assert(e);
+                }
+                let tokenBalanceAfter = await tokenLocal.balanceOf(investors[i]);
+                let investorTokenBalanceAfter = await share.getBalanceTokenOf(investors[i]);
+            }
+        });
+
+        it("should not work with incorrect sum when refundShareForce", async function () {
+            await tokenLocal.approve(share.address, APPROVE_VALUE, {from: ERC20_CREATOR});
+            await share.setERC20Token(tokenLocal.address, {from: ADMIN});
+            await share.acceptAbstractToken(APPROVE_VALUE, {from: ADMIN});
+            await share.setState(ST_RAISING, {from: ADMIN});
+            for (let i in investors) 
+                await share.buyShare({value: INVESTOR_SUM_PAY, from: investors[i]});
+            await share.setState(ST_MONEY_BACK, {from: ADMIN});
+            let incorrenct = {
+                account3: tw('123213213'),
+                account4: tw('0.0000000000000000000000000000000000000000000000001'),
+                account5: 'we33w!w0',
+                account6: investors.account6,
+                account7: '22e',
+                account8: '00000000000000000000000000000000.111'
+            };
+            for (let i in investors) {
+                let investorTokenBalanceBefore = await share.getBalanceTokenOf(investors[i]);
+                let tokenBalanceBefore = await tokenLocal.balanceOf(investors[i]);
+                try {
+                    await share.refundShareForce(investors[i], incorrenct[i], {from: ADMIN});
+                } catch (e) {
+                    assert(e);
+                }
+                let tokenBalanceAfter = await tokenLocal.balanceOf(investors[i]);
+                let investorTokenBalanceAfter = await share.getBalanceTokenOf(investors[i]);
+            }
+        });
     });
 });
 
