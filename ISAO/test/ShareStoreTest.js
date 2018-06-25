@@ -514,9 +514,8 @@ contract('ShareStore', (accounts) => {
         });
     });
 
-
     describe('NEGATIVE TEST', () => {
-        it("should try to accept more tokens than approve", async function () {
+        it("should not allow to accept more tokens than approve", async function () {
             await tokenLocal.approve(share.address, APPROVE_VALUE, {from: ERC20_CREATOR});
             await share.setERC20Token(tokenLocal.address, {from: ADMIN});
             try {
@@ -564,7 +563,7 @@ contract('ShareStore', (accounts) => {
             }
         });
         
-        it("should try to send ETH to ISAO, when state is ST_FUND_DEPRECATED", async function () {
+        it("should not allow to send ETH to ISAO, when state is ST_FUND_DEPRECATED", async function () {
             await tokenLocal.approve(share.address, APPROVE_VALUE, {from: ERC20_CREATOR});
             await share.setERC20Token(tokenLocal.address, {from: ADMIN});
             await share.acceptAbstractToken(APPROVE_VALUE, {from: ADMIN});
@@ -583,7 +582,7 @@ contract('ShareStore', (accounts) => {
             }
         });
 
-        it("should try to destribute more tokens than investor has", async function () {
+        it("should not allow to destribute more tokens than investor has", async function () {
             let goodValues = calculateTokenBalances(investors, INVESTOR_SUM_PAY);
             let goodTotalShare = goodValues.goodTotalShare;
             let goodInvestorTokenBalance = goodValues.goodInvestorTokenBalance;
@@ -612,7 +611,7 @@ contract('ShareStore', (accounts) => {
             }
         });
 
-        it("should refundShareForce more than investor has", async function () {
+        it("should not allow refundShareForce more than investor has", async function () {
             let investorsSendSums = {
                 account3: tw('0.354'),
                 account4: tw('5'),
@@ -658,6 +657,44 @@ contract('ShareStore', (accounts) => {
             }
         });
 
+        it("should not allow to refundShareForce and refundShare during ST_TOKEN_DISTRIBUTION", async function () {
+            let investorsSendSums = {
+                account3: tw('1.54'),
+                account4: tw('5.00000001'),
+                account5: tw('1.1201010010103'),
+                account6: tw('2.555555555551'),
+                account7: tw('1.20314232124324'),
+                account8: tw('0.109909999999')
+            };
+            let goodValues = calculateTokenBalances(investors, investorsSendSums);
+            let goodInvestorTokenBalance = goodValues.goodInvestorTokenBalance;
+            await tokenLocal.approve(share.address, APPROVE_VALUE, {from: ERC20_CREATOR});
+            await share.setERC20Token(tokenLocal.address, {from: ADMIN});
+            await share.acceptAbstractToken(APPROVE_VALUE, {from: ADMIN});
+            await share.setState(ST_RAISING, {from: ADMIN});
+            for (let i in investors)
+                await share.sendTransaction({value: investorsSendSums[i], from: investors[i]});
+            await share.setState(ST_TOKEN_DISTRIBUTION, {from: ADMIN});
+            for (let i in investors) {
+                let ETHBalanceBefore = await web3.eth.getBalance(investors[i]);
+                let tokenBalanceBefore = await share.getBalanceTokenOf(investors[i]);
+                try {
+                    await share.refundShareForce(investors[i], goodInvestorTokenBalance[i], {from: ADMIN});
+                } catch (e) {
+                    assert(e);
+                }
+                try {
+                    await share.refundShare(investors[i], goodInvestorTokenBalance[i], {from: investors[i]});
+                } catch (e) {
+                    assert(e);
+                }
+                let ETHBalanceAfter = await web3.eth.getBalance(investors[i]);
+                let tokenBalanceAfter = await share.getBalanceTokenOf(investors[i]);
+                assert(ETHBalanceAfter.eq(ETHBalanceBefore));
+                assert(tokenBalanceBefore.eq(tokenBalanceAfter));
+            }
+        });
+
         it("should not allow to ETH and tokens back to admin during ST_RAISING", async function () {
             let investorsSendSums = {
                 account3: tw('0.354'),
@@ -675,6 +712,43 @@ contract('ShareStore', (accounts) => {
             await share.setState(ST_RAISING, {from: ADMIN});
             for (let i in investors)
                 await share.sendTransaction({value: investorsSendSums[i], from: investors[i]});
+            let ISAOETHBalanceBefore = await web3.eth.getBalance(share.address); 
+            let ISAOTokenBalanceBefore = await tokenLocal.balanceOf(share.address);
+            let data = web3.eth.contract(IERC20_ABI).at(tokenLocal.address).transfer.getData(ADMIN, goodTotalShare);
+            try {
+                await share.execute(tokenLocal.address, 0, data, {from: ADMIN, gasPrice: gasPrice});
+            } catch (e) {
+                assert(e);
+            }
+            try {
+                await share.execute(tokenLocal.address, tw('1'), 0, {from: ADMIN, gasPrice: gasPrice});
+            } catch (e) {
+                assert(e);
+            }
+            let ISAOETHBalanceAfter = await web3.eth.getBalance(share.address); 
+            let ISAOTokenBalanceAfter = await tokenLocal.balanceOf(share.address);
+            assert(ISAOETHBalanceAfter.eq(ISAOETHBalanceBefore));
+            assert(ISAOTokenBalanceAfter.eq(ISAOTokenBalanceBefore));
+        });
+
+        it("should not allow to ETH and tokens back to admin during ST_TOKEN_DISTRIBUTION", async function () {
+            let investorsSendSums = {
+                account3: tw('0.354'),
+                account4: tw('5'),
+                account5: tw('1.121241223'),
+                account6: tw('5.555555555551'),
+                account7: tw('1.22314232124324'),
+                account8: tw('0.89999999999999')
+            };
+            let goodValues = calculateTokenBalances(investors, investorsSendSums);
+            let goodTotalShare = goodValues.goodTotalShare;
+            await tokenLocal.approve(share.address, APPROVE_VALUE, {from: ERC20_CREATOR});
+            await share.setERC20Token(tokenLocal.address, {from: ADMIN});
+            await share.acceptAbstractToken(APPROVE_VALUE, {from: ADMIN});
+            await share.setState(ST_RAISING, {from: ADMIN});
+            for (let i in investors)
+                await share.sendTransaction({value: investorsSendSums[i], from: investors[i]});
+            await share.setState(ST_TOKEN_DISTRIBUTION, {from: ADMIN});
             let ISAOETHBalanceBefore = await web3.eth.getBalance(share.address); 
             let ISAOTokenBalanceBefore = await tokenLocal.balanceOf(share.address);
             let data = web3.eth.contract(IERC20_ABI).at(tokenLocal.address).transfer.getData(ADMIN, goodTotalShare);
