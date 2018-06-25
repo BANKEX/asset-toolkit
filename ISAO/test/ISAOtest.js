@@ -165,56 +165,108 @@ const DISTRIBUTION_PERIOD = TI_DAY.mul(45);
 const MINIMAL_FUND_SIZE = tw(1);
 const MAXIMAL_FUND_SIZE = tw(100000);
 
+const APPROVE_VALUE = TOKEN_SUPPLY;
 const INVESTOR_SUM_PAY = tw(0.5);
 const INVESTOR_SUM_TO_TRIGGER = tw(0.00001);
 
 const RL_DEFAULT = tbn(0x00);
 const RL_ADMIN = tbn(0x04);
 const RL_PAYBOT = tbn(0x08);
-const LIMITS = [tw(100), tw(500), tw(1000)];
+const LIMITS = [tw(5), tw(15), tw(200)];
 const COSTS = [tw(0.1), tw(0.2), tw(0.5)];
 
 const gasPrice = tw("3e-7");
 
+/**
+ * Calculates totalShare and investors balances (in tokens)
+ * @param {Object} investors contains accounts of investors
+ * @param {Object} investorsSendSums contains sums in ETH which investors would send
+ */
+function calculateTokenBalances(investors, investorsSendSums) {
+    let goodInvestorTokenBalance = {
+        account3: tbn('0'),
+        account4: tbn('0'),
+        account5: tbn('0'),
+        account6: tbn('0'),
+        account7: tbn('0'),
+        account8: tbn('0')
+    };
+    let goodTotalShare = tbn(0);
+    let currentStage = 0;
+    for (let i in investors) {
+        let remainETHValue = investorsSendSums[i];
+        while (tbn(remainETHValue).gt(0) && goodTotalShare.lte(LIMITS[LIMITS.length - 1])) {
+            if (goodTotalShare.plus(remainETHValue.mul(1e18).div(COSTS[currentStage])).lte(LIMITS[currentStage])) {
+                goodTotalShare = goodTotalShare.plus(remainETHValue.mul(1e18).div(COSTS[currentStage]));
+                goodInvestorTokenBalance[i] = goodInvestorTokenBalance[i].plus(remainETHValue.mul(1e18).div(COSTS[currentStage]));
+                remainETHValue = 0;
+                if (goodTotalShare.eq(LIMITS[currentStage]))
+                    currentStage++;
+            } else {
+                remainETHValue = remainETHValue.minus(LIMITS[currentStage].minus(goodTotalShare).mul(COSTS[currentStage]).div(1e18));
+                goodInvestorTokenBalance[i] = goodInvestorTokenBalance[i].plus(LIMITS[currentStage].minus(goodTotalShare));
+                goodTotalShare = goodTotalShare.plus(LIMITS[currentStage].minus(goodTotalShare));
+                currentStage++;
+            }
+        }
+    }
+
+    return {
+        goodTotalShare: goodTotalShare,
+        goodInvestorTokenBalance: goodInvestorTokenBalance
+    }
+}
+
+
 contract('ShareStore COMMON TEST', (accounts) => {
+    const ADMIN = accounts[0];
+    const PAYBOT = accounts[1];
+    const ERC20_CREATOR = accounts[0];
+
+    const investors = {
+        account3: accounts[3],
+        account4: accounts[4],
+        account5: accounts[5],
+        account6: accounts[6],
+        account7: accounts[7],
+        account8: accounts[8]
+    };
 
     beforeEach(async function () {
         isao = await ISAO.new(
             RAISING_PERIOD, DISTRIBUTION_PERIOD,
             MINIMAL_FUND_SIZE, LIMITS, COSTS, MINIMAL_DEPOSIT_SIZE,
-            accounts[0],  accounts[1]
+            ADMIN,  PAYBOT
         );
-        token = await Token.new(TOKEN_SUPPLY, {from: accounts[0]});
+        token = await Token.new(TOKEN_SUPPLY, {from: ADMIN});
     });
 
-    it("should allow to take all tokens when distribution", async function () {
-        await token.approve(isao.address, TOKEN_SUPPLY, {from: accounts[0]});
-        await isao.setERC20Token(token.address, {from: accounts[0]});
-        await isao.acceptAbstractToken(TOKEN_SUPPLY, {from: accounts[0]});
-        await isao.setState(ST_RAISING);
-        assert((await isao.getState()).eq(ST_RAISING));
-
-        await isao.sendTransaction({from: accounts[2], value: 10e18});
-        await isao.setState(ST_TOKEN_DISTRIBUTION, {from: accounts[0]});
-        assert((await isao.getState()).eq(ST_TOKEN_DISTRIBUTION));
-
-        let balToken = await isao.getBalanceTokenOf(accounts[2]);
-
-        console.log((balToken).toString());
-
-        await isao.releaseToken(90000000000000000000, {from: accounts[2]});
-
-
-        let balToken2 = await isao.getBalanceTokenOf(accounts[2]);
-
-        console.log((balToken2).toString());
-
-        await isao.releaseToken(9999999999999998800, {from: accounts[2]});
-
-        let balToken3 = await isao.getBalanceTokenOf(accounts[2]);
-
-        console.log((balToken3).toString());
-
-
+    describe('NEGATIVE TEST', () => {
+        it("should try to send ETH when fund has been already collected", async function () {
+            let investorsSendSums = {
+                account3: tw('0.5'),
+                account4: tw('2'),
+                account5: tw('23.125'),
+                account6: tw('23.125'),
+                account7: tw('23.125'),
+                account8: tw('23.125')
+            };
+            await token.approve(isao.address, APPROVE_VALUE, {from: ADMIN});
+            await isao.setERC20Token(token.address, {from: ADMIN});
+            await isao.acceptAbstractToken(APPROVE_VALUE, {from: ADMIN});
+            await isao.setState(ST_RAISING, {from: ADMIN});
+            for (let i in investors)
+                await isao.buyShare({value: investorsSendSums[i], from: investors[i]});
+            let state = await isao.getState();
+            assert(state.eq(ST_TOKEN_DISTRIBUTION));
+            try {
+                await isao.buyShare({value: tw('1'), from: investors.account3});
+                console.log('ERROR')
+            } catch (e) {
+                assert(e);
+            }
+        });
     });
 });
+
+
