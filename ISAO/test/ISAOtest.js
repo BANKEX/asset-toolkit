@@ -141,7 +141,7 @@ const tw = v => web3.toBigNumber(v).mul(1e18);
 const fw = v => web3._extend.utils.fromWei(v).toString();
 
 
-const TOKEN_SUPPLY = tw(1000);
+const TOKEN_SUPPLY = tw(900000);
 const MINIMAL_DEPOSIT_SIZE = tw(0.05);
 const TI_DAY = tbn(86400);
 
@@ -162,7 +162,7 @@ const RAISING_PERIOD = TI_DAY.mul(10);
 const ICO_PERIOD = TI_DAY.mul(15);
 const DISTRIBUTION_PERIOD = TI_DAY.mul(45);
 
-const MINIMAL_FUND_SIZE = tw(1);
+const MINIMAL_FUND_SIZE = tw(0);
 const MAXIMAL_FUND_SIZE = tw(100000);
 
 const APPROVE_VALUE = TOKEN_SUPPLY;
@@ -218,7 +218,7 @@ function calculateTokenBalances(investors, investorsSendSums) {
 }
 
 
-contract('ShareStore COMMON TEST', (accounts) => {
+contract('ISAO COMMON TEST', (accounts) => {
     const ADMIN = accounts[0];
     const PAYBOT = accounts[1];
     const ERC20_CREATOR = accounts[0];
@@ -233,12 +233,14 @@ contract('ShareStore COMMON TEST', (accounts) => {
     };
 
     beforeEach(async function () {
-        isao = await ISAO.new(
+        tokenLocal = await Token.new(TOKEN_SUPPLY, {
+            from: ERC20_CREATOR
+        });
+        share = await ISAO.new(
             RAISING_PERIOD, DISTRIBUTION_PERIOD,
             MINIMAL_FUND_SIZE, LIMITS, COSTS, MINIMAL_DEPOSIT_SIZE,
-            ADMIN,  PAYBOT
+            ADMIN, PAYBOT
         );
-        token = await Token.new(TOKEN_SUPPLY, {from: ADMIN});
     });
 
     describe('NEGATIVE TEST', () => {
@@ -251,16 +253,16 @@ contract('ShareStore COMMON TEST', (accounts) => {
                 account7: tw('23.125'),
                 account8: tw('23.125')
             };
-            await token.approve(isao.address, APPROVE_VALUE, {from: ADMIN});
-            await isao.setERC20Token(token.address, {from: ADMIN});
-            await isao.acceptAbstractToken(APPROVE_VALUE, {from: ADMIN});
-            await isao.setState(ST_RAISING, {from: ADMIN});
+            await tokenLocal.approve(share.address, APPROVE_VALUE, {from: ADMIN});
+            await share.setERC20Token(tokenLocal.address, {from: ADMIN});
+            await share.acceptAbstractToken(APPROVE_VALUE, {from: ADMIN});
+            await share.setState(ST_RAISING, {from: ADMIN});
             for (let i in investors)
-                await isao.buyShare({value: investorsSendSums[i], from: investors[i]});
-            let state = await isao.getState();
+                await  share.buyShare({value: investorsSendSums[i], from: investors[i]});
+            let state = await share.getState();
             assert(state.eq(ST_TOKEN_DISTRIBUTION));
             try {
-                await isao.buyShare({value: tw('1'), from: investors.account3});
+                await share.buyShare({value: tw('1'), from: investors.account3});
                 console.log('ERROR')
             } catch (e) {
                 assert(e);
@@ -269,7 +271,7 @@ contract('ShareStore COMMON TEST', (accounts) => {
 
         it("should admin sends tokens to ISAO => invest => first investor gets 50% their share => refund some investors shares => admin gets back 50% his share in ETH => admin sends tokens to ISAO => all investors gets their remain share", async function () {
             // First part that will be sent
-            let approveValue1 = TOKEN_SUPPLY.divToInt(2e6);
+            let approveValue1 = TOKEN_SUPPLY.divToInt(2e2);
             // Second part that will be sent
             let approveValue2 = TOKEN_SUPPLY.minus(approveValue1);
             // ETH that investor will send to contract
@@ -309,7 +311,7 @@ contract('ShareStore COMMON TEST', (accounts) => {
             await share.setERC20Token(tokenLocal.address, {from: ADMIN});
             // get this address
             let tokenAddress = await share.tokenAddress();
-            // check that token address == token local address
+            // // check that token address == token local address
             assert(tbn(tokenAddress).eq(tokenLocal.address));
             // accept firs portion of tokens
             await share.acceptAbstractToken(approveValue1, {from: ADMIN});
@@ -318,6 +320,8 @@ contract('ShareStore COMMON TEST', (accounts) => {
             // check that accept function works fine
             assert(ISAOTokenBalance.eq(approveValue1));
             // set Raising state
+            console.log((await tokenLocal.balanceOf(share.address)).toString());
+            console.log((await share.getMaximalFundSize()).toString());
             await share.setState(ST_RAISING, {from: ADMIN});
             for (let i in investors) {
                 // send eth from investors to account

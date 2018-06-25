@@ -201,6 +201,9 @@ contract ShareStore is ICassette, IRoleModel, IShareStore, IStateModel {
   function getMaximalFundSize_() internal view returns(uint) {
     return maximalFundSize;
   }
+  function getMaximalFundSize() external view returns(uint) {
+    return getMaximalFundSize_();
+  }
 
   function buyShare_() internal returns(bool) {
     require(msg.value >= minimalDeposit);

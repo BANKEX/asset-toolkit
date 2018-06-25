@@ -452,7 +452,7 @@ contract('ShareStore', (accounts) => {
                 let balanceAfter = await web3.eth.getBalance(investors[i]);
                 assert(balanceAfter.eq(balanceBefore.plus(INVESTOR_SUM_PAY)));
             }
-        })ж
+        });
 
         it("should allow refundShareForce during RAISING period", async function () {
             await tokenLocal.approve(share.address, APPROVE_VALUE, {from: ERC20_CREATOR});
@@ -469,7 +469,7 @@ contract('ShareStore', (accounts) => {
                 let balanceAfter = await web3.eth.getBalance(investors[i]);
                 assert(balanceAfter.eq(balanceBefore.plus(INVESTOR_SUM_PAY)));
             }
-        })
+        });
 
         it("should get all remain share in tokens by ADMIN during ST_FUND_DEPRECATED period", async function () {
             await tokenLocal.approve(share.address, APPROVE_VALUE, {from: ERC20_CREATOR});
