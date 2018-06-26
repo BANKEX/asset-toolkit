@@ -269,7 +269,7 @@ contract('ISAO COMMON TEST', (accounts) => {
             }
         });
 
-        it("should admin sends tokens to ISAO => invest => first investor gets 50% their share => refund some investors shares => admin gets back 50% his share in ETH => admin sends tokens to ISAO => all investors gets their remain share", async function () {
+        it("should admin sends tokens to ISAO => invest => first investor gets 50% their share => refund some investors shares => admin gets back 50% his share in ETH => all investors gets their remain share", async function () {
             // Amount of tokens that will be sent
             let approveValue = LIMITS[LIMITS.length - 1];
             // ETH that investor will send to contract
