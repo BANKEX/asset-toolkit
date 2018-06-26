@@ -243,7 +243,7 @@ contract('ISAO COMMON TEST', (accounts) => {
         );
     });
 
-    describe('NEGATIVE TEST', () => {
+    describe('Common test', () => {
         it("should try to send ETH when fund has been already collected", async function () {
             let investorsSendSums = {
                 account3: tw('0.5'),
@@ -258,7 +258,7 @@ contract('ISAO COMMON TEST', (accounts) => {
             await share.acceptAbstractToken(APPROVE_VALUE, {from: ADMIN});
             await share.setState(ST_RAISING, {from: ADMIN});
             for (let i in investors)
-                await  share.buyShare({value: investorsSendSums[i], from: investors[i]});
+                await share.buyShare({value: investorsSendSums[i], from: investors[i]});
             let state = await share.getState();
             assert(state.eq(ST_TOKEN_DISTRIBUTION));
             try {
@@ -344,7 +344,10 @@ contract('ISAO COMMON TEST', (accounts) => {
             // get balance before admin release ether to stakeholder
             let adminBalanceBefore = await web3.eth.getBalance(ADMIN);
             // release amount of ETH to admin
-            let tx = await share.releaseEtherToStakeholderForce(RL_ADMIN, adminShare.divToInt(2), {from: ADMIN, gasPrice: gasPrice});
+            let tx = await share.releaseEtherToStakeholderForce(RL_ADMIN, adminShare.divToInt(2), {
+                from: ADMIN,
+                gasPrice: gasPrice
+            });
             // amount of gas that admin spent
             let gasCost1 = gasPrice.mul(tx.receipt.gasUsed);
             // get balance after admin release ether to stakeholder
@@ -373,6 +376,26 @@ contract('ISAO COMMON TEST', (accounts) => {
                 // check that calculated sum was correct and equals to erc20 sum
                 assert(tokenBalance.eq(goodTokenBalance));
             }
+        });
+
+        it("should allow to get all money back", async () => {
+            let investor = accounts[4];
+            let investorBalance = await web3.eth.getBalance(investor);
+            await tokenLocal.approve(share.address, APPROVE_VALUE, {from: ADMIN});
+            await share.setERC20Token(tokenLocal.address, {from: ADMIN});
+            await share.acceptAbstractToken(APPROVE_VALUE, {from: ADMIN});
+            await share.setState(ST_RAISING, {from: ADMIN});
+            let txZero = await share.buyShare({value: tw(5), from: investor, gasPrice: gasPrice});
+            let feeZero = (tbn(txZero.receipt.gasUsed)).mul(gasPrice);
+            await share.setState(ST_MONEY_BACK, {from: ADMIN});
+            let state = await share.getState();
+            assert(state.eq(ST_MONEY_BACK));
+            let investorTokenBalance = await share.getBalanceTokenOf(investor);
+            let tx = await share.refundShare(investorTokenBalance, {from: investor, gasPrice: gasPrice});
+            let feeOne = tbn(0);
+            feeOne = (tbn(tx.receipt.gasUsed)).mul(gasPrice);
+            let investorBalanceNew = await web3.eth.getBalance(investor);
+            assert((investorBalance).eq(investorBalanceNew.plus(feeOne.plus(feeZero))), `balance before ${investorBalance} |\nbalance now ${investorBalanceNew} |\n delta ${fw(investorBalance - investorBalanceNew)} |\nfee ${fw(feeOne)}`);
         });
     });
 });

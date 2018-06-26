@@ -8,8 +8,7 @@ import "../ISAO/IRoleModel.sol";
 contract ERC888Cassette is ICassette, IRoleModel, IStateModel {
   address public tokenAddress;
   uint public tokenId;
-
-
+  
   function getCassetteSize_() internal view returns(uint) {
     return IERC888(tokenAddress).balanceOf(tokenId, this);
   }
