@@ -141,7 +141,7 @@ const tw = v => web3.toBigNumber(v).mul(1e18);
 const fw = v => web3._extend.utils.fromWei(v).toString();
 
 
-const TOKEN_SUPPLY = tw(900000);
+const TOKEN_SUPPLY = tw(1000000);
 const MINIMAL_DEPOSIT_SIZE = tw(0.05);
 const TI_DAY = tbn(86400);
 
@@ -162,17 +162,17 @@ const RAISING_PERIOD = TI_DAY.mul(10);
 const ICO_PERIOD = TI_DAY.mul(15);
 const DISTRIBUTION_PERIOD = TI_DAY.mul(45);
 
-const MINIMAL_FUND_SIZE = tw(0);
+const MINIMAL_FUND_SIZE = tw(0.1);
 const MAXIMAL_FUND_SIZE = tw(100000);
 
 const APPROVE_VALUE = TOKEN_SUPPLY;
-const INVESTOR_SUM_PAY = tw(0.5);
+const INVESTOR_SUM_PAY = tw(0.6);
 const INVESTOR_SUM_TO_TRIGGER = tw(0.00001);
 
 const RL_DEFAULT = tbn(0x00);
 const RL_ADMIN = tbn(0x04);
 const RL_PAYBOT = tbn(0x08);
-const LIMITS = [tw(5), tw(15), tw(200)];
+const LIMITS = [tw(5), tw(15), tw(300)];
 const COSTS = [tw(0.1), tw(0.2), tw(0.5)];
 
 const gasPrice = tw("3e-7");
@@ -248,10 +248,10 @@ contract('ISAO COMMON TEST', (accounts) => {
             let investorsSendSums = {
                 account3: tw('0.5'),
                 account4: tw('2'),
-                account5: tw('23.125'),
-                account6: tw('23.125'),
-                account7: tw('23.125'),
-                account8: tw('23.125')
+                account5: tw('35.625'),
+                account6: tw('35.625'),
+                account7: tw('35.625'),
+                account8: tw('35.625'),
             };
             await tokenLocal.approve(share.address, APPROVE_VALUE, {from: ADMIN});
             await share.setERC20Token(tokenLocal.address, {from: ADMIN});
@@ -270,14 +270,12 @@ contract('ISAO COMMON TEST', (accounts) => {
         });
 
         it("should admin sends tokens to ISAO => invest => first investor gets 50% their share => refund some investors shares => admin gets back 50% his share in ETH => admin sends tokens to ISAO => all investors gets their remain share", async function () {
-            // First part that will be sent
-            let approveValue1 = TOKEN_SUPPLY.divToInt(2e2);
-            // Second part that will be sent
-            let approveValue2 = TOKEN_SUPPLY.minus(approveValue1);
+            // Amount of tokens that will be sent
+            let approveValue = LIMITS[LIMITS.length - 1];
             // ETH that investor will send to contract
             let investorsSendSums = {
                 // Sending this value we get current max amount of tokens
-                account3: approveValue1.mul(COSTS[0]).divToInt(1e18),
+                account3: tw('0.5'),
                 account4: tw('1.2231221'),
                 account5: tw('0.123242423452423'),
                 account6: tw('9.999919999999999'),
@@ -302,11 +300,11 @@ contract('ISAO COMMON TEST', (accounts) => {
             // amount of eth to money back
             let firstInvestorMoneyBackInETH = firstInvestorMoneyBack.mul(COSTS[0]).div('1e18');
             // approve first part of tokens to ISAO
-            await tokenLocal.approve(share.address, approveValue1, {from: ERC20_CREATOR});
+            await tokenLocal.approve(share.address, approveValue, {from: ERC20_CREATOR});
             // get amount of tokens that was approved
             let allowance = await tokenLocal.allowance(ERC20_CREATOR, share.address);
             // check that amounts are correct
-            assert(allowance.eq(approveValue1));
+            assert(allowance.eq(approveValue));
             // just say to ISAO that token local is target token
             await share.setERC20Token(tokenLocal.address, {from: ADMIN});
             // get this address
@@ -314,14 +312,12 @@ contract('ISAO COMMON TEST', (accounts) => {
             // // check that token address == token local address
             assert(tbn(tokenAddress).eq(tokenLocal.address));
             // accept firs portion of tokens
-            await share.acceptAbstractToken(approveValue1, {from: ADMIN});
+            await share.acceptAbstractToken(approveValue, {from: ADMIN});
             // get balance of ISAO in tokens
             let ISAOTokenBalance = await tokenLocal.balanceOf(share.address);
             // check that accept function works fine
-            assert(ISAOTokenBalance.eq(approveValue1));
+            assert(ISAOTokenBalance.eq(approveValue));
             // set Raising state
-            console.log((await tokenLocal.balanceOf(share.address)).toString());
-            console.log((await share.getMaximalFundSize()).toString());
             await share.setState(ST_RAISING, {from: ADMIN});
             for (let i in investors) {
                 // send eth from investors to account
@@ -363,18 +359,10 @@ contract('ISAO COMMON TEST', (accounts) => {
             let investorTokenBalance = await tokenLocal.balanceOf(investors.account3);
             // check that calculated sum is correct and investor has it
             assert(investorTokenBalance.eq(firstInvestorReleaseAmount));
-            // approve next portion of tokens to investor
-            await tokenLocal.approve(share.address, approveValue2, {from: ERC20_CREATOR});
-            // get allowed sum to spend by ISAO
-            let allowance1 = await tokenLocal.allowance(ERC20_CREATOR, share.address);
-            // check that approve works fine
-            assert(allowance1.eq(approveValue2));
-            // accept next portion of tokens
-            await share.acceptAbstractToken(approveValue2, {from: ADMIN});
             // get balance of ISAO in tokens
             let ISAOTokenBalance1 = await tokenLocal.balanceOf(share.address);
             // check that token balance now is equal to balance of 2 approved values - amount that investor released
-            assert(ISAOTokenBalance1.eq(approveValue1.plus(approveValue2).minus(firstInvestorReleaseAmount)));
+            assert(ISAOTokenBalance1.eq(approveValue.minus(firstInvestorReleaseAmount)));
             for (let i in investors) {
                 // buy tokens (send ETH) to ISAO
                 await share.sendTransaction({value: tw('0.0001'), from: investors[i]});

@@ -856,11 +856,11 @@ contract('ShareStore', (accounts) => {
         });
 
         it("should admin sends tokens to ISAO => invest => first investor gets 50% their share => refund some investors shares => admin gets back 50% his share in ETH => admin sends tokens to ISAO => all investors gets their remain share", async function () {
-            let approveValue1 = TOKEN_SUPPLY.divToInt(2e6);
+            let approveValue1 = TOKEN_SUPPLY.divToInt('2e6');
             let approveValue2 = TOKEN_SUPPLY.minus(approveValue1);
             let investorsSendSums = {
                 // Sending this value we get current max amount of tokens
-                account3: approveValue1.mul(COSTS[0]).divToInt(1e18),
+                account3: approveValue1.mul(COSTS[0]).divToInt('1e18'),
                 account4: tw('1.2231221'),
                 account5: tw('0.123242423452423'),
                 account6: tw('9.999919999999999'),
