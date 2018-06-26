@@ -12,6 +12,7 @@ export class RaisingComponent implements OnInit {
   public str;
   public hasTokens: Observable<boolean>;
   public isInitialized: Observable<boolean>;
+  public oldValue;
 
   public constructor(public $isao: IsaoService) {
     this.hasTokens = this.$isao.tokensOrderedByUser.map( x => x > 0);

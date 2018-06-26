@@ -11,24 +11,24 @@ doctype html
 
   .text-center(*ngIf="($stage|async) === Stage.RAISING")
     ng-container(*ngTemplateOutlet="time_control")
+    .entry
+      button.start-distribution(
+        kendoButton,
+        *ngIf="!$admin.process.runningDistribution && !$admin.process.runningMoneyback",
+        (click)="$admin.startDistribution()") Start distribution fase
 
-    button.start-distribution(
-      kendoButton,
-      *ngIf="!$admin.process.runningDistribution && !$admin.process.runningMoneyback",
-      (click)="$admin.startDistribution()") Start distribution fase
+      span.k-i-loading.k-icon(
+        *ngIf="$admin.process.runningDistribution",
+        style="font-size: 24px; color: #ff6358")
 
-    span.k-i-loading.k-icon(
-      *ngIf="$admin.process.runningDistribution",
-      style="font-size: 24px; color: #ff6358")
+      button.start-moneyback(
+        kendoButton,
+        *ngIf="!$admin.process.runningDistribution && !$admin.process.runningMoneyback",
+        (click)="$admin.startMoneyback()") Start money back fase
 
-    button.start-moneyback(
-      kendoButton,
-      *ngIf="!$admin.process.runningDistribution && !$admin.process.runningMoneyback",
-      (click)="$admin.startMoneyback()") Start money back fase
-
-    span.k-i-loading.k-icon(
-      *ngIf="$admin.process.runningMoneyback",
-      style="font-size: 24px; color: #ff6358")
+      span.k-i-loading.k-icon(
+        *ngIf="$admin.process.runningMoneyback",
+        style="font-size: 24px; color: #ff6358")
 
   .text-center(*ngIf="($stage|async) === Stage.TOKEN_DISTRIBUTION")
     ng-container(*ngTemplateOutlet="time_control")
@@ -42,7 +42,6 @@ doctype html
 
   ng-template(#time_control)
     .entry
-      input([(ngModel)]="str", type="text", size="21", maxlength="20", placeholder="Enter value in hours", style="margin: 10px")
+      input([(ngModel)]="str", value="1", type="text", size="21", maxlength="20", placeholder="Enter value in hours", style="margin: 10px")
       button([attr.disabled]="$admin.process.runningTimeInc?true:null", kendoButton, (click)="incTimestamp(str)") Increase timestamp
       span.spinner.k-i-loading.k-icon(*ngIf="$admin.process.runningTimeInc", style="font-size: 24px; color: #ff6358")
-        input([(ngModel)]="str", type="text", size="20", maxlength="20", placeholder="Enter value in hours", style="margin: 10px; text-align: center")

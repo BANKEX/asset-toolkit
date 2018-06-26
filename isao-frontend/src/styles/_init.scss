@@ -1,9 +1,16 @@
 .init {
+  .title {
+    margin-bottom: 20px;
+  }
   input {
     background: #fbfbfb;
     text-align: center;
   }
-  .entry {
-
+  .submit {
+    text-align: center;
+    height: 125px;
+    button {
+      margin: 30px;
+    }
   }
 }

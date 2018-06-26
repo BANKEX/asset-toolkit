@@ -8,6 +8,8 @@ import { StageService } from './stage.service';
 import { TransactionReceipt, Contract, PromiEvent, TransactionObject } from 'web3/types';
 import { ContractInput } from './types/contract-input';
 import { TokenType } from './types/contract-type.enum';
+import { EventService } from './event.service';
+import { TransferContent } from '../shared/types/transfer-content.enum';
 
 type processMap = {
   'takingAllMoneyBack': boolean,
@@ -45,6 +47,7 @@ export class IsaoService {
     @Inject('AppConfig') private $config,
     private $connection: ConnectionService,
     private $error: ErrorMessageService,
+    private $events: EventService,
     private $stage: StageService,
   ) {
     $connection.subscribe(async(status) => {
@@ -99,9 +102,10 @@ export class IsaoService {
   private getTokenInterval;
 
   public async publishNewContract(i: ContractInput, type: TokenType = TokenType.ERC20, params: any[] = []) {
-    let factory: Contract, transaction: TransactionObject<Contract>;
+    let factory: Contract, transaction: TransactionObject<Contract>, hash: string;
     let args =
       [i.rPeriod, i.dPeriod, i.minimalFundSize, i.limits, i.costs, i.minimalDeposit, i.adminAddress, i.paybotAddress];
+    this.$events.deployAdded(type);
     if (type === TokenType.ERC20) {
       factory = new this.$connection.web3.eth.Contract(this.$config.factory20Abi);
       transaction = factory.deploy({data: this.$config.factory20Code, arguments: args});
@@ -118,14 +122,21 @@ export class IsaoService {
       console.log(args);
     } else { this.$error.addError('Unknown token type!'); return; }
     const pEvent: PromiEvent<any> = transaction.send({from: this.$connection.account});
-    pEvent.on('transactionHash', (hash) => this.process.creatingContract = true);
+    pEvent.on('transactionHash', (_hash) => {
+      hash = _hash;
+      this.process.creatingContract = true;
+      this.$events.deploySubmited(hash);
+    });
     pEvent.then(async(_contract: Contract) => {
+      this.$events.deployConfirmed(hash);
       factory = _contract;
       const isaoAddress = await factory.methods.isaoAddress().call();
       await this.$connection.connect(isaoAddress);
       console.log('Factory Contract Address: ', _contract.options.address);
       console.log('ISAO Contract Address: ', isaoAddress);
-    });
+    }).catch((err) =>
+      err.message.indexOf('User denied') > 0 ? this.$events.deployCanceled(type) : this.$events.deployFailed(err.message, hash)
+    );
   }
 
   public payToISAOContact(amount): PromiEvent<TransactionReceipt> {
@@ -138,9 +149,19 @@ export class IsaoService {
 
   // Be really careful you can use that method only when the actual contact on blockchain is in the MONEY-BACK state
   public getAllMoneyBack() {
+    let hash, type = TransferContent.ETHER;
     const pEvent = this.payToISAOContact('0');
-    pEvent.on('transactionHash', () => this.process.takingAllMoneyBack = true);
-    pEvent.then(() => this.process.takingAllMoneyBack = false);
+    this.$events.transferAdded({type});
+    pEvent.on('transactionHash', (_hash) => {
+      hash = _hash;
+      this.process.takingAllMoneyBack = true;
+      this.$events.transferConfirmed({type, hash});
+    });
+    pEvent.then(() => this.process.takingAllMoneyBack = false).catch((err) =>
+    err.message.indexOf('User denied') > 0
+      ? this.$events.transferCanceled({type, hash})
+      : this.$events.transferFailed(err.message, {type, hash})
+    );
   }
 
   public buyTokens(amount) {
@@ -148,29 +169,59 @@ export class IsaoService {
       this.$error.addError('Wrong amount!');
       return;
     }
-
+    let hash, type = TransferContent.ETHER;
     const pEvent = this.payToISAOContact(amount);
-    pEvent.on('transactionHash', () => this.process.buyingTokens = true);
-    pEvent.then(() => {
-      this.process.buyingTokens = false;
-      this.tokensOrderedByUser.next(undefined);
+    this.$events.transferAdded({type, amount});
+    pEvent.on('transactionHash', (_hash) => {
+      hash = _hash;
+      this.process.buyingTokens = true;
+      this.$events.transferConfirmed({type, hash});
     });
+    pEvent.then(() => this.process.buyingTokens = false).catch((err) =>
+      err.message.indexOf('User denied') > 0
+        ? this.$events.transferCanceled({type, hash})
+        : this.$events.transferFailed(err.message, {type, hash})
+    );
   }
 
   public receiveTokens(amount) {
-    if (!amount) { this.$error.addError('Empty amount!'); return; }
-    if (+amount > this.tokensOrderedByUser.value) { this.$error.addError('Too much!'); return; }
+    if (!amount || isNaN(Number(amount)) || +amount < 0 || +amount > this.tokensOrderedByUser.value) {
+      this.$error.addError('Wrong amount!');
+      return;
+    }
+    let hash, type = TransferContent.TOKEN;
     const pEvent = this.$connection.contract.methods.releaseToken(amount * 1e18).send(this.from);
-    pEvent.on('transactionHash', () => this.process.receivingTokens = true);
-    pEvent.then(() => { this.process.receivingTokens = false; this.tokensOrderedByUser.next(undefined); });
+    this.$events.transferAdded({type, amount});
+    pEvent.on('transactionHash', (_hash) => {
+      hash = _hash;
+      this.process.receivingTokens = true;
+      this.$events.transferConfirmed({type, hash});
+    });
+    pEvent.then((_hash) => this.process.receivingTokens = false).catch((err) =>
+    err.message.indexOf('User denied') > 0
+      ? this.$events.transferCanceled({type, hash})
+      : this.$events.transferFailed(err.message, {type, hash})
+    );
   }
 
   public refundTokens(amount) {
-    if (!amount) { this.$error.addError('Empty amount!'); return; }
-    if (+amount > this.tokensOrderedByUser.value) { this.$error.addError('Too much!'); return; }
+    if (!amount || isNaN(Number(amount)) || +amount < 0 || +amount > this.tokensOrderedByUser.value) {
+      this.$error.addError('Wrong amount!');
+      return;
+    }
+    let hash, type = TransferContent.ETHER;
     const pEvent = this.$connection.contract.methods.refundShare(amount * 1e18).send(this.from);
-    pEvent.on('transactionHash', () => this.process.refundingPartOfTokens = true);
-    pEvent.then(() => this.process.refundingPartOfTokens = false);
+    this.$events.transferAdded({type});
+    pEvent.on('transactionHash', (_hash) => {
+      hash = _hash;
+      this.process.refundingPartOfTokens = true;
+      this.$events.transferConfirmed({type, hash});
+    });
+    pEvent.then(() => this.process.refundingPartOfTokens = false).catch((err) =>
+    err.message.indexOf('User denied') > 0
+      ? this.$events.transferCanceled({type, hash})
+      : this.$events.transferFailed(err.message, {type, hash})
+    );
   }
 
   public async getCurrentTime(): Promise<boolean> {
