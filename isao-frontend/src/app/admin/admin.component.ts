@@ -25,6 +25,7 @@ export class AdminComponent {
     this.timeLeft$ = $connection.switchMap((connection) => {
       this.$isao.getCurrentTime();
       return $isao.currentTime.map(time => {
+        console.log(time);
         const range = $isao.dPeriod * 1000;
         const launchTime = this.$isao.launchTime;
         const timeLeft = launchTime.getTime() + range - time.getTime();

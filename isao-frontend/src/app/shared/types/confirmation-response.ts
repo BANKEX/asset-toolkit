@@ -1,5 +1,7 @@
+import { TransferContent } from './transfer-content.enum';
+
 export interface ConfirmationResponse {
-  internalId: number;
-  resultIndex?: string;
-  txHash?: string; // hash address of running transaction
+  amount?: number;              // amount ov transfered itens
+  type?: TransferContent;       // what is transfered
+  hash?: string;                // hash address of running transaction
 }

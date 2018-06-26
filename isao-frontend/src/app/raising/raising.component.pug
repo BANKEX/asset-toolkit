@@ -1,10 +1,10 @@
 .raising
   .flex
     .left
-      .entry(*ngIf="!(isInitialized|async)")
+      .entry.text-center(*ngIf="!(isInitialized|async)")
         span Checking your funds
         span.k-i-loading.k-icon(style="font-size: 24px; color: #ff6358; margin-left: 10px")
-      .entry(*ngIf="isInitialized|async")
+      .entry.text-center(*ngIf="isInitialized|async")
         .title You oredered
         .value <b>{{$isao.tokensOrderedByUser|async}}</b> tokens
       .entry

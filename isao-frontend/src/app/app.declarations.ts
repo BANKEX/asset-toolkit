@@ -7,6 +7,7 @@ import { InfoComponent } from './info/info.component';
 import { StairsComponent } from './stairs/stairs.component';
 import { TimerComponent } from './timer/timer.component';
 import { InitComponent } from './init/init.component';
+import { TosterComponent } from './toster/toster.component';
 
 // import { ContentComponent } from './content/content.component';
 // import { WalletComponent } from './wallet/wallet.component';
@@ -36,4 +37,5 @@ export const APP_DECLARATIONS = [
   StairsComponent,
   TimerComponent,
   InitComponent,
+  TosterComponent,
 ];

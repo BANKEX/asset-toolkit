@@ -1,5 +1,5 @@
 .init(style="padding-top: 10px")
-  h4 Initialization stage
+  h4.title Initialization
   .flex(style="justify-content: center")
     .left.nomargin.nopadding.flex.flex-column
       .entry
@@ -47,6 +47,6 @@
         input.value(type="text",[(ngModel)]="limits", size="40")
       .entry
         input.value(type="text",[(ngModel)]="costs", size="40")
-  .text-center
+  .submit
     button.big(*ngIf="!$isao.process.creatingContract", kendoButton, id="initContractBtn", (click)="initContract()") Create new contract
     span.k-i-loading.k-icon(*ngIf="$isao.process.creatingContract", style="font-size: 40px; color: #ff6358; margin: 25px")

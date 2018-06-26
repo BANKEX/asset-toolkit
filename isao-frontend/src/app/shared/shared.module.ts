@@ -73,5 +73,6 @@ export function windowFactory() {
 export class SharedModule {
   constructor(private toastyConfig: ToastyConfig) {
     this.toastyConfig.theme = 'bootstrap';
+    this.toastyConfig.timeout = 6000;
   }
 }
