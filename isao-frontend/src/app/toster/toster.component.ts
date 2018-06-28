@@ -82,10 +82,6 @@ export class TosterComponent implements OnInit {
       console.info(`Failed transaction hash: ${transfer.hash}`);
     });
 
-    // Time
-
-    //
-
     // Clipboard
     this.$events.onCopyToClipboard().subscribe((title) => {
       this.$toasty.info(`${title ? title : 'Address'} copied to clipboard`);

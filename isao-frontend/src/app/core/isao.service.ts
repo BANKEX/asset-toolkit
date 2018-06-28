@@ -155,9 +155,12 @@ export class IsaoService {
     pEvent.on('transactionHash', (_hash) => {
       hash = _hash;
       this.process.takingAllMoneyBack = true;
-      this.$events.transferConfirmed({type, hash});
+      this.$events.transferSubmited({type, hash});
     });
-    pEvent.then(() => this.process.takingAllMoneyBack = false).catch((err) =>
+    pEvent.then(() => {
+      this.$events.transferConfirmed(hash);
+      this.process.takingAllMoneyBack = false;
+    }).catch((err) =>
     err.message.indexOf('User denied') > 0
       ? this.$events.transferCanceled({type, hash})
       : this.$events.transferFailed(err.message, {type, hash})
@@ -175,9 +178,12 @@ export class IsaoService {
     pEvent.on('transactionHash', (_hash) => {
       hash = _hash;
       this.process.buyingTokens = true;
-      this.$events.transferConfirmed({type, hash});
+      this.$events.transferSubmited({type, hash});
     });
-    pEvent.then(() => this.process.buyingTokens = false).catch((err) =>
+    pEvent.then(() => {
+      this.$events.transferConfirmed(hash);
+      this.process.buyingTokens = false;
+    }).catch((err) =>
       err.message.indexOf('User denied') > 0
         ? this.$events.transferCanceled({type, hash})
         : this.$events.transferFailed(err.message, {type, hash})
@@ -195,9 +201,12 @@ export class IsaoService {
     pEvent.on('transactionHash', (_hash) => {
       hash = _hash;
       this.process.receivingTokens = true;
-      this.$events.transferConfirmed({type, hash});
+      this.$events.transferSubmited({type, hash});
     });
-    pEvent.then((_hash) => this.process.receivingTokens = false).catch((err) =>
+    pEvent.then((_hash) => {
+      this.$events.transferConfirmed(hash);
+      this.process.receivingTokens = false;
+    }).catch((err) =>
     err.message.indexOf('User denied') > 0
       ? this.$events.transferCanceled({type, hash})
       : this.$events.transferFailed(err.message, {type, hash})
@@ -215,9 +224,12 @@ export class IsaoService {
     pEvent.on('transactionHash', (_hash) => {
       hash = _hash;
       this.process.refundingPartOfTokens = true;
-      this.$events.transferConfirmed({type, hash});
+      this.$events.transferSubmited({type, hash});
     });
-    pEvent.then(() => this.process.refundingPartOfTokens = false).catch((err) =>
+    pEvent.then(() => {
+      this.$events.transferConfirmed(hash);
+      this.process.refundingPartOfTokens = false;
+    }).catch((err) =>
     err.message.indexOf('User denied') > 0
       ? this.$events.transferCanceled({type, hash})
       : this.$events.transferFailed(err.message, {type, hash})
