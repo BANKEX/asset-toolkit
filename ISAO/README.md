@@ -82,11 +82,11 @@ The main participants in the procedure of ISAO are originator (asset owner), adm
 
 From the moment of creation, the contract goes through the following state sequence:
 
-![state-sequence-diagram](https://git.bankex.team/proof_of_asset/ISAO/raw/master/README_docs/state-sequence-diagram.svg)
+![state-sequence-diagram](https://artall64.github.io/tmp-isao-images/state-sequence-diagram.svg)
 
 ##### 1. Contract deployment 
 
-![deploy](https://git.bankex.team/proof_of_asset/ISAO/blob/master/README_docs/deploy.svg)
+![deploy](https://artall64.github.io/tmp-isao-images/deploy.svg)
 
 Initially administrator of the ISAO should deploy contract to the Ethereum network. For the production deploy you can use `truffle migrate --prod --network YOUR_NETWORK ` . You also also deploy contract with a factory contract as it done in our [demo project (linke to the line in the source code)](link to the demo);
 
@@ -114,7 +114,7 @@ After deployment the contract gets `DEFAULT` state. In the code you can find `ST
 
 ##### 2. Change state from DEFAULT  to RAISING
 
-![deploy-to-raising](https://git.bankex.team/proof_of_asset/ISAO/blob/master/README_docs/deploy-to-raising.svg)
+![deploy-to-raising](https://artall64.github.io/tmp-isao-images/deploy-to-raising.svg)
 
 ###### DEFAULT STATE
 
@@ -136,7 +136,7 @@ At that state investors can by tokens by sending ETH to the contract or calling 
 
 ##### 3. Change state from RASING to DISTRIBTUION or MONET_BACK
 
-![raising-to-distribution-or-money-back](C:\Users\artem\Desktop\readme\raising-to-distribution-or-money-back.PNG)
+![raising-to-distribution-or-money-back](https://artall64.github.io/tmp-isao-images/raising-to-distribution-or-money-back.svg)
 
 
 
@@ -180,7 +180,7 @@ In the MONEY_BACK state investors should request back ETH they. They can do it e
 
 ##### 4. Change state from DISTRIBUTION or MONEY_BACK to DEPRECATED
 
-![distribution-or-money-back-to-deprecated](C:\Users\artem\Desktop\readme\distribution-or-money-back-to-deprecated.PNG)
+![distribution-or-money-back-to-deprecated](https://artall64.github.io/tmp-isao-images/distribution-or-money-back-to-deprecated.svg)
 
 When distribution period ends, contract automatically changes its state DEPRECATED. 
 
