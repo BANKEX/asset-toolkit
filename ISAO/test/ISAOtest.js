@@ -376,6 +376,7 @@ contract('ISAO COMMON TEST', (accounts) => {
                 // check that calculated sum was correct and equals to erc20 sum
                 assert(tokenBalance.eq(goodTokenBalance));
             }
+
         });
 
         it("should allow to get all money back", async () => {
