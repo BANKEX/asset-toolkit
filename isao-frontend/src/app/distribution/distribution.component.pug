@@ -1,0 +1,26 @@
+.distribution(style="padding-top: 10%;")
+  .flex
+    .left
+      .entry(*ngIf="!(isInitialized|async)")
+        span Checking your funds
+        span.k-i-loading.k-icon(style="font-size: 24px; color: #ff6358; margin-left: 10px")
+      .entry(*ngIf="isInitialized|async")
+        .title You have
+        .value <b>{{$isao.tokensOrderedByUser|async}}</b> tokens at the ISAO contract
+      .entry
+        input(
+          type="text",
+          [(ngModel)]="str",
+          id="byTokenInput",
+          size="20", maxlength="20",
+          placeholder="Enter amount in tokens")
+        button(
+          [disabled]="!(hasTokens|async) || $isao.process.receivingTokens",
+          kendoButton,
+          id="byTokensBtn",
+          (click)="receiveTokens(str)") Receive tokens
+        span.spinner.k-i-loading.k-icon(
+          *ngIf="$isao.process.receivingTokens",
+          style="font-size: 24px; color: #ff6358")
+    .right
+      isao-timer

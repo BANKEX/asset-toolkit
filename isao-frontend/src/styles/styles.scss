@@ -1,0 +1,27 @@
+@import 'variables.scss';
+@import '../../node_modules/bootstrap/scss/bootstrap-reboot.scss';
+@import '../../node_modules/bootstrap/scss/bootstrap-grid.scss';
+@import '../../node_modules/bootstrap/scss/carousel.scss';
+@import '../../node_modules/bootstrap/scss/modal.scss';
+@import '../../node_modules/bootstrap/scss/utilities/display.scss';
+@import '../../node_modules/bootstrap/scss/bootstrap.scss';
+@import '../../node_modules/font-awesome/scss/font-awesome.scss';
+
+@import 'css/ng2-toasty-bootstrap.css';
+
+
+
+@import '~@progress/kendo-theme-default/scss/all.scss';
+
+@import 'effects';
+@import 'fonts';
+@import 'main';
+@import 'custom';
+@import 'modal';
+@import 'header';
+@import 'footer';
+@import 'info';
+@import 'rising';
+@import 'history';
+@import 'admin';
+@import 'init';

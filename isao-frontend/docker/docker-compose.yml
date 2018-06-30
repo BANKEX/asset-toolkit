@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  isao-frontend:
+    image: $CI_REGISTRY_IMAGE
+    container_name: isao-frontend
+    restart: always
+    expose:
+      - "80"
+    environment:
+      VIRTUAL_HOST: $VIRTUAL_HOST
+      LETSENCRYPT_HOST: $LETSENCRYPT_HOST
+      LETSENCRYPT_EMAIL: $LETSENCRYPT_EMAIL
+      HTTPS_METHOD: noredirect
+
+networks:
+  default:
+    external:
+      name: frontend_default

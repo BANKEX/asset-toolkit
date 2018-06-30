@@ -1,0 +1,52 @@
+.init(style="padding-top: 10px")
+  h4.title Initialization
+  .flex(style="justify-content: center")
+    .left.nomargin.nopadding.flex.flex-column
+      .entry
+        .title Select type of tokens:
+      .entry(*ngIf="selectedTokenType.value === TokenType.Multitoken")
+        .title Subtoken Id:
+      .entry
+        .title Raising period in days:
+      .entry
+        .title Distribution period:
+      .entry
+        .title Minimal funds in tokens:
+      .entry
+        .title Minimal deposit in ETH:
+      .entry
+        .title Paybot address (you can skip it):
+      .entry
+        .title Limits in tokens(ex.: 100, 500, 1000):
+      .entry
+        .title Costs in ETH (ex.: 0.5, 2, 3):
+
+    .right.nomargin.nopadding.flex.flex-column
+      .entry
+        kendo-dropdownlist.w-100(
+          [data]="tokenTypes",
+          [textField]="'name'",
+          [valueField]="'value'",
+          [valuePrimitive]="false",
+          [(ngModel)]="selectedTokenType",
+          (selectionChange)="selectionChange($event)",
+          #kendoDropDownListInstance="kendoDropDownList")
+      .entry(*ngIf="selectedTokenType.value === TokenType.Multitoken")
+        input.value(type="text",[(ngModel)]="subtokenId", size="40")
+      .entry
+        input.value(type="text",[(ngModel)]="rPeriod", size="40")
+      .entry
+        input.value(type="text",[(ngModel)]="dPeriod", size="40")
+      .entry
+        input.value(type="text",[(ngModel)]="minimalFundSize", size="40")
+      .entry
+        input.value(type="text",[(ngModel)]="minimalDeposit", size="40")
+      .entry
+        input.value(type="text",[(ngModel)]="paybotAddress", size="40")
+      .entry
+        input.value(type="text",[(ngModel)]="limits", size="40")
+      .entry
+        input.value(type="text",[(ngModel)]="costs", size="40")
+  .submit
+    button.big(*ngIf="!$isao.process.creatingContract", kendoButton, id="initContractBtn", (click)="initContract()") Create new contract
+    span.k-i-loading.k-icon(*ngIf="$isao.process.creatingContract", style="font-size: 40px; color: #ff6358; margin: 25px")

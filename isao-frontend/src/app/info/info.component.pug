@@ -1,0 +1,26 @@
+.info
+  h4 Info
+  .flex
+    .left
+      .entry
+        .title Launch time:
+        .value {{$isao.launchTime ? ($isao.launchTime|date:'medium') : 'not started'}}
+      .entry
+        .title Rising Period:
+        .value {{$isao.rPeriod / 86400}} days
+      .entry
+        .title Distribution Period:
+        .value {{$isao.dPeriod / 86400}} days
+      .entry
+        .title Minimal funds:
+        .value {{$isao.minimalFundSize}} Token
+      .entry
+        .title Minimal deposit:
+        .value {{$isao.minimalDeposit}} ETH
+      .entry
+        .title Token address:
+        br
+        .value
+          small {{$isao.token ? $isao.token : '-'}}
+    .right
+      isao-stairs

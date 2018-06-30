@@ -1,0 +1,28 @@
+.raising
+  .flex
+    .left
+      .entry.text-center(*ngIf="!(isInitialized|async)")
+        span Checking your funds
+        span.k-i-loading.k-icon(style="font-size: 24px; color: #ff6358; margin-left: 10px")
+      .entry.text-center(*ngIf="isInitialized|async")
+        .title You oredered
+        .value <b>{{$isao.tokensOrderedByUser|async}}</b> tokens
+      .entry
+        input([(ngModel)]="str",
+          type="text",
+          id="byTokenInput",
+          size="18",
+          maxlength="20",
+          placeholder="Enter amount in ETH")
+        button(
+          [attr.disabled]="$isao.process.buyingTokens?true:null",
+          kendoButton,
+          id="byTokensBtn",
+          (click)="buyTokens(str)") Order tokens
+        span.spinner.k-i-loading.k-icon(
+          *ngIf="$isao.process.buyingTokens",
+          style="font-size: 24px; color: #ff6358")
+      .text-center
+        isao-timer
+    .right
+      isao-stairs

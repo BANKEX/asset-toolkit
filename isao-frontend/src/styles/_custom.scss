@@ -1,0 +1,137 @@
+body {
+  // background: #fefefe url("../assets/svg/blockchain1.svg") 40% 15px no-repeat;
+  background-size: 166px;
+  background-color: #f7f7f7;
+}
+
+h4 {
+  text-align: center;
+  margin-top: 10px;
+  line-height: 39px;
+  font-size: 16px;
+  letter-spacing: 1.3px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.info, .raising, .distribution, .money-back {
+  min-height: 400px
+}
+
+.init {
+  min-height: 500px
+}
+
+.admin {
+  min-height: 200px;
+}
+
+.content {
+  padding: 0 5%;
+  margin: 15px;
+  .flex {
+    display: flex;
+    justify-content: space-around;
+    .left {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding-top: 40px;
+    }
+    .right {
+      margin: auto 0;
+    }
+  }
+  kendo-chart {
+    width: 500px !important;
+    height: 300px !important;
+  }
+  .entry {
+    position: relative;
+    margin: 10px 0;
+    .title {
+      display: inline;
+      margin-right: 10px;
+    }
+    .value {
+      display: inline;
+    }
+    .spinner {
+      color: #ff6358;
+      font-size: 24px;
+      position: absolute;
+      right: -35px;
+      top: 20%;
+    }
+  }
+}
+
+.arrow {
+  cursor: default;
+}
+.btn {
+  border-radius: 20px;
+
+  &.pl {
+    box-shadow: -2px 2px 5px lightgrey;
+    margin-left: 15px;
+    padding-left: 30px;
+    padding-right: 30px;
+
+  }
+
+  &.spinner {
+    background: white;
+    img {
+      position: absolute;
+      right: 24px;
+      top: -2px;
+    }
+  }
+}
+
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+}
+
+.nopadding {
+  padding: 0 !important;
+}
+.nomargin {
+  margin: 0 !important;
+}
+
+
+button {
+  position: relative;
+  padding: 7px 14px !important;
+  margin: 0 10px;
+  &.big {
+    padding: 15px !important;
+    margin: 25px;
+  }
+}
+kendo-buttongroup {
+  button {
+    margin: 0;
+  }
+}
+
+select {
+  outline: none;
+  option {
+    color: grey;
+    padding: 2px 3px;
+  }
+}
+
+// Kendo buttons stuling
+
+kendo-buttongroup {
+  outline: none;
+  .k-button {
+    padding: 10px 15px;
+  }
+}
+

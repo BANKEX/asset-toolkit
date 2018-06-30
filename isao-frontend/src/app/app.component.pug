@@ -1,0 +1,41 @@
+isao-toster-message
+bnkx-error-message
+bnkx-loading-overlay
+bnkx-blocking-notification-overlay
+.app
+  .header
+    .container
+      .header-inner
+        .header-inner-logo
+        .header-inner-title ISAO Demo
+        .header-inner-address Client address:
+          span.address((click)="copyToClipboard(clientAddress)") {{clientAddress}}
+        .header-inner-contract Contract address:
+          span.address((click)="copyToClipboard(contractAddress)") {{contractAddress}}
+
+
+  .wrapper
+    .container
+      .wrapper-inner
+        isao-stage
+        .content(*ngIf="($stage|async) === Stage.DEFAULT")
+          isao-info
+        .content(*ngIf="($stage|async) === Stage.RAISING")
+          isao-raising
+        .content(*ngIf="($stage|async) === Stage.TOKEN_DISTRIBUTION")
+          isao-distribution
+        .content(*ngIf="($stage|async) === Stage.MONEY_BACK")
+          isao-money-back
+        .content(*ngIf="($stage|async) === Stage.FUND_DEPRECATED")
+          isao-info
+        .content(*ngIf="($stage|async) === undefined")
+          isao-init
+        .content
+          isao-admin(*ngIf="($stage|async) !== undefined")
+
+  .footer
+    .container
+      .footer-inner
+        .footer-inner-copyright((click)="copyToClipboard('We building future!')") © 2018 bankex
+        .footer-inner-link="Go to "
+          a(href="//bankex.com") bankex.com

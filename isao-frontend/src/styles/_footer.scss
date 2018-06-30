@@ -1,0 +1,29 @@
+.footer {
+  padding-left: 32px;
+  padding-right: 32px;
+  &-inner {
+    height: 90px;
+    position: relative;
+    &-copyright, &-link {
+      position: absolute;
+      top: 25px;
+      line-height: 40px;
+      letter-spacing: 1.2px;
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    &-copyright {
+      left: 0;
+    }
+    &-link {
+      right: 0;
+      a {
+        color: #0da9ff;
+      }
+    }
+  }
+  .container {
+    min-width: 700px !important;
+  }
+}

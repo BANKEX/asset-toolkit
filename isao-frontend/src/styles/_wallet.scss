@@ -1,0 +1,283 @@
+.tokens {
+  padding: 40px 90px 30px 75px;
+  max-height: 360px;
+
+  &.controls {
+    padding-top: 82px;
+  }
+
+  label {
+    margin-right: 10px;
+  }
+
+  select option {
+    color: grey;
+    padding: 2px 3px;
+  }
+
+  &-buttons {
+    position: absolute;
+    top: -60px;
+    left: 22%;
+    &-add {
+      border: 1px solid #0da9ff;
+      border-radius: 4px;
+      color: #0da9ff;
+      display: inline-block;
+      font-weight: 600;
+      font-size: 16px;
+      height: 44px;
+      letter-spacing: -0.3;
+      line-height: 50px;
+      margin-right: 20px;
+      outline: none;
+      position: relative;
+      padding: 0 20px 0 50px;
+      text-decoration: none;
+      transition: all 0.5s;
+      &:hover {
+        background: #0da9ff;
+        color: #fff;
+        text-decoration: none;
+      }
+      &:hover svg * {
+        fill: #fff;
+      }
+      i.icon {
+        height: 32px;
+        left: 10px;
+        position: absolute;
+        top: 5px;
+        width: 20px;
+      }
+      .label {
+        position: relative;
+        top: -5px;
+      }
+    }
+  }
+
+  &-inner {
+    position: relative;
+  }
+
+  &-sort {
+    position: absolute;
+    right: 0;
+    top: 12px;
+  }
+
+  &-list {
+    height: 240px;
+    margin-right: -32px;
+    margin-top: -5px;
+  }
+
+  .token-controls {
+    position: absolute;
+    right: 0;
+    top: 0;
+
+    span {
+      display: inline-block;
+      text-align: center;
+      width: 48px;
+      height: 48px;
+      padding-top: 10px;
+      cursor: pointer;
+      transition: all 0.5s;
+
+      &:hover {
+        background: #0da9ff;
+      }
+
+      &:hover svg * {
+        fill: #fff;
+      }
+    }
+  }
+
+  &-info {
+    text-align: center;
+    font-size: 17px;
+    line-height: 32px;
+    padding: 24px 0 20px 0;
+    // font-family: 'Lora';
+  }
+
+  .tabs {
+    top: -25px;
+    position: relative;
+
+    &-title {
+      border-left: 1px solid rgba(0, 0, 0, 0.1);
+      padding: 0 8px;
+      margin: 0;
+      &:first-child {
+        border: none;
+        padding-left: 0;
+      }
+      & > a {
+        font-size: 22px;
+        &:hover {
+          text-decoration: none;
+        }
+      }
+      &.is-active {
+        & > a {
+          color: black;
+        }
+      }
+    }
+  }
+}
+
+.token, .transaction {
+  position: relative;
+  font-size: 0;
+  background: rgba(10, 60, 87, 0.03);
+  border-radius: 4px;
+  height: 48px;
+  line-height: 48px;
+  margin-bottom: 16px;
+  padding: 2px 24px 0 16px;
+  margin-right: 15px;
+  font-family: monospace;
+
+  &-address,
+  &-date,
+  &-direction,
+  &-number,
+  &-label,
+  &-sum,
+  &-value,
+  &-tokens,
+  &-pending,
+  &-dividends {
+    display: inline-block;
+    font-size: 14px;
+  }
+
+  &-sum {
+    width: 315px;
+    text-align: left;
+    text-transform: uppercase;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    .value {
+      display: inline-block;
+      max-width: 100px;
+      overflow: hidden;
+      padding-right: 5px;
+      text-align: left;
+      text-overflow: ellipsis;
+      vertical-align: bottom;
+    }
+    &:hover a {
+      text-decoration: none;
+    }
+  }
+
+  &-pending {
+    overflow: hidden;
+    //padding-left: 20px;
+    vertical-align: top;
+    &-transaction {
+      display: inline-block;
+      text-transform: uppercase;
+      .value {
+        display: inline-block;
+        margin-left: 8px;
+        max-width: 90px;
+        overflow: hidden;
+        padding-right: 5px;
+        text-overflow: ellipsis;
+        text-align: left;
+        vertical-align: bottom;
+      }
+      .spinner {
+        padding-left: 10px;
+        margin-bottom: 5px;
+      }
+      &.incoming {
+        //background: url("../assets/svg/in.svg") 40% 15px no-repeat;
+        background-size: 16px;
+        background-position-x: 0;
+      }
+      &.outgoing {
+        //background: url("../assets/svg/out.svg") 40% 15px no-repeat;
+        background-size: 16px;
+        background-position-x: 0;
+        svg {
+          transform: rotate(180deg);
+        }
+      }
+      &:last-child {
+        margin-left: 20px;
+      }
+      .svg {
+        position: relative;
+        top: 1px;
+      }
+    }
+  }
+
+  &-address {
+    width: 400px;
+    margin-left: 25px;
+  }
+
+  &-number {
+    margin-right: 2em;
+    overflow: hidden;
+    text-align: left;
+    text-overflow: ellipsis;
+    width: 100px;
+  }
+
+  &-date {
+    width: 150px;
+  }
+
+  &-transfer {
+    svg {
+      transform: scale(1);
+      top: -3px;
+      position: relative;
+    }
+  }
+  &-get-dividends {
+    svg {
+      transform: scale(1.6);
+      top: -3px;
+      position: relative;
+    }
+  }
+  &-send-dividends {
+    svg {
+      transform: scale(2);
+      position: relative;
+    }
+  }
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  // span {
+  //   display: inline-block;
+  // }
+}
+
+.ps__rail-x, .ps__rail-x:hover, .ps__rail-y, .ps__rail-y:hover {
+  background-color: initial !important;
+  .ps__thumb-x, .ps__thumb-x:hover, .ps__thumb-y, .ps__thumb-y:hover {
+    background-color: #0da9ff !important;
+  }
+}
+@media screen and (max-width: 1200px) {
+  .tokens {
+    padding-right: 40px;
+    padding-left: 25px;
+  }
+}

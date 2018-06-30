@@ -1,0 +1,29 @@
+.money-back(style="display:flex")
+  .flex(style="flex-direction:column; align-items: center; justify-content: center; margin: auto")
+    div(*ngIf="!(isInitialized$|async)", style="text-align: center")
+      span Checking your funds
+      span.k-i-loading.k-icon(style="font-size: 24px; color: #ff6358; margin: 10px")
+    .entry(*ngIf="isInitialized$|async")
+      .title You have <span><b>{{$isao.tokensOrderedByUser|async}}</b></span> tokens at the ISAO contract
+    .entry
+      button(
+        [disabled]="!(hasTokens$|async) || $isao.process.takingAllMoneyBack || $isao.process.refundingPartOfTokens",
+        kendoButton,
+        (click)="$isao.getAllMoneyBack()") Send All my money back
+      span.spinner.k-i-loading.k-icon(*ngIf="$isao.process.takingAllMoneyBack")
+
+    h4 Or
+    .entry
+      input([(ngModel)]="str",
+        type="text",
+        id="byTokenInput",
+        size="20",
+        maxlength="20",
+        placeholder="Enter amount in tokens")
+      button(
+        [disabled]="!(hasTokens$|async) || $isao.process.takingAllMoneyBack || $isao.process.refundingPartOfTokens",
+        kendoButton,
+        id="byTokensBtn",
+        (click)="$isao.refundTokens(str)") Refund
+      span.spinner.k-i-loading.k-icon(*ngIf="$isao.process.refundingPartOfTokens")
+

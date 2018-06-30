@@ -1,0 +1,47 @@
+doctype html
+.admin
+  .text-center(*ngIf="($stage|async) === Stage.DEFAULT")
+    p(*ngIf="!$isao.token")
+      input([(ngModel)]="str", type="text", id="contractAddressInput", size="60", maxlength="42", placeholder="Enter token contract address here...")
+      button(kendoButton, id="initContractFromAddressBtn", (click)="connectToken(str)") Подключить токен
+    button.start-funding(*ngIf="$isao.token && !$admin.process.runningFunding", kendoButton, (click)="$admin.startFunding()") Start fund rising fase
+    span.k-i-loading.k-icon(
+      *ngIf="(!$isao.token && $admin.process.connectingToken) || $admin.process.runningFunding",
+      style="font-size: 64px; color: #ff6358")
+
+  .text-center(*ngIf="($stage|async) === Stage.RAISING")
+    ng-container(*ngTemplateOutlet="time_control")
+    .entry
+      button.start-distribution(
+        kendoButton,
+        *ngIf="!$admin.process.runningDistribution && !$admin.process.runningMoneyback",
+        (click)="$admin.startDistribution()") Start distribution fase
+
+      span.k-i-loading.k-icon(
+        *ngIf="$admin.process.runningDistribution",
+        style="font-size: 24px; color: #ff6358")
+
+      button.start-moneyback(
+        kendoButton,
+        *ngIf="!$admin.process.runningDistribution && !$admin.process.runningMoneyback",
+        (click)="$admin.startMoneyback()") Start money back fase
+
+      span.k-i-loading.k-icon(
+        *ngIf="$admin.process.runningMoneyback",
+        style="font-size: 24px; color: #ff6358")
+
+  .text-center(*ngIf="($stage|async) === Stage.TOKEN_DISTRIBUTION")
+    ng-container(*ngTemplateOutlet="time_control")
+
+
+  .text-center(*ngIf="($stage|async) === Stage.MONEY_BACK")
+    p(style="line-height:1.6em") Admin will be able to take unclaimed funds after {{(timeLeft$|async)}} hours <br/> You cant test that functionality by increasing the time stamp
+    ng-container(*ngTemplateOutlet="time_control")
+
+
+
+  ng-template(#time_control)
+    .entry
+      input([(ngModel)]="str", value="1", type="text", size="21", maxlength="20", placeholder="Enter value in hours", style="margin: 10px")
+      button([attr.disabled]="$admin.process.runningTimeInc?true:null", kendoButton, (click)="incTimestamp(str)") Increase timestamp
+      span.spinner.k-i-loading.k-icon(*ngIf="$admin.process.runningTimeInc", style="font-size: 24px; color: #ff6358")
