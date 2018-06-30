@@ -1,0 +1,11 @@
+node_modules
+.idea/
+.vscode/
+.editorconfig
+build/
+/*.cmd
+*.sh
+/*.deprecated
+docs/bundle.js.map
+doxity/
+.env
