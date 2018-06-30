@@ -1,0 +1,32 @@
+doctype html
+.history
+  .history-inner(*ngIf="!operations")
+    .history-placeholder(*ngIf="showSpinner; else default_message")
+      .center-loader
+        img(src="/assets/spinner.gif", alt="Loading transactions...")
+  .history-inner(*ngIf="operations")
+    h2(*ngIf="!operations.length") No transactions yet...
+    h2(*ngIf="operations.length") {{title}}
+    .history-list
+      perfect-scrollbar
+        .transaction(*ngFor="let item of operations | orderBy:'date':true")
+          .transaction-direction([ngClass]="{in: item.direction == 'in', out: item.direction == 'out'}", title="{{getDirectionTitle(item)}}")
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+              <g fill="#fff" fill-rule="evenodd">
+                <path d="M0 16h4V0H0zM11 2.6L9.6 4l3 3H6v2h6.6l-3 3 1.4 1.4 4.7-4.7c.4-.4.4-1 0-1.4L11 2.6z">
+                </path>
+              </g>
+            </svg>
+          .transaction-value(title="{{prepareValue(item)}}") {{prepareValue(item)}}
+          .transaction-address.address(
+            title="{{item.direction == 'in' ? 'Transaction came from this address' : 'Transaction went to this address'}}",
+            (click)="copyToClipboard(item.address)") {{item.direction == 'in' ? item.initiator : item.to}}
+          .transaction-date(*ngIf="item.blockHash") {{item.date | date}}
+          .transaction-date(*ngIf="!item.blockHash")
+            img(src="/assets/spinner.gif", alt="transaction in process")
+    //-.history-sort
+      label Sort by
+      select([(ngModel)]="sortBy")
+        option(*ngFor="let option of sortOptions, let i = index", [ngValue]="option") {{option.name}}
+ng-template(#default_message)
+  .center-message Click on token or dividends to see transactions history

@@ -1,0 +1,52 @@
+.tabs {
+  margin: 0;
+  list-style-type: none;
+  background: none;
+
+  &-title {
+    float: left;
+    margin-right: 10px;
+
+    & > a {
+      display: block;
+      padding: inherit;
+      line-height: 1;
+      font-size: 12px;
+      text-decoration: none;
+      color: #0da9ff;
+
+      &:hover {
+        background: none;
+        text-decoration: underline;
+      }
+
+      &:focus, &[aria-selected='true'] {
+        background: none;
+      }
+    }
+  }
+
+  &-content {
+    background: none;
+    transition: all 0.5s ease;
+    border: 1px solid transparent;
+    border-top: 0;
+
+    &.vertical {
+      border: 1px solid transparent;
+      border-left: 0;
+    }
+  }
+
+  &-panel {
+    display: none;
+    padding: inherit;
+
+    &.is-active {
+      display: block;
+    }
+  }
+}
+
+
+

@@ -1,0 +1,23 @@
+ng2-toasty
+bnkx-error-message
+bnkx-loading-overlay
+bnkx-blocking-notification-overlay
+.app
+  .header
+    .container
+      .header-inner
+        .header-inner-logo
+        .header-inner-title Multitoken Demo
+        .header-inner-address Client address:
+          span.address((click)="copyToClipboard(clientAddress)") {{clientAddress}}
+        .header-inner-contract Contract address:
+          span.address((click)="copyToClipboard(contractAddress)") {{contractAddress}}
+
+  mt-content
+
+  .footer
+    .container
+      .footer-inner
+        .footer-inner-copyright((click)="copyToClipboard('We building future!')") © 2018 bankex
+        .footer-inner-link="Go to "
+          a(href="//bankex.com") bankex.com

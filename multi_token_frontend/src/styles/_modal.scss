@@ -1,0 +1,228 @@
+.popup {
+  &-input {
+    position: relative;
+    margin: 0 20px 0 0;
+    min-width: 250px;
+
+    &:before {
+      background: #aaa;
+    }
+
+    &:after {
+      content: '';
+      position: absolute;
+      height: 2px;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      margin: 0 50%;
+      background: #0da9ff;
+      transition: all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+      z-index: 3;
+    }
+
+    & .label {
+      border-color: transparent !important;
+      background-color: transparent !important;
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: auto !important;
+      text-align: left;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: #202326;
+      font-size: 16px;
+    }
+
+    input {
+      background-color: transparent;
+      position: relative;
+      z-index: 2;
+      color: rgba(32, 35, 38, 0.8);
+      font-size: 16px;
+      line-height: 40px;
+      height: 40px;
+      margin: 0 !important;
+      border-bottom: 2px solid rgba(13, 169, 255, 0.2) !important;
+      padding-top: 10px;
+      padding-bottom: 11px;
+
+      &.error, &.error:focus {
+        border-bottom: 2px solid darkred !important;
+      }
+
+      &.error + .label {
+        color: darkred !important;
+      }
+
+      &:focus + .label, &.not-null + .label {
+        padding-top: 6px;
+        padding-bottom: 0;
+        font-size: 12px;
+        z-index: 3;
+        opacity: 1;
+        color: #0da9ff;
+      }
+
+      &:focus {
+        border-bottom: 2px solid rgba(13, 169, 255, 1) !important;
+        transition: all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+      }
+
+      .label,
+      &:focus + .label,
+      &.not-null + .label {
+        padding-top: 0;
+        top: -11px;
+        transition: .2s;
+      }
+    }
+
+    &.placeholder .label, & input {
+      padding: 10px 0 11px 0;
+      height: 40px;
+      border-radius: 0;
+      top: 0;
+    }
+  }
+
+  &-close {
+    width: 30px;
+    height: 30px;
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    cursor: pointer;
+    z-index: 9999;
+
+    span {
+      display: block;
+      width: 14px;
+      height: 14px;
+      position: absolute;
+      top: 8px;
+      left: 8px;
+    }
+  }
+
+  &-block {
+    margin: auto;
+    background: #fff;
+    position: relative;
+    box-shadow: 0 20px 40px 0 rgba(0, 0, 0, 0.5);
+    border-radius: 4px;
+    padding: 16px 32px 32px 32px;
+  }
+
+  &-title {
+    font-size: 24px;
+    line-height: 48px;
+    font-weight: 600;
+    margin-bottom: 16px;
+
+    span {
+      color: #0da9ff;
+    }
+  }
+
+  &-cancel {
+    color: #0da9ff;
+    font-size: 16px;
+    line-height: 48px;
+    display: inline-block;
+    vertical-align: top;
+  }
+
+  &-button {
+    color: #fff;
+    background: #0da9ff;
+    border: none !important;
+    line-height: 48px;
+    height: 48px;
+    display: inline-block;
+    border-radius: 100px;
+    font-size: 16px;
+    padding: 0 16px;
+    box-shadow: 0 10px 30px 0 rgba(13, 169, 255, 0.5);
+    vertical-align: top;
+    font-weight: 600;
+    cursor: pointer;
+    transition: .2s;
+    margin-right: 16px;
+
+    &:hover {
+      transform: translateY(-3px);
+    }
+
+    &:active {
+      box-shadow: 0 10px 30px 0 rgba(16, 85, 134, 0.5);
+      background: #095785;
+    }
+
+    &.disabled {
+      box-shadow: 0 10px 30px 0 rgba(16, 85, 134, 0.5);
+      background: rgba(9, 87, 133, 0.5);
+    }
+  }
+
+  &-details {
+    font-size: 13px;
+    margin-bottom: 2em;
+  }
+
+  &-description {
+    padding-bottom: 1em;
+
+    a {
+      color: #2199e8;
+    }
+  }
+
+  &-btn {
+    line-height: 40px;
+    font-size: 14px;
+    border: 1px solid #0da9ff;
+    padding: 0 16px;
+    border-radius: 24px;
+    color: #0da9ff;
+    font-weight: 600;
+  }
+
+  &-input-withdraw, &-input-transfer, &-input-add {
+    display: block !important;
+    width: 100% !important;
+    margin-bottom: 32px !important;
+
+    input {
+      display: block !important;
+      width: 100% !important;
+    }
+  }
+
+  &-select {
+    border: 1px solid #0da9ff !important;
+    line-height: 48px !important;
+    height: 48px !important;
+    display: block !important;
+    margin-bottom: 32px !important;
+    border-radius: 24px;
+    padding: 0 16px !important;
+    width: 100% !important;
+    background-position: 97% 22px;
+  }
+
+  &-get-test-tokens .buttons {
+    text-align: center;
+    margin-top: 10px;
+  }
+}
+
+@media (min-width: 576px) {
+  .modal-margin-lg {
+    .modal-dialog {
+      margin: 12.75rem auto;
+    }
+  }
+}
