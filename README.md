@@ -1,15 +1,15 @@
 # Proof of Asset smart contracts core
 
 ### About 
-This repo contains smart contracts library that we use in the asset tokenization products in the BANKEX.
-Nevertheless, contracts can be used in wide range of products including ICO.
+This repo contains the smart contracts library that we use in the asset tokenization products in BANKEX.
+Contracts can be used in wide range of products including ICO.
 
 Contacts covered with unit test and optimized by gas usage - we design it to be scalable on a significant amount of users.
 We also provide demo web applications for the contacts that visualize workflow and main features.
 
 ### Smart contacts
 - #####ISAO - Initial Smart Asset Offer
-  Smart contact that allows you to collect funds for any ERC20 token in the transparent and convenient, it supports common procedures and features like funding stairs and refunds.
+  Smart contact that allows you to collect funds for any ERC20 token in a transparent and convenient way, it supports common procedures and features like funding stairs and refunds.
   <p>Contract workflow:</p>
   
   ![state-sequence-diagram](https://artall64.github.io/tmp-isao-images/state-sequence-diagram-v2.svg)
@@ -18,12 +18,11 @@ We also provide demo web applications for the contacts that visualize workflow a
   Source code and detailed instructions as well as demo project source code you can find in `ISAO` subfolder.
     
 - #####Multitoken - ERC888 Implemantation, with additional divedends payout feature
-  That contact is [ERC888](https://github.com/ethereum/EIPs/issues/888) token implementation.
+  That contract is [ERC888](https://github.com/ethereum/EIPs/issues/888) token implementation.
   It allows you to store and manage multiple ERC20 tokens in the single contract.
-  Our implementation also has additional dividend payout feature.
-  You can find it overview it this [blog post](https://blog.bankex.org/dividend-payout-bankex-tests-the-newest-token-standard-erc-888-aff5a1fb14eb).
+  Our implementation also has an additional dividends payout feature. You can find the overview [here](https://blog.bankex.org/dividend-payout-bankex-tests-the-newest-token-standard-erc-888-aff5a1fb14eb).
   
-  You can check demo project here: [https://multitoken.bankex.team](https://isao.staging.bankex.team).
+  You can check the demo project here: [https://multitoken.bankex.team](https://isao.staging.bankex.team).
   Source code and detailed instructions as well as demo project source code you can find in `multi_token` subfolder.
     
 - #####ERC20 Dividends

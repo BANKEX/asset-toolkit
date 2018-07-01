@@ -1,16 +1,14 @@
-# Not for production usage. This is still alpha.
+# IMPORTANT! Not for production usage. This is still alpha.
 
 # ISAO Smart Contract
 
 ### What is ISAO?
 
-ISAO - Initial Smart Asset Offer is the procedure of issuance of security or utility tokens for the assets and is one of the core parts of BANKEX proof of asset protocol.
-By assets, we mean anything that has value or is able to generate cash flow.
-Full ISAO procedure includes a lot of steps including KYC, Asset Verification, Legal part.
-ISAO smart contract helps to organize very last step of ISAO - issuing, selling, and the distribution of the tokens.
+ISAO - Initial Smart Asset Offer is the procedure of issuance of security or utility tokens for assets and is one of the core parts of BANKEX proof of asset protocol. By assets, we mean anything that has value or is able to generate cash flow.
 
-Nevertheless is designed to be a part of ISAO, that smart contracts can be used in wide range of products including ICO.
-So, fill free to use it in your products.
+Full ISAO procedure includes several steps including KYC, Asset Verification & Legal. ISAO smart contracts help organize the very last step of ISAO - issuing, selling, and the distribution of tokens.
+
+ISAO smart contracts can be used in wide range of products including ICO.
 
 ### Supported Features
 
@@ -33,11 +31,11 @@ Features to be implemented:
 
 ### Quick Start
 
-You can check demo project [https://isao.staging.bankex.team](https://isao.staging.bankex.team) here.
+You can check the demo project [here](https://isao.staging.bankex.team).
 
 If you want to deploy your own contract in the Ethereum test network:
 
-1) Clone this repo and run `npm install`, also you'll need `truffle` installed globally so check [instructions](https://github.com/trufflesuite/truffle) how to install it.
+1) Clone this repo and run `npm install`, also you'll need `truffle` installed globally so check the instructions [here](https://github.com/trufflesuite/truffle), on how to install it.
 
 2) Register in https://infura.io/ and copy your API KEY. It will allow you to deploy the contract to the  Ethereum network without maintaining the full node. 
 
@@ -77,7 +75,7 @@ The main participants in the procedure of ISAO are originator (asset owner), adm
 ## Funding Stairs
 Funding stairs defines steps of contract funding. For example if we going to raise 300 ETH in 3 steps it can looks like that:
 <p align="center">
-  <img src="https://artall64.github.io/tmp-isao-images/funding%20stairs.svg" alt="Funding stairs"/>
+  <img src="https://artall64.github.io/tmp-isao-images/funding-stairs.svg" alt="Funding stairs"/>
 </p>
 
 
@@ -136,7 +134,7 @@ At that state investors can by tokens by sending ETH to the contract or calling 
 
 
 
-##### 3. Change state from RASING to DISTRIBUTION or MONET_BACK
+##### 3. Change state from RASING to DISTRIBUTION or MONEY_BACK
 
 ![raising-to-distribution-or-money-back](https://artall64.github.io/tmp-isao-images/raising-to-distribution-or-money-back.svg)
 
@@ -157,10 +155,10 @@ Duration of the distribution period is set in the constructor at the moment of c
 
 ###### DISTRIBTUTION STATE
 
-In the DISTRIBUTION state investors should transfer tokens they bought from the ISAO contract to they own wallets. They can do it either:
+In the DISTRIBUTION state investors should transfer tokens they bought from the ISAO contract to their own wallets. They can do it by:
 
-- By calling a payable function on the contact. In that case, all the tokens will be transferred to the caller account. If caller pay any ETH with transaction ISAO contract return it;
-- By calling `releaseToken` function. In that case, a caller should specify a number of tokens that he wants to transfer to his account.
+- Calling a payable function on the contact. In that case, all the tokens will be transferred to the caller account. If caller pay any ETH with transaction ISAO contract return it;
+- Calling `releaseToken` function. In that case, a caller should specify a number of tokens that he wants to transfer to his account.
 
 Administrator or paybot can force distribution by transfer tokens to the owners, they can do that by calling `releaseTokenForce ` method.
 
@@ -172,18 +170,18 @@ Also, at that state administrator can take raised during ISAO by calling `releas
 
 ###### MONEY_BACK STATE
 
-In the MONEY_BACK state, investors should request back ETH they. They can do it either:
+In the MONEY_BACK state, investors should request back ETH they. They can do it by:
 
-- By calling a payable function on the contact. In that case, all the ETH will be transferred to the caller account. If caller pay any ETH with transaction ISAO contract return it to the caller;
+- Calling a payable function on the contact. In that case, all the ETH will be transferred to the caller account. If caller pay any ETH with transaction ISAO contract return it to the caller;
 
-- By calling `refundShare` function. In that case, a caller should specify an amount of tokens that he wants to refund back to ETH to his account.
+- Calling `refundShare` function. In that case, a caller should specify an amount of tokens that he wants to refund back to ETH to his account.
 
 
 ##### 4. Change state from DISTRIBUTION or MONEY_BACK to DEPRECATED
 
 ![distribution-or-money-back-to-deprecated](https://artall64.github.io/tmp-isao-images/distribution-or-money-back-to-deprecated.svg)
 
-When distribution period ends, the contract automatically changes its state DEPRECATED. 
+When distribution period ends, the contract automatically changes its state to DEPRECATED. 
 
 ###### DEPRECATED STATE
 
