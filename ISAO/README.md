@@ -88,7 +88,7 @@ Contract bypass next state sequence during its life cycle:
 
 ![deploy](https://artall64.github.io/tmp-isao-images/deploy.svg)
 
-Initially, administrator of the ISAO should deploy contract to the Ethereum network. For the production deploy you can use `truffle migrate --prod --network YOUR_NETWORK`. You also deploy contract with a factory contract as it done in our demo project;
+Initially, administrator of the ISAO should deploy contract to the Ethereum network. For the production deploy you can use `truffle migrate --network YOUR_NETWORK`. You also deploy contract with a factory contract as it done in our demo project;
 
 The important thing that administrator should set specify following parameters at the deployment stage:
 

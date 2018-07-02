@@ -1,19 +1,16 @@
-# Simple Summary
----
-ERC888 token implementation. 
-
-# Abstract
----
-The following standard allows to store the set of unique (like  ERC721), but splittable (like ERC20) token.
-
-# Motivation
----
-This standard allow us to make tokenizing assets cheaper (we do not need to publish separate contract for each asset). Also 
-ERC888 tokens allow us to create DApps easier, because all tokens corresponding the DApp are stored in one contract.
+# Multitoken - ERC888 Implemantation, with additional divedends payout feature
+## About
+That contract is [ERC888](https://github.com/ethereum/EIPs/issues/888) token implementation.
+  Contract specification allows you to store and manage multiple ERC20 tokens inside of the single contract ERC888 contract.
+  When you call ERC20 token method that stored inside ERC888, you additionally specifies Id of the ERC20 token.
+  
+  Our implementation also has an additional dividends payout feature. You can find the overview [here](https://blog.bankex.org/dividend-payout-bankex-tests-the-newest-token-standard-erc-888-aff5a1fb14eb).
+  
+  You can check the demo project here: [https://multitoken.bankex.team](https://isao.staging.bankex.team).
+  List of all smart contracts you can find in the root [readme](../).
 
 # Specification
----
-## Token
+
 ### Methods
 ##### totalSupply
 Returns the total token supply by it's **ID**
@@ -56,16 +53,15 @@ MUST trigger on any successful call to `approve`(uint256 _tokenId, address _spen
 ``` java
   event Approval(uint256 indexed tokenId, address indexed owner, address indexed spender, uint256 value)
 ```
-
 ### Deployment
----
-Use `truffle migrate --network ganache` to  deploy contract on ganache.
-
-Use
+ Run ganache or geth: 
+- Use `truffle migrate --network ganache` to  deploy contract on ganache.
+- Use
 ```bash
 geth --dev --rpccorsdomain="*" --rpcaddr="0.0.0.0" --rpc --rpcapi="personal,eth,net,debug,web3,db,admin" --networkid 7555  --dev.period=1
 ```
 to setup remix compatible debug supporting test ethereum blockchain and `truffle migrate --network geth_dev` to deploy the contract.
+
 Strictly recommended to use solium linter. `solium -d contracts`
 If you have compilation errors due to `emit Event` in solidity, update truffle.
 
