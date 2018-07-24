@@ -5,15 +5,15 @@ ERC888 multitoken works the following way: assume that there are two smart-contr
 
 ![getting multitokens](../docs/images/multitoken/image0_m.svg)
 
+![getting multitokens](../docs/images/multitoken/image1_m.svg)
+
 Then, Customer 1 buys coffee for 10 Eth and Customer 2 buys mineral water for 20 Eth. As ERC-888 multitoken contains two ERC-20 dividend tokens with different IDs, dividends are distributed just like in case with ERC-20 dividend token. After that tokenholders are able to release their dividends using function ***`releaseDividendsRights`*** and receive ethers. Tokenholder one can receive 7 Eth from smart-contract 1 and 10 Eth from smart-contract 2, and tokenholder two can receive 3 and 10 Eth from these smart-contracts respectively.
 
-### For tokenholder 1:
+![tokenholder 1 releasing dividends](../docs/images/multitoken/image2_m.svg)
 
-![tokenholder 1 releasing dividends](../docs/images/multitoken/image1_m.svg)
+For more information about how dividends tokens work visit [ERC20DividendsToken](https://github.com/BANKEX/asseet-toolkit/tree/master/ERC20DividendsToken)
 
-### For tokenholder 2:
-
-![tokenholder 2 releasing dividends](../docs/images/multitoken/image2_m.svg)
+You can check the demo project here: https://multitoken.bankex.team. Source code and detailed instructions as well as demo project source code you can find in multi_token subfolder.
 
 # Multitoken - ERC888 Implemantation, with additional divedends payout feature
 ## About
