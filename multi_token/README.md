@@ -1,3 +1,32 @@
+# ERC-888 Multitoken
+That contract is an [ERC888](https://github.com/ethereum/EIPs/issues/888)  token implementation. Contract specification allows you to store and manage multiple ERC-20 tokens inside of the single ERC888 contract. When you call ERC-20 token method that stored inside ERC888, you additionally specify the ID of the ERC-20 token.
+
+ERC888 multitoken works the following way: assume that there are two smart-contracts with ERC-20 tokens, which have different IDs (smart-contract 1 of vending machine which sells coffee and smart-contract 2 of vending machine which sells mineral water) both of them have 100 tokens in total  and they are stored in ERC-888 multitoken smart-contract. Two tokenholders buy tokens of these smart contracts so that tokenholder one has 70 ‘coffee tokens’ and 50 ‘water tokens’, and the second tokenholder has 30 ‘coffee tokens’ and 50 ‘water tokens’.  
+
+![getting multitokens](../docs/images/image0_m.svg)
+
+Then, Customer 1 buys coffee for 10 Eth and Customer 2 buys mineral water for 20 Eth. As ERC-888 multitoken contains two ERC-20 dividend tokens with different IDs, dividends are distributed just like in case with ERC-20 dividend token. After that tokenholders are able to release their dividends using function releaseDividendsRights and receive ethers. Tokenholder one can receive 7 Eth from smart-contract 1 and 10 Eth from smart-contract 2, and tokenholder two can receive 3 and 10 Eth from these smart-contracts respectively.
+
+For tokenholder 1:
+
+![getting multitokens](../docs/images/image1_m.svg)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # Multitoken - ERC888 Implemantation, with additional divedends payout feature
 ## About
 That contract is [ERC888](https://github.com/ethereum/EIPs/issues/888) token implementation.
