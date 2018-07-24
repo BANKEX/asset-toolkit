@@ -9,23 +9,11 @@ Then, Customer 1 buys coffee for 10 Eth and Customer 2 buys mineral water for 20
 
 For tokenholder 1:
 
-![getting multitokens](../docs/images/image1_m.svg)
+![tokenholder 1 releasing dividends](../docs/images/image1_m.svg)
 
+For tokenholder 2:
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+![tokenholder 2 releasing dividends](../docs/images/image2_m.svg)
 
 # Multitoken - ERC888 Implemantation, with additional divedends payout feature
 ## About
