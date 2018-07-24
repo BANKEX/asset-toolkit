@@ -12,6 +12,8 @@ Now, imagine that a customer bought a huge amount of coffee for 10 Eth. Smart-co
 
 //photo 2
 
+![name](../docs/images/image.svg)
+
 Now, assume that tokenholder 1 transferred 25 of his tokens to tokenholder 2 using function transfer, thus changing the proportion of tokens distribution. Now tokenholder 1 has 25 tokens, and tokenholder 2 has 55 tokens. When another customer buys coffee for 10 Eth, tokenholder 1 receives 2.5 Eth as dividends, and tokenholder 2 receives 5.5 Eth. It’s important to mention that amount of dividends they had from the previous purchase doesn’t change - the first tokenholder has 5 Eth, and the second one has 3 Eth. 
 
 //photo 3
