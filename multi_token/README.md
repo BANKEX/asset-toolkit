@@ -5,13 +5,13 @@ ERC888 multitoken works the following way: assume that there are two smart-contr
 
 ![getting multitokens](../docs/images/image0_m.svg)
 
-Then, Customer 1 buys coffee for 10 Eth and Customer 2 buys mineral water for 20 Eth. As ERC-888 multitoken contains two ERC-20 dividend tokens with different IDs, dividends are distributed just like in case with ERC-20 dividend token. After that tokenholders are able to release their dividends using function releaseDividendsRights and receive ethers. Tokenholder one can receive 7 Eth from smart-contract 1 and 10 Eth from smart-contract 2, and tokenholder two can receive 3 and 10 Eth from these smart-contracts respectively.
+Then, Customer 1 buys coffee for 10 Eth and Customer 2 buys mineral water for 20 Eth. As ERC-888 multitoken contains two ERC-20 dividend tokens with different IDs, dividends are distributed just like in case with ERC-20 dividend token. After that tokenholders are able to release their dividends using function ***`releaseDividendsRights`*** and receive ethers. Tokenholder one can receive 7 Eth from smart-contract 1 and 10 Eth from smart-contract 2, and tokenholder two can receive 3 and 10 Eth from these smart-contracts respectively.
 
-For tokenholder 1:
+### For tokenholder 1:
 
 ![tokenholder 1 releasing dividends](../docs/images/image1_m.svg)
 
-For tokenholder 2:
+### For tokenholder 2:
 
 ![tokenholder 2 releasing dividends](../docs/images/image2_m.svg)
 
