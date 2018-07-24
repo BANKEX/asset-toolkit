@@ -21,9 +21,9 @@ Now, assume that tokenholder 1 transferred 25 of his tokens to tokenholder 2 usi
 
 
 
-# Documentation
+# Contract API
 
-https://bankex.github.io/ERC20DividendsToken/
+https://bankex.github.io/ERC20DividendsToken/docs/ERC20DividendsToken/
 
 
 # Deployment
