@@ -8,8 +8,7 @@ ERC-20 dividends token works the following way. Assume that there is a smart con
 
 ![name](../docs/images/image.svg)
 
-Now, imagine that a customer bought a huge amount of coffee for 10 Eth. Smart-contract receives these funds, and tokenholders get dividends that are distributed among them in proportion to their contribution. After that tokenholders are able to release their dividends and get ethers using releaseDividendsRights function.  
-So, tokenholder 1 can receive 5 Eth, tokenholder 2 can receives 3 Eth, and tokenholder 3 can receive 2 Eth.
+Now, imagine that a customer bought a huge amount of coffee for 10 Eth. Smart-contract receives these funds, and tokenholders get dividends that are distributed among them in proportion to their contribution. After that tokenholders are able to release their dividends and get ethers using releaseDividendsRights function.  So, tokenholder 1 can receive 5 Eth, tokenholder 2 can receives 3 Eth, and tokenholder 3 can receive 2 Eth.
 
 //photo 2
 
