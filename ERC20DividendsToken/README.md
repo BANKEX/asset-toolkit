@@ -2,7 +2,7 @@
 
 ERC-20 Dividends token is an implementation of an ERC-20 standard with an ability to distribute funds received by smart-contract among token-holders. Dividend balance update happens at the time of receipt of ether at the contract. Token holder is responsible for transferring ether dividends from token contract to his own.
 
-ERC-20 dividends token works the following way. Assume that there is a smart contract of a vending machine that sells coffee and has 100 tokens total. Three token-holders buy those tokens so that the first one has 50 tokens, the second and the third one have 30 and 20 tokens respectively.  
+ERC-20 dividends token works the following way: assume that there is a smart-contract of a vending machine that sells coffee and has 100 tokens total. Three token-holders buy those tokens so that the first one has 50 tokens, the second and the third one have 30 and 20 tokens respectively.  
 
 ![getting tokens](../docs/images/dividends/image0.svg)
 

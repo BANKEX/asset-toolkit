@@ -1,30 +1,36 @@
-# ERC-888 Multitoken
+# Multitoken - ERC888 Implemantation, with additional divedends payout feature
+## About
 That contract is an [ERC888](https://github.com/ethereum/EIPs/issues/888)  token implementation. Contract specification allows you to store and manage multiple ERC-20 tokens inside of the single ERC888 contract. When you call ERC-20 token method that stored inside ERC888, you additionally specify the ID of the ERC-20 token.
 
-ERC888 multitoken works the following way: assume that there are two smart-contracts with ERC-20 tokens, which have different IDs (smart-contract 1 of vending machine which sells coffee and smart-contract 2 of vending machine which sells mineral water) both of them have 100 tokens in total  and they are stored in ERC-888 multitoken smart-contract. Two tokenholders buy tokens of these smart contracts so that tokenholder one has 70 ‘coffee tokens’ and 50 ‘water tokens’, and the second tokenholder has 30 ‘coffee tokens’ and 50 ‘water tokens’.  
+For example the ***`balanceOf`*** method of standard ERC-20 token implementation 
+```js
+  function balanceOf(address who) external view returns (uint);
+```
+becomes 
+```js
+  function balanceOf(uint256 _tokenId, address _owner) external view returns (uint256);
+```
 
-![getting multitokens](../docs/images/multitoken/image0_m.svg)
+Our implementation also has an additional dividends payout feature. You can find the overview [here](https://blog.bankex.org/dividend-payout-bankex-tests-the-newest-token-standard-erc-888-aff5a1fb14eb)
 
-![getting multitokens](../docs/images/multitoken/image1_m.svg)
+## How does it work
 
-Then, Customer 1 buys coffee for 10 Eth and Customer 2 buys mineral water for 20 Eth. As ERC-888 multitoken contains two ERC-20 dividend tokens with different IDs, dividends are distributed just like in case with ERC-20 dividend token. After that tokenholders are able to release their dividends using function ***`releaseDividendsRights`*** and receive ethers. Tokenholder one can receive 7 Eth from smart-contract 1 and 10 Eth from smart-contract 2, and tokenholder two can receive 3 and 10 Eth from these smart-contracts respectively.
+ERC888 multitoken works the following way: assume that there is a smart-contract of a vending machine with two types of ERC-20 tokens, which have different IDs (token 1 for selling coffee and token 2 for selling mineral water). Total amount of both of these tokens is 100. Two tokenholders buy these tokens (for the price 1 token = 1 ether) so that tokenholder one has 70 ‘coffee tokens’ and 50 ‘water tokens’, and the second tokenholder has 30 ‘coffee tokens’ and 50 ‘water tokens’. 
+ 
 
-![tokenholder 1 releasing dividends](../docs/images/multitoken/image2_m.svg)
+![getting multitokens](../docs/images/multitoken/image0_multi.svg)
+
+![getting multitokens](../docs/images/multitoken/image1_multi.svg)
+
+Then, Customer 1 buys coffee for 10 Eth and Customer 2 buys mineral water for 20 Eth. As ERC-888 multitoken contains two ERC-20 dividend tokens with different IDs, dividends are distributed just like in case with [ERC-20 dividends token](https://github.com/BANKEX/asseet-toolkit/tree/master/ERC20DividendsToken). After that tokenholders are able to release their dividends using function ***`releaseDividendsRights`*** and receive ethers.
+
+![tokenholder 1 releasing dividends](../docs/images/multitoken/image2_multi.svg)
+
+![tokenholder 1 releasing dividends](../docs/images/multitoken/image3_multi.svg)
 
 For more information about how dividends tokens work visit [ERC20DividendsToken](https://github.com/BANKEX/asseet-toolkit/tree/master/ERC20DividendsToken)
 
-You can check the demo project here: https://multitoken.bankex.team. Source code and detailed instructions as well as demo project source code you can find in multi_token subfolder.
-
-# Multitoken - ERC888 Implemantation, with additional divedends payout feature
-## About
-That contract is [ERC888](https://github.com/ethereum/EIPs/issues/888) token implementation.
-  Contract specification allows you to store and manage multiple ERC20 tokens inside of the single contract ERC888 contract.
-  When you call ERC20 token method that stored inside ERC888, you additionally specifies Id of the ERC20 token.
-  
-  Our implementation also has an additional dividends payout feature. You can find the overview [here](https://blog.bankex.org/dividend-payout-bankex-tests-the-newest-token-standard-erc-888-aff5a1fb14eb).
-  
-  You can check the demo project here: [https://multitoken.bankex.team](https://isao.staging.bankex.team).
-  List of all smart contracts you can find in the root [readme](../).
+You can check the demo project here: [https://multitoken.bankex.team](https://isao.staging.bankex.team).List of all smart contracts you can find in the root [readme](../).
 
 # Specification
 
