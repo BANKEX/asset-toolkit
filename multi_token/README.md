@@ -10,25 +10,9 @@ becomes
 ```js
   function balanceOf(uint256 _tokenId, address _owner) external view returns (uint256);
 ```
+During the creation of new tokens under the ERC-888 standard, smart contracts spend about 15 times less gas. So, with ERC-888 the production of tokens will be much cheaper.
 
-Our implementation also has an additional dividends payout feature. You can find the overview [here](https://blog.bankex.org/dividend-payout-bankex-tests-the-newest-token-standard-erc-888-aff5a1fb14eb)
-
-## How does it work
-
-ERC888 multitoken works the following way: assume that there is a smart-contract of a vending machine with two types of ERC-20 tokens, which have different IDs (token 1 for selling coffee and token 2 for selling mineral water). Total amount of both of these tokens is 100. Two tokenholders buy these tokens (for the price 1 token = 1 ether) so that tokenholder one has 70 ‘coffee tokens’ and 50 ‘water tokens’, and the second tokenholder has 30 ‘coffee tokens’ and 50 ‘water tokens’. 
- 
-
-![getting multitokens](../docs/images/multitoken/image0_multi.svg)
-
-![getting multitokens](../docs/images/multitoken/image1_multi.svg)
-
-Then, Customer 1 buys coffee for 10 Eth and Customer 2 buys mineral water for 20 Eth. As ERC-888 multitoken contains two ERC-20 dividend tokens with different IDs, dividends are distributed just like in case with [ERC-20 dividends token](https://github.com/BANKEX/asseet-toolkit/tree/master/ERC20DividendsToken). After that tokenholders are able to release their dividends using function ***`releaseDividendsRights`*** and receive ethers.
-
-![tokenholder 1 releasing dividends](../docs/images/multitoken/image2_multi.svg)
-
-![tokenholder 1 releasing dividends](../docs/images/multitoken/image3_multi.svg)
-
-For more information about how dividends tokens work visit [ERC20DividendsToken](https://github.com/BANKEX/asseet-toolkit/tree/master/ERC20DividendsToken)
+Our implementation also has an additional dividends payout feature. You can find the overview [here](https://blog.bankex.org/dividend-payout-bankex-tests-the-newest-token-standard-erc-888-aff5a1fb14eb) or in the readme section of [ERC-20 dividends token](https://github.com/BANKEX/asseet-toolkit/tree/master/ERC20DividendsToken).
 
 You can check the demo project here: [https://multitoken.bankex.team](https://isao.staging.bankex.team).List of all smart contracts you can find in the root [readme](../).
 
