@@ -75,18 +75,18 @@ The main participants in the procedure of ISAO are originator (asset owner), adm
 ## Funding Stairs
 Funding stairs defines steps of contract funding. For example if we going to raise 300 ETH in 3 steps it can looks like that:
 <p align="center">
-  <img src="https://artall64.github.io/tmp-isao-images/funding-stairs.svg" alt="Funding stairs"/>
+  <img src="../docs/images/ISAO/funding-stairs.svg" alt="Funding stairs"/>
 </p>
 
 
 ## Sequence of states
 Contract bypass next state sequence during its life cycle:
 
-![state-sequence-diagram](https://artall64.github.io/tmp-isao-images/state-sequence-diagram-v2.svg)
+![state-sequence-diagram](../docs/images/ISAO/state-sequence-diagram-v2.svg)
 
 ##### 1. Contract deployment 
 
-![deploy](https://artall64.github.io/tmp-isao-images/deploy.svg)
+![deploy](../docs/images/ISAO/deploy.svg)
 
 Initially, administrator of the ISAO should deploy contract to the Ethereum network. For the production deploy you can use `truffle migrate --network YOUR_NETWORK`. You also deploy contract with a factory contract as it done in our demo project;
 
@@ -114,7 +114,7 @@ After deployment the contract gets `DEFAULT` state. In the code you can find `ST
 
 ##### 2. Change state from DEFAULT  to RAISING
 
-![deploy-to-raising](https://artall64.github.io/tmp-isao-images/deploy-to-raising.svg)
+![deploy-to-raising](../docs/images/ISAO/deploy-to-raising.svg)
 
 ###### DEFAULT STATE
 
@@ -136,7 +136,7 @@ At that state investors can by tokens by sending ETH to the contract or calling 
 
 ##### 3. Change state from RASING to DISTRIBUTION or MONEY_BACK
 
-![raising-to-distribution-or-money-back](https://artall64.github.io/tmp-isao-images/raising-to-distribution-or-money-back.svg)
+![raising-to-distribution-or-money-back](../docs/images/ISAO/raising-to-distribution-or-money-back.svg)
 
 
 
@@ -179,7 +179,7 @@ In the MONEY_BACK state, investors should request back ETH they. They can do it 
 
 ##### 4. Change state from DISTRIBUTION or MONEY_BACK to DEPRECATED
 
-![distribution-or-money-back-to-deprecated](https://artall64.github.io/tmp-isao-images/distribution-or-money-back-to-deprecated.svg)
+![distribution-or-money-back-to-deprecated](../docs/images/ISAO/distribution-or-money-back-to-deprecated.svg)
 
 When distribution period ends, the contract automatically changes its state to DEPRECATED. 
 
